@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# macos extension contains viewing preferences for folder 
+*.DS_Store
