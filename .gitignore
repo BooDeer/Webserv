@@ -35,3 +35,5 @@
 *.DS_Store
 # test file 
 test*.cpp
+# config vscode
+*.vscode
