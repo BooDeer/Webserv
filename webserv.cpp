@@ -7,6 +7,7 @@
 
 
 
+
 // #define PORT 8080
 // int main(int argc, char const *argv[])
 // {
@@ -59,13 +60,18 @@
 //     return 0;
 // }
 
+
+#include "parsing/parsing.hpp"
+#include "utils/Colors.hpp"
+
 int main(int ac, char **av)
 {
+	ServerBlock	config;
 	if (ac != 2)
 	{
-		std::cerr << "usage: ./webserv [Configuration file]" << std::endl;
+		std::cerr << "usage: ./webserv " << CYAN << "[Configuration file]" << std::endl;
 		return (1);
 	}
-	
-	return (0);
+
+	parse(av[1]);
 }
