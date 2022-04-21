@@ -1,6 +1,6 @@
 CC 		= c++
 NAME 	= webserv
-FLAGS 	= -std=c++98 \
+FLAGS 	= -std=c++98 -g\
 		# -Wall -Wextra -Werror
 DFLAGS 	= -std=c++98 -Wall -Wextra -Werror -g \
 			-fsanitize=address
@@ -27,9 +27,9 @@ t:
 .PHONY: clean re fclean all
 
 re: clean all
+	@echo "Recreating the program..."
 
 clean:
 	@echo "Deleting the program..."
-	@rm -f $(NAME
-	)
+	@rm -f $(NAME)
 fclean: clean
