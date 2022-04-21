@@ -5,4 +5,4 @@
 #include <string>
 #include "configFile/Config.hpp"
 
-void	parse(char *file);
+void	parse(char *file, ServerBlock& config);
