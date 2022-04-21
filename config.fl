@@ -1,21 +1,33 @@
 # <=== Those are comments.
-
+# The configuration file is whitespace and case sensitive.
 
 
 # Server block must start with "server {" (whitespace sensitive).
+#server {
+#	"port": 80,
+# test 
+#}
+## These commands throw an error. (Unknown command)
+#area
+#
+## Error, no space between server and the curly bracket.
+#server{
+#
+#adasd
+#adasdad
+#
+#}
+#
+## Error missing closing curly bracket.
+#server {
+
 server {
-	"port": 80,
-
-}d
-area
-
-
-server{
-
-adasd
-adasdad
-
+	"port": 80
+	"host": 1.2.3.6.5
+	"serverNames": example.com
+	"errorPages": 401 pathexample
+	"limitSize": 90;
+	"location": {
+		
+	}
 }
-
-server {
-
