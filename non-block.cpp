@@ -6,32 +6,34 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <fcntl.h>
+#include <map>
 #include <iostream>
 
-#define PORT 9090
-#define CHUNK_SIZE 1500
-int receive_basic(int s)
+#define PORT 83
+
+#define CHUNK_SIZE 500
+int receive_basic(int s, std::map<int, std::string>& m)
 {
+    // map(s, hhh)
+    // map[s] == ""
     std::cout << "receve data  if == > "   << s << std::endl;
 	int size_recv , total_size= 0;
 	char chunk[CHUNK_SIZE];
-	
-	//loop
-	// while(1)
-	// {
-		// memset(chunk ,0 , CHUNK_SIZE);	//clear the variable
-		if((size_recv =  recv(s , chunk , CHUNK_SIZE , 0) ) < 0)
-		{
-			// break;
-		}
-		else
-		{
-			total_size += size_recv;
-			printf("%s" , chunk);
-            // sleep(0);
+    size_t size_read;
+    while ((size_recv =  recv(s , chunk , CHUNK_SIZE , 0)) > 0)// "\r\n\r\n" || endof/chunk
+    {
+         
+        if(m[s].find("\r\n\r\n") != std::string::npos)
+        {
+                // i = 0;
+                std::cout << " find " << std::endl;
+                std::cout << "number ==  "  << s << " " << m[s] << std::endl;
+                std::cout << "|||||||||||||||||||||||||||||size == > " << size_recv << std::endl;
         }
-	// }
-	
+        else
+            m[s].append(chunk);// s == 4   
+    }
+    
 	return total_size;
 }
 
@@ -47,6 +49,8 @@ int main(int argc, char const *argv[])
     // int fd2 = open("non-block.cpp", O_RDONLY);
     // int fd3 = open("non-block.cpp", O_RDONLY);
     // Creating socket file descriptor
+    std::string test1;
+    std::map<int, std::string> m;
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("In socket");
@@ -60,8 +64,8 @@ int main(int argc, char const *argv[])
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     
-    address.sin_port = htons( PORT );
-    
+    address.sin_port =  htons(PORT);
+    std::cout << " address.sin_port " <<  address.sin_port << std::endl;
     // memset(address.sin_zero, '\0', sizeof address.sin_zero);
     // fcntl()
    fcntl(server_fd, F_SETFL, O_NONBLOCK);
@@ -70,7 +74,7 @@ int main(int argc, char const *argv[])
         perror("In bind");
         exit(EXIT_FAILURE);
     }
-    if (listen(server_fd, 0) < 0)
+    if (listen(server_fd, 5) < 0)
     {
         perror("In listen");
         exit(EXIT_FAILURE);
@@ -84,6 +88,7 @@ int main(int argc, char const *argv[])
     // FD_CLR(server_fd, &current_sockets);
     while(1)
     {
+        i = 1;
         ready_sockets = current_sockets;
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0)
@@ -111,8 +116,9 @@ int main(int argc, char const *argv[])
                 {
                     // handle request  
                     printf("------------------Hello message sent-------------------\n");
-                    receive_basic(client_socket);
+                    receive_basic(client_socket, m);
                     std::cout << "----------------------------------------------------client >> " << i << std::endl;
+                    std::cout << "test 2 ==> " << m[i] << std::endl;
                     write(client_socket , hello , strlen(hello));
                     //  int fd = open("socket.jpg", O_RDONLY);
                     //  char *save = new char[5000];
