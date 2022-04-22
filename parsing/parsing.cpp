@@ -6,7 +6,7 @@
 /*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/04/21 05:59:28 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/04/22 03:39:00 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,29 @@ void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int l
 	//TODO: wether it contains digits only or not.
 }
 
-void	locationBlock(std::ifstream &ifs, std::string &line, int &ln, ServerBlock& config)
+void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& config)
 {
-	
+	int start = int(ln);
+	std::vector<std::string> tmp;
+
+	ft_split(line, ' ', tmp);
+	if (tmp.size() != 2 && tmp[1] != "{")
+		exitMessage(1, "missing '{' in line: ", ln);
+	while (tmp[0] != "}") // Location block loop,
+	{
+		tmp.clear();
+		ln++;
+		LOG(ln << ": " << line);
+		if (!std::getline(ifs, line))
+			exitMessage(1, "missing '}' after line: ", start);
+		ft_split(line, ' ', tmp);
+		if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
+			exitMessage(1, "unknown directive line: ", ln);
+		else if (tmp.size() == 1 && tmp[0] == "}")
+			break ;
+	}
+	if (tmp.size() > 1)
+		exitMessage(1, "unknown directive line: ", ln);
 }
 
 //TODO:
@@ -119,7 +139,7 @@ void	serverBlock(std::ifstream &ifs, int &ln, ServerBlock &config)
 			checkServerNames(tmp, config, ln, true);
 		else if (tmp.size() > 0 && tmp[0] == "\"errorPages\":")
 			checkServerNames(tmp, config, ln);
-		else if (tmp.size() > 2 && tmp[0] == "\"location\":")
+		else if (tmp.size() > 0 && tmp[0] == "\"location\":") //todo: doesn't check whether there is an opening bracket or not
 			locationBlock(ifs, line, ln, config);
 		else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
 			exitMessage(1, "unknown directive line: ", ln);
