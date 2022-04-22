@@ -21,7 +21,7 @@ int receive_basic(int s, std::map<int, std::string>& m)
 	char chunk[CHUNK_SIZE];
     memset(chunk ,0 , CHUNK_SIZE);
     size_t size_read;
-    while (recv(s , chunk , CHUNK_SIZE , 0))// "\r\n\r\n" || endof/chunk
+    while (read(s , chunk , CHUNK_SIZE))// "\r\n\r\n" || endof/chunk
     {
       //	memset(chunk ,0 , CHUNK_SIZE);	//clear the variable
         if(m[s].find("\r\n\r\n") != std::string::npos)
@@ -137,7 +137,6 @@ int main(int argc, char const *argv[])
                     receive_basic(client_socket, m);
                     std::cout << "----------------------------------------------------client >> " << i << std::endl;
                     std::cout << "test 2 ==> " << m[i] << std::endl;
-                    close(client_socket);
                     write(client_socket , hello , strlen(hello));
                     //  int fd = open("socket.jpg", O_RDONLY);
                     //  char *save = new char[5000];
