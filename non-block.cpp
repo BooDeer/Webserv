@@ -9,7 +9,7 @@
 #include <map>
 #include <iostream>
 
-#define PORT 83
+#define PORT 812
 
 #define CHUNK_SIZE 500
 int receive_basic(int s, std::map<int, std::string>& m)
@@ -19,21 +19,39 @@ int receive_basic(int s, std::map<int, std::string>& m)
     std::cout << "receve data  if == > "   << s << std::endl;
 	int size_recv , total_size= 0;
 	char chunk[CHUNK_SIZE];
+    memset(chunk ,0 , CHUNK_SIZE);
     size_t size_read;
-    while ((size_recv =  recv(s , chunk , CHUNK_SIZE , 0)) > 0)// "\r\n\r\n" || endof/chunk
+    while (recv(s , chunk , CHUNK_SIZE , 0))// "\r\n\r\n" || endof/chunk
     {
-         
+      //	memset(chunk ,0 , CHUNK_SIZE);	//clear the variable
         if(m[s].find("\r\n\r\n") != std::string::npos)
         {
                 // i = 0;
-                std::cout << " find " << std::endl;
-                std::cout << "number ==  "  << s << " " << m[s] << std::endl;
-                std::cout << "|||||||||||||||||||||||||||||size == > " << size_recv << std::endl;
+               std::cout << " ------------------------- bruh --------------------" << std::endl;
+                 break;
+                // std::cout << "number ==  "  << s << " " << m[s] << std::endl;
+                // std::cout << "|||||||||||||||||||||||||||||size == > " << size_recv << std::endl;
         }
         else
             m[s].append(chunk);// s == 4   
     }
     
+    // test 2 
+  //loop
+	// while(1)
+	// {
+	// 	memset(chunk ,0 , CHUNK_SIZE);	//clear the variable
+	// 	if((size_recv =  recv(s , chunk , CHUNK_SIZE , 0)) < 0)
+	// 	{
+	// 		break;
+	// 	}
+	// 	else
+	// 	{
+	// 		total_size += size_recv;
+	// 		printf("%s" , chunk);
+    //         // sleep(0);
+    //     }
+	// }
 	return total_size;
 }
 
@@ -98,7 +116,7 @@ int main(int argc, char const *argv[])
             exit(EXIT_FAILURE);
         }
         int client_socket;
-        for (size_t i = 0; i < 9; i++)
+        for (size_t i = 0; i < 10; i++)
         {
             if (FD_ISSET(i, &ready_sockets))
             {
@@ -119,6 +137,7 @@ int main(int argc, char const *argv[])
                     receive_basic(client_socket, m);
                     std::cout << "----------------------------------------------------client >> " << i << std::endl;
                     std::cout << "test 2 ==> " << m[i] << std::endl;
+                    close(client_socket);
                     write(client_socket , hello , strlen(hello));
                     //  int fd = open("socket.jpg", O_RDONLY);
                     //  char *save = new char[5000];
