@@ -28,7 +28,7 @@ int receive_basic(int s, std::map<int, std::string>& m)
         {
                 // i = 0;
                std::cout << " ------------------------- bruh --------------------" << std::endl;
-                 break;
+                 break ;
                 // std::cout << "number ==  "  << s << " " << m[s] << std::endl;
                 // std::cout << "|||||||||||||||||||||||||||||size == > " << size_recv << std::endl;
         }
