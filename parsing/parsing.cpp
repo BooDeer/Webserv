@@ -6,7 +6,7 @@
 /*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/04/22 03:39:00 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/04/24 13:14:29 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,18 @@ void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int l
 	//TODO: wether it contains digits only or not.
 }
 
+void	allowedMethods(std::vector<std::string>& line, ServerBlock& config, int ln)
+{
+	std::vector<std::string>::iterator it;
+	
+	if (line.size() < 2)
+		exitMessage(1, "Error! too few arguments in line: ", ln);
+	it = line.begin();
+	it++;
+	for (; it != line.end(); ++it)
+		config.__Locations
+}
+
 void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& config)
 {
 	int start = int(ln);
@@ -96,14 +108,17 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 	{
 		tmp.clear();
 		ln++;
-		LOG(ln << ": " << line);
+		// LOG(ln << ": " << line);
 		if (!std::getline(ifs, line))
 			exitMessage(1, "missing '}' after line: ", start);
 		ft_split(line, ' ', tmp);
-		if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
+		if (tmp.size() > 0 && tmp[0] == "\"methods\":")
+			allowedMethods(tmp, config, ln);
+		else if (tmp[0] != "}" && tmp.size() > 0)
 			exitMessage(1, "unknown directive line: ", ln);
 		else if (tmp.size() == 1 && tmp[0] == "}")
 			break ;
+		// else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
 	}
 	if (tmp.size() > 1)
 		exitMessage(1, "unknown directive line: ", ln);
@@ -141,8 +156,10 @@ void	serverBlock(std::ifstream &ifs, int &ln, ServerBlock &config)
 			checkServerNames(tmp, config, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"location\":") //todo: doesn't check whether there is an opening bracket or not
 			locationBlock(ifs, line, ln, config);
-		else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
+		// else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
+		else if (tmp[0] != "}" && tmp.size() > 0)
 			exitMessage(1, "unknown directive line: ", ln);
+		// LOG("value: " << std::boolalpha << (tmp[0] != "}" && tmp.size() != 1) << " in line: " << ln);
 	}
 	if (line.size() > 1)
 		exitMessage(1,"unknown directive after '}' in line: ", ln);
@@ -181,13 +198,7 @@ void	parse(char *file, ServerBlock &config)
 
 	// Checking whether the given configuration file is valid or not. (permissions, exists ...)
 	if(!ifs.good())
-	{
-		std::cerr << RED;
-		std::cerr << "Something is wrong with the configuration file." << std::endl;
-		std::cerr << "Please check if the given file is valid: if it exists and it got reading permission." << std::endl;
-		std::cerr << RESET;
-		exit(1);
-	}
+		exitMessage(1, "Something is wrong with the configuration file.\nPlease check if the given file is valid: if it exists and it got reading permission.");
 
 	__LN = 0;
 	// The parsing file loop.
@@ -202,6 +213,6 @@ void	parse(char *file, ServerBlock &config)
 			exitMessage(1, "unknown directive in line: ", __LN);
 	}
 	// Debugging function.
-	log_data(config);
+	// log_data(config);
 	ifs.close();
 }
