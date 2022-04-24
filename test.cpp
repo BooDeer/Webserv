@@ -1,47 +1,80 @@
 #include <stdio.h>
-#include <sys/socket.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <netinet/in.h>
 #include <string.h>
+#include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
-#define PORT 8080
 
-int main(int argc, char const *argv[])
+#define PORT 4118
+
+#define MaxBufferLength 1024 // set the size of data you want to recieve from Server
+
+
+int main()
 {
-    // int sock = 0; long valread;
-    // struct sockaddr_in serv_addr;
-    // char *hello = "Hello from client";
-    // char buffer[1024] = {0};
-    // if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    // {
-    //     printf("\n Socket creation error \n");
-    //     return -1;
-    // }
-    
-    // memset(&serv_addr, '0', sizeof(serv_addr));
-    
-    // serv_addr.sin_family = AF_INET;
-    // serv_addr.sin_port = htons(PORT);
-    
-    // // Convert IPv4 and IPv6 addresses from text to binary form
-    // if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
-    // {
-    //     printf("\nInvalid address/ Address not supported \n");
-    //     return -1;
-    // }
-    
-    // if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    // {
-    //     printf("\nConnection Failed \n");
-    //     return -1;
-    // }
-    // send(sock , hello , strlen(hello) , 0 );
-    // printf("Hello message sent\n");
-    // valread = read( sock , buffer, 1024);
-    // printf("%s\n",buffer );
-    char *test = "This is a long\0 test because this is al ongt est";
-    printf("%s\n", test);
+    int sockFd, bytesRead= 1, bytesSent;
+
+    char buffer[MaxBufferLength];
+
+    struct sockaddr_in server, client;
+
+
+    server.sin_port= htons(PORT);
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    sockFd = socket(AF_INET, SOCK_STREAM, 0);
+
+
+    if(sockFd < 0)
+        printf("Unable to open socket\n");
+
+    int connectionSocket = connect(sockFd, (struct sockaddr *) &server, sizeof(struct sockaddr) );
+
+    if(connectionSocket < 0)
+        perror("connection not established\n");
+
+
+    int fd = open("helloworlds.txt",O_CREAT | O_WRONLY,S_IRUSR | S_IWUSR);  
+
+    if(fd == -1)
+        perror("couldn't openf iel");
+
+    while(bytesRead > 0)
+    {           
+
+        bytesRead = recv(sockFd, buffer, MaxBufferLength, 0);
+
+        if(bytesRead == 0)
+        {
+
+            break;
+        }
+
+        printf("bytes read %d\n", bytesRead);
+
+        printf("receivnig data\n");
+
+        bytesSent = write(fd, buffer, bytesRead);
+
+
+        printf("bytes written %d\n", bytesSent);
+
+        if(bytesSent < 0)
+            perror("Failed to send a message");
+
+    }
+
+
+    close(fd);
+
+    close(sockFd);
+
     return 0;
+
 }
