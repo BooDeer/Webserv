@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: boodeer <boodeer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/04/24 13:14:29 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/05/01 10:37:16 by boodeer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "parsing.hpp"
 #include "../utils/Colors.hpp"
-
+#include <cstdlib>
 
 #define LOG(X)	std::cout << X << std::endl
 
@@ -81,10 +81,14 @@ void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int l
 		else
 			config.__DefaultErrorpg.push_back(*it);
 	//TODO: In the case of errorPages (dir == false) check each pair(status code)
-	//TODO: wether it contains digits only or not.
+	//TODO: whether it contains digits only or not.
 }
 
-void	allowedMethods(std::vector<std::string>& line, ServerBlock& config, int ln)
+//TODO: Check whether the vector content is pair or not
+/* Vector content: [301][redirectionURL] */
+/* 	  impair element ^ || pair element &*/
+
+void	allowedMethods(std::vector<std::string>& line, Locations& location, int ln)
 {
 	std::vector<std::string>::iterator it;
 	
@@ -93,27 +97,78 @@ void	allowedMethods(std::vector<std::string>& line, ServerBlock& config, int ln)
 	it = line.begin();
 	it++;
 	for (; it != line.end(); ++it)
-		config.__Locations
+		location.__AllowedMethods.push_back(*it);
 }
+
+void	redirections(std::vector<std::string>& line, Locations& location, int ln)
+{
+	std::vector<std::string>::iterator it;
+	
+	if (line.size() < 2)
+		exitMessage(1, "Error! too few arguments in line: ", ln);
+	it = line.begin();
+	it++;
+	for (; it != line.end(); ++it)
+		location.__Redirection.push_back(*it);
+}
+
+void	root(std::vector<std::string> &line, Locations &location, int ln)
+{
+	if (line.size() != 2)
+		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
+	location.__Root = line[1];
+}
+
+void	directoryListing(std::vector<std::string>& line, Locations &location ,int ln)
+{
+	if (line.size() != 2)
+		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
+	if (line[1] == "on")
+		location.__DirList = true;
+	else if (line[1] == "off")
+		location.__DirList = false;
+	else
+		exitMessage(1, "Error! Wrong argument in line: ", ln);
+}
+
+void	defaultFile(std::vector<std::string>& line, Locations& location, int ln)
+{
+	if (line.size() != 2)
+		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
+	location.__DefaultFile = line[1];
+}
+/*============================================================================*/
+//TODO: I should probably make a generic function that fills a vector.
+		// else if (tmp.size() > 0 && tmp[0] == "\"redirections\":")
+		// 	fillVector(tmp, NULL, location, ln);
+/*============================================================================*/
 
 void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& config)
 {
-	int start = int(ln);
-	std::vector<std::string> tmp;
+	int start = 				int(ln);
+	std::vector<std::string>	tmp;
+	Locations					location;
 
 	ft_split(line, ' ', tmp);
 	if (tmp.size() != 2 && tmp[1] != "{")
 		exitMessage(1, "missing '{' in line: ", ln);
-	while (tmp[0] != "}") // Location block loop,
+	while (tmp[0] != "}") // Location block loop.
 	{
 		tmp.clear();
 		ln++;
-		// LOG(ln << ": " << line);
-		if (!std::getline(ifs, line))
+		if (!std::getline(ifs, line)) // Reached the end of the file.
 			exitMessage(1, "missing '}' after line: ", start);
 		ft_split(line, ' ', tmp);
 		if (tmp.size() > 0 && tmp[0] == "\"methods\":")
-			allowedMethods(tmp, config, ln);
+			allowedMethods(tmp, location, ln);
+		else if (tmp.size() > 0 && tmp[0] == "\"redirection\":") // there's only two arguments for redirections.
+			redirections(tmp, location, ln);
+		else if (tmp.size() > 0 && tmp[0] == "\"root\":")
+			root(tmp, location, ln);
+		else if (tmp.size() > 0 && tmp[0] == "\"autoindex\":") // AKA directory listing.
+			directoryListing(tmp, location, ln);
+		else if (tmp.size() > 0 && tmp[0] == "\"Default\":")
+			defaultFile(tmp, location, ln);
 		else if (tmp[0] != "}" && tmp.size() > 0)
 			exitMessage(1, "unknown directive line: ", ln);
 		else if (tmp.size() == 1 && tmp[0] == "}")
@@ -122,6 +177,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 	}
 	if (tmp.size() > 1)
 		exitMessage(1, "unknown directive line: ", ln);
+	config.__Locations.push_back(location);
 }
 
 //TODO:
@@ -131,9 +187,9 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 void	serverBlock(std::ifstream &ifs, int &ln, ServerBlock &config)
 {
 	std::string line;
-	int		start = int(ln); // to throw the line of the error in case '}' not found.
-	std::vector<std::string> tmp;
-	
+	int		start = 			int(ln); // to throw the line of the error in case '}' not found.
+	std::vector<std::string>	tmp;
+	ServerBlock					server;
 	while(line[0] != '}') // Server block loop
 	{
 		tmp.clear();
@@ -180,14 +236,28 @@ void	log_data(ServerBlock& config)
 	for(; it != config.__DefaultErrorpg.end(); it++)
 		LOG("			" << *it);
 	LOG("LimitSize	=====> " << config.__ClientLimit);
-		
+	LOG("Location: ");
+	LOG("	methods: ====>");
+	it = config.__Locations[0].__AllowedMethods.begin();
+	for (; it !=config.__Locations[0].__AllowedMethods.end(); it++)
+		LOG("			" << *it);
+
+
+
 	LOG("============================================");
 
+}
+
+void	checkDataValidity(ServerBlock& config)
+{
+	
 }
 
 //TODO: list of things to check later.
 /* 
 	* Check duplicate arguments.
+	* Add another struct that contains a vector of ServerBlock's.
+	* Create a temporary variable to append to the ServerBlock's vector.
 */
 void	parse(char *file, ServerBlock &config)
 {
@@ -212,7 +282,8 @@ void	parse(char *file, ServerBlock &config)
 		else if (!line.empty())
 			exitMessage(1, "unknown directive in line: ", __LN);
 	}
+	checkDataValidity(config); //* Probably should be in serverBlock(). (to check each server object one at the time)
 	// Debugging function.
-	// log_data(config);
+	log_data(config);
 	ifs.close();
 }

@@ -74,5 +74,6 @@ int main(int ac, char **av)
 	}
 
 	parse(av[1], config);
+	
 	// system("leaks webserv");
 }

@@ -6,7 +6,7 @@
 class Locations
 {
 	public:
-		std::string					__Route;
+		std::string					__Route; // location: /tmp <=== This{}
 		std::vector<std::string>	__AllowedMethods;
 		std::vector<std::string>	__Redirection;
 		std::string					__Root;
@@ -33,4 +33,9 @@ class ServerBlock //! Name to be changed later
 	public:
 		// ServerBlock( void );
 		// ~ServerBlock( void );
+};
+
+class ConfigFile
+{
+	
 };
