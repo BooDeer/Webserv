@@ -107,18 +107,19 @@ void start_server(int *fd_savior, fd_set *socket_list)
             {
                 if(FD_ISSET(j, &read_check[i]))
                 {
-                    if (j == fd_savior[j])
+                    if (j == fd_savior[i])
                     {
-                        client_socket = accept(fd_savior[j], (struct sockaddr *)&address, (socklen_t*)&addrlen);
-                        FD_SET(client_socket, &socket_list[j]);
+                        client_socket = accept(fd_savior[i], (struct sockaddr *)&address, (socklen_t*)&addrlen);
+                        FD_SET(client_socket, &socket_list[i]);
+                        std::cout << " is out " << std::endl;
                         usleep(10);
                     }
                     else
                     {
-                         receive_basic(client_socket, socket_list[j]);
+                         receive_basic(client_socket, socket_list[i]);
                         std::cout << "send response " << std::endl;
                         // send(sj, hello, )
-                        write(j, hello, strlen(hello));
+                        write(i, hello, strlen(hello));
                     }
                 }
             }  
