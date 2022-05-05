@@ -103,7 +103,7 @@ void start_server(int *fd_savior, fd_set *socket_list)
                 std::cout << " select problem " << std::endl;
                 exit(EXIT_FAILURE);
             }
-            for(size_t j = 0 ; j <= FD_SETSIZE; j++)
+            for(size_t j = 0 ; j < FD_SETSIZE; j++)
             {
                 if(FD_ISSET(j, &read_check[i]))
                 {
