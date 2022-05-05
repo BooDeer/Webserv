@@ -15,7 +15,7 @@
 void prepare_socket(char *ip, short port, int &save)
 {
     struct sockaddr_in server_info;
-    std::cout << "------------crearte socket-----------" << std::endl;
+    std::cout << "------------crearte socket----------- with port " << port << std::endl;
     save = socket(PF_INET, SOCK_STREAM, 0);
     if (save < 0)
     {
@@ -55,8 +55,8 @@ int receive_basic(int s, fd_set &current_sockets)
         size_read = recv(s , chunk , CHUNK_SIZE, 0);
         if(size_read == 0)
         {
-            close(s);
-            FD_CLR(s, &current_sockets);
+            // close(s);
+            // FD_CLR(s, &current_sockets);
         }
 
         // fs << chunk;
@@ -83,7 +83,10 @@ int receive_basic(int s, fd_set &current_sockets)
 void start_server(int *fd_savior, fd_set *socket_list)
 {
     struct timeval tm;
-
+    for(int i = 0; i < 4; i++)
+    {
+        std::cout << fd_savior[i] << std::endl;
+    }
     tm.tv_sec = 0;
     tm.tv_usec = 10;
     struct sockaddr_in address;
@@ -91,14 +94,13 @@ void start_server(int *fd_savior, fd_set *socket_list)
     fd_set read_check[servers];
     int client_socket;
     char hello[82] = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 20\n\n<h1>Hello world!</h1>";
-
     // int selewct_check;
     while(1)
     {
         for(int i = 0; i <  servers; i++)
         {
             read_check[i] = socket_list[i];
-            if(select(fd_savior[i], &read_check[i], NULL, NULL, &tm) < 0)
+            if(select(FD_SETSIZE, &read_check[i], NULL, NULL, &tm) < 0)
             {
                 std::cout << " select problem " << std::endl;
                 exit(EXIT_FAILURE);
@@ -107,6 +109,7 @@ void start_server(int *fd_savior, fd_set *socket_list)
             {
                 if(FD_ISSET(j, &read_check[i]))
                 {
+                    std::cout << " here " << std::endl;
                     if (j == fd_savior[i])
                     {
                         client_socket = accept(fd_savior[i], (struct sockaddr *)&address, (socklen_t*)&addrlen);
@@ -116,10 +119,10 @@ void start_server(int *fd_savior, fd_set *socket_list)
                     }
                     else
                     {
-                         receive_basic(client_socket, socket_list[i]);
+                        receive_basic(client_socket, socket_list[i]);
                         std::cout << "send response " << std::endl;
                         // send(sj, hello, )
-                        write(i, hello, strlen(hello));
+                        write(j, hello, strlen(hello));
                     }
                 }
             }  
