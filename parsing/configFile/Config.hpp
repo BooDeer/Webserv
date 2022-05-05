@@ -37,5 +37,6 @@ class ServerBlock //! Name to be changed later
 
 class ConfigFile
 {
-	
+	public: //* To be changed to private if desired later.
+		std::vector<ServerBlock>		__Servers;
 };

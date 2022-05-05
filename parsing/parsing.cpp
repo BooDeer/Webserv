@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: boodeer <boodeer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/05/01 10:37:16 by boodeer          ###   ########.fr       */
+/*   Updated: 2022/05/05 17:07:44 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 #include "parsing.hpp"
 #include "../utils/Colors.hpp"
 #include <cstdlib>
-
+#include <map>
 #define LOG(X)	std::cout << X << std::endl
 
 void	ft_split(std::string const& src, const char delimiter, std::vector<std::string> &dst)
 {
 	std::istringstream iss(src);
-
+	
 	do
 	{
 		std::string subs;
@@ -184,12 +184,13 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 /* 
 	* Check whether the given server block is the first one or not. (For the default server boolean)
 */
-void	serverBlock(std::ifstream &ifs, int &ln, ServerBlock &config)
+void	serverBlock(std::ifstream &ifs, int &ln, ConfigFile &config)
 {
 	std::string line;
 	int		start = 			int(ln); // to throw the line of the error in case '}' not found.
 	std::vector<std::string>	tmp;
 	ServerBlock					server;
+
 	while(line[0] != '}') // Server block loop
 	{
 		tmp.clear();
@@ -201,17 +202,17 @@ void	serverBlock(std::ifstream &ifs, int &ln, ServerBlock &config)
 		//TODO: split the given string by spaces.
 		ft_split(line, ' ', tmp);
 		if (tmp.size() > 0 && tmp[0] == "\"port\":")
-			checkPort(tmp, config, ln, true);
+			checkPort(tmp, server, ln, true);
 		else if (tmp.size() > 0 && tmp[0] == "\"limitSize\":")
-			checkPort(tmp, config, ln);
+			checkPort(tmp, server, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"host\":")
-			checkHost(tmp, config, ln);
+			checkHost(tmp, server, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"serverNames\":")
-			checkServerNames(tmp, config, ln, true);
+			checkServerNames(tmp, server, ln, true);
 		else if (tmp.size() > 0 && tmp[0] == "\"errorPages\":")
-			checkServerNames(tmp, config, ln);
+			checkServerNames(tmp, server, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"location\":") //todo: doesn't check whether there is an opening bracket or not
-			locationBlock(ifs, line, ln, config);
+			locationBlock(ifs, line, ln, server);
 		// else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
 		else if (tmp[0] != "}" && tmp.size() > 0)
 			exitMessage(1, "unknown directive line: ", ln);
@@ -219,6 +220,7 @@ void	serverBlock(std::ifstream &ifs, int &ln, ServerBlock &config)
 	}
 	if (line.size() > 1)
 		exitMessage(1,"unknown directive after '}' in line: ", ln);
+	config.__Servers.push_back(server);
 }
 
 void	log_data(ServerBlock& config)
@@ -259,13 +261,14 @@ void	checkDataValidity(ServerBlock& config)
 	* Add another struct that contains a vector of ServerBlock's.
 	* Create a temporary variable to append to the ServerBlock's vector.
 */
-void	parse(char *file, ServerBlock &config)
+void	parse(char *file, ConfigFile &config)
 {
 	int							__LN; // Line number. (of the config file)
 	std::ifstream				ifs(file);
 	std::string					line;
 	std::vector<std::string>	test; // Splitting vector.
-
+	ServerBlock					server;
+	
 	// Checking whether the given configuration file is valid or not. (permissions, exists ...)
 	if(!ifs.good())
 		exitMessage(1, "Something is wrong with the configuration file.\nPlease check if the given file is valid: if it exists and it got reading permission.");
@@ -282,8 +285,10 @@ void	parse(char *file, ServerBlock &config)
 		else if (!line.empty())
 			exitMessage(1, "unknown directive in line: ", __LN);
 	}
-	checkDataValidity(config); //* Probably should be in serverBlock(). (to check each server object one at the time)
+	// checkDataValidity(server); //* Probably should be in serverBlock(). (to check each server object one at the time)
+	
 	// Debugging function.
-	log_data(config);
+	// log_data(server);
+	// config.__Servers.push_back(server);
 	ifs.close();
 }
