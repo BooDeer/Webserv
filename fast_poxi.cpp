@@ -56,6 +56,7 @@ int receive_basic(int s, fd_set &current_sockets)
         if(size_read == 0)
         {
             close(s);
+            std::cout << "close and clear file" << std::endl;
             FD_CLR(s, &current_sockets);
         }
             std::cout << chunk << std::endl;
