@@ -55,14 +55,14 @@ int receive_basic(int s, fd_set &current_sockets)
         size_read = recv(s , chunk , CHUNK_SIZE, 0);
         if(size_read == 0)
         {
-            // close(s);
-            // FD_CLR(s, &current_sockets);
+            close(s);
+            FD_CLR(s, &current_sockets);
         }
-
+            std::cout << chunk << std::endl;
         // fs << chunk;
           std::cout << " ------------------------- chuck --------------------" << std::endl;
       memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
-  return total_size;
+    return total_size;
 }
 
 // template<class T>
@@ -109,23 +109,23 @@ void start_server(int *fd_savior, fd_set *socket_list)
             {
                 if(FD_ISSET(j, &read_check[i]))
                 {
-                    std::cout << " here " << std::endl;
+                    // std::cout << " here " << std::endl;
                     if (j == fd_savior[i])
                     {
-                        client_socket = accept(fd_savior[i], (struct sockaddr *)&address, (socklen_t*)&addrlen);
+                        client_socket = accept(fd_savior[i], NULL, NULL);
                         FD_SET(client_socket, &socket_list[i]);
-                        std::cout << " is out " << std::endl;
+                        // std::cout << " is out " << std::endl;
                         usleep(10);
                     }
                     else
                     {
                         receive_basic(client_socket, socket_list[i]);
-                        std::cout << "send response " << std::endl;
+                        // std::cout << "send response " << std::endl;
                         // send(sj, hello, )
                         write(j, hello, strlen(hello));
                     }
                 }
-            }  
+            }
         }
     }
 }
@@ -142,8 +142,6 @@ void install_servers()
         FD_ZERO(&socket_list[i]);
         FD_SET(fd_savior[i], &socket_list[i]);
    }
-   
-
     start_server(fd_savior, socket_list);
 }
 
