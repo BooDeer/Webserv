@@ -6,7 +6,7 @@
 class Locations
 {
 	public:
-		std::string					__Route; // location: /tmp <=== This{}
+		std::string					__Route; // location/extension.
 		std::vector<std::string>	__AllowedMethods;
 		std::vector<std::string>	__Redirection;
 		std::string					__Root;
@@ -31,7 +31,11 @@ class ServerBlock //! Name to be changed later
 		bool									__DefaultServer; // The default server. (Mainly the first server)
 		std::vector<Locations>					__Locations;	//
 	public:
-		// ServerBlock( void );
+		//TODO: Take functions out of header file.
+		ServerBlock( void ): __Port(0), __ClientLimit(0)
+		{
+
+		};
 		// ~ServerBlock( void );
 };
 

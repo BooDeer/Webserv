@@ -75,6 +75,6 @@ int main(int ac, char **av)
 	}
 
 	parse(av[1], config);
-	std::cout << config.__Servers[0].__Host << std::endl;
+	// std::cout << config.__Servers[0].__Host << std::endl;
 	// system("leaks webserv");
 }
