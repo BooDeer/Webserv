@@ -4,13 +4,13 @@
 #include <sys/select.h> //  select header
 #include <iostream>
 #include <stdlib.h>
-#include <unistd.h>
+#include <unistd.h> // for close 
 #include <fstream>  // header for create file 
 #include <netinet/in.h> // structer sockaddr_in header
 #include <arpa/inet.h> // header for inet_addr
 #include <fcntl.h> // fcntl hreader 
 
-#define servers 4
+#define servers 100
 #define CHUNK_SIZE 10000
 void prepare_socket(char *ip, short port, int &save)
 {
@@ -130,12 +130,13 @@ void start_server(int *fd_savior, fd_set *socket_list)
         }
     }
 }
+
 void install_servers()
 {
     // create socket first;
     int fd_savior[servers];
     char ip[]= "127.0.0.1";
-    short port = 5000;
+    short port = 2008;
     fd_set socket_list[servers];
    for(int i  = 0; i < servers; i++)
    {
