@@ -1,45 +1,185 @@
 #include <stdio.h>
 #include <sys/socket.h>
-#include <stdlib.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <arpa/inet.h>
+#include <fcntl.h>
+#include <map>
+#include <iostream>
 
-#define PORT 8080
+#define PORT 70
+
+#define CHUNK_SIZE 1000
+
+
+int receive_basic(int s, std::map<int, std::string>& m, fd_set &current_sockets)
+{
+  // map(s, hhh)
+  // map[s] == ""
+  std::cout << " test hna 200 " << std::endl;
+  int size_recv , total_size= 0;
+  char chunk[CHUNK_SIZE];
+  memset(chunk ,0 , CHUNK_SIZE);
+  // int fd = open("helloworlds.txt",O_CREAT | O_WRONLY |  O_APPEND);
+
+  int size_read;
+//   while ((size_read =recv(s , chunk , CHUNK_SIZE, 0)) > 0)// "\r\n\r\n" || endof/chunk
+//     {
+        size_read =recv(s , chunk , CHUNK_SIZE, 0);
+      m[s].append(chunk);
+      std::cout << "app ==> " << m[s] << std::endl;
+        if(m[s].find("\r\n\r\n") != std::string::npos)
+        {
+          // i = 0;
+          std::cout << " ------------------------- bruh --------------------" << std::endl;
+          FD_CLR(s, &current_sockets);
+          return 666;
+          // std::cout << "number ==  "  << s << " " << m[s] << std::endl;
+          // std::cout << "|||||||||||||||||||||||||||||size == > " << size_recv << std::endl;
+        }
+      // else
+      // {
+      memset(chunk ,0 , CHUNK_SIZE);	//clear the variable
+
+      //      std::cout << "app ==> " << m[s] << std::endl;
+      //     //  std::cout << "chuck " << chunk << std::endl;
+      // }
+    // }
+
+  return total_size;
+}
 
 int main(int argc, char const *argv[])
 {
-    int sock = 0; long valread;
-    struct sockaddr_in serv_addr;
-    char *hello = "Hello from client";
-    char buffer[1024] = {0};
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  int server_fd, server_fd2, new_socket; long valread;
+  struct sockaddr_in address;
+  int addrlen = sizeof(address);
+
+  char hello[600] = "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Type: text/html\nContent-Length: 700\n\n<h1>Hello world!<img src=socket.jpg alt=""></h1>";
+
+  //int fd = open("non-block.cpp", O_RDONLY);
+  // int fd2 = open("non-block.cpp", O_RDONLY);
+  // int fd3 = open("non-block.cpp", O_RDONLY);
+  // Creating socket file descriptor
+  std::string test1;
+  std::map<int, std::string> m;
+  if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
-        printf("\n Socket creation error \n");
-        return -1;
+      perror("In socket");
+      exit(EXIT_FAILURE);
     }
-    
-    memset(&serv_addr, '0', sizeof(serv_addr));
-    
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-    
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
+  int faical = 0;
+  // if ((server_fd2 = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+  // {
+  //     perror("In socket");
+  //     exit(EXIT_FAILURE);
+  // }
+  address.sin_family = AF_INET;
+  address.sin_addr.s_addr = INADDR_ANY;
+
+  address.sin_port =  htons(PORT);
+  std::cout << " address.sin_port " <<  htonl(PORT) << std::endl;
+  // memset(address.sin_zero, '\0', sizeof address.sin_zero);
+  // fcntl()
+  int save_data = 0;
+  fcntl(server_fd, F_SETFL, O_NONBLOCK);
+  if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
     {
-        printf("\nInvalid address/ Address not supported \n");
-        return -1;
+      perror("In bind");
+      exit(EXIT_FAILURE);
     }
-    
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+  if (listen(server_fd, 50) < 0)
     {
-        printf("\nConnection Failed \n");
-        return -1;
+      perror("In listen");
+      exit(EXIT_FAILURE);
     }
-    send(sock , hello , strlen(hello) , 0 );
-    printf("Hello message sent\n");
-    valread = read( sock , buffer, 1024);
-    printf("%s\n",buffer );
-    return 0;
-}
+  int i = 0;
+  fd_set current_sockets, ready_sockets, write_fd;       
+  FD_ZERO(&current_sockets);
+  
+  FD_SET(server_fd, &current_sockets);
+  int d = 0;
+                            char *wldfaicla;
+                          wldfaicla = (char *)malloc(50000 * sizeof(char));
+
+
+  while(1)
+    {
+      ready_sockets = current_sockets;
+        write_fd =  ready_sockets;
+      printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+      if (select(FD_SETSIZE, &ready_sockets, &write_fd, NULL, NULL) < 0)
+        {
+          // continue;
+          perror("select error");
+          exit(EXIT_FAILURE);
+        }
+      int client_socket;
+      for (size_t i = 0; i < 9; i++)
+        {
+          if (FD_ISSET(i, &ready_sockets))
+            {
+              //std::cout << "i ===> " << i << " server  socket ==> " << server_fd <<  std::endl;
+              if(i == server_fd)
+                {
+                  //std::cout << "check is server fd read " << std::endl;
+                  client_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+                  //  std::cout << "client socket ===> " << client_socket << std::endl;
+                  FD_SET(client_socket, &current_sockets);
+
+                  //    close(client_socket);
+                }
+              else
+                {
+                  // handle request
+                  printf("------------------Hello message sent-------------------\n");
+                  int j = receive_basic(client_socket, m, current_sockets);
+                  //std::cout << "----------------------------------------------------client >> " << i << std::endl;
+
+                  //std::cout << "test 2 ==> " << m[i] << std::endl;
+                  // std::cerr << "Debugging: client_socket: " << client_socket << std::endl << "buffer: " << hello << std::endl;
+                  // send(client_socket, hello, strlen(hello), 0);
+                  if (j == 666)
+                    {
+                      faical++;
+                      std::cout << " faical 3ami9" << std::endl;
+                      if(faical  == 1)
+                        {
+                          write(client_socket , hello , strlen(hello));
+                            // close(client_socket);
+                            save_data = client_socket;
+                        }
+                      else if (faical == 2)
+                        {
+                            std::cout << " mara wela " << std::endl;
+                          char koko[29000];
+                          char hello1[50600] = "HTTP/1.1 200 OK\nContent-Type: image/jpg\nContent-Length: 21560\r\n\r\n"; // add size image 
+                          memset(koko, 0, 29000);
+                          int fd2 = open("/Users/ssamadi/Desktop/Webserv/socket.jpg", O_RDONLY);
+                          int size = read(fd2, koko, 29000);
+                          std::cout << "size is === > " << size  << std::endl;
+                          //char *wldfaicla = strjoin1(hello1, koko);
+                          //char *wldfaicla = (char *)memcpy(hello1 + strlen(hello1), koko, size);
+                        //   char *wldfaicla;
+                        //   wldfaicla = (char *)malloc(50000 * sizeof(char));
+                          memcpy(wldfaicla, hello1, strlen(hello1));
+                          memcpy(wldfaicla + strlen(hello1), koko, size);
+                          write(client_socket, wldfaicla, strlen(hello1) + size);
+                        // send()
+                         // FD_CLR(i, &current_sockets);
+                         std::cout << "anaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" << std::endl;
+                        close(client_socket);
+                        close(save_data);
+                        }
+                      //close(client_socket);
+                    }
+                  // std::cout << "Current value: " << d << std::endl;
+                }
+            }
+
+        }
+
+    }
+  return 0;
+  }

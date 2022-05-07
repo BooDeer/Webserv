@@ -35,5 +35,8 @@
 *.DS_Store
 # test file 
 test*.cpp
+*test*
+noPermFile
+*.dSYM
 # config vscode
 *.vscode
