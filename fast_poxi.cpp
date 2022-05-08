@@ -9,6 +9,7 @@
 #include <netinet/in.h> // structer sockaddr_in header
 #include <arpa/inet.h> // header for inet_addr
 #include <fcntl.h> // fcntl hreader 
+#include <stdio.h> // for remove() function
 
 #define servers 100
 #define CHUNK_SIZE 10000
@@ -51,12 +52,13 @@ int receive_basic(int s, fd_set &current_sockets)
       
 //      std::string name = "test_file";
     //   name  + std::to_string(s);
-        // fs.open (name.data(), std::fstream::in | std::fstream::out);
+        // fs.open (name.data() + "fd", std::fstream::in | std::fstream::out);
         size_read = recv(s , chunk , CHUNK_SIZE, 0);
         if(size_read == 0)
         {
             close(s);
             std::cout << "close and clear file" << std::endl;
+            // open again // remove
             FD_CLR(s, &current_sockets);
         }
             std::cout << chunk << std::endl;
