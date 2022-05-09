@@ -92,8 +92,8 @@ void start_server(int *fd_savior, fd_set *socket_list)
     }
     tm.tv_sec = 0;
     tm.tv_usec = 10;
-    struct sockaddr_in address;
-    int addrlen = sizeof(address);
+    // struct sockaddr_in address;
+    // socklen_t addrlen = sizeof(ad/dress);
     fd_set read_check[servers];
     int client_socket;
     char hello[82] = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 20\n\n<h1>Hello world!</h1>";
