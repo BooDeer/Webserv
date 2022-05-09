@@ -48,11 +48,11 @@ int receive_basic(int s, fd_set &current_sockets)
   memset(chunk ,0 , CHUNK_SIZE);
 
         int size_read;
-  //    std::fstream fs;
+     std::fstream fs;
       
 //      std::string name = "test_file";
     //   name  + std::to_string(s);
-        // fs.open (name.data() + "fd", std::fstream::in | std::fstream::out);
+        fs.open ("just_test", std::fstream::in | std::fstream::out | std::fstream::binary);
         size_read = recv(s , chunk , CHUNK_SIZE, 0);
         if(size_read == 0)
         {
@@ -62,7 +62,10 @@ int receive_basic(int s, fd_set &current_sockets)
             FD_CLR(s, &current_sockets);
         }
             std::cout << chunk << std::endl;
-        // fs << chunk;
+            std::string bood(chunk);
+            if (bood.find("\r\n\r\n") != std::string::npos)
+                std::cout << "test is working" << std::endl;
+            fs << chunk;
           std::cout << " ------------------------- chuck --------------------" << std::endl;
       memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
     return total_size;

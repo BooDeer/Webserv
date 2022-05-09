@@ -3,21 +3,6 @@
 #include <vector>
 #include <fstream>
 
-
-// void	ft_split(std::string const& line, std::vector<std::string> &dst)
-// {
-// 	std::istringstream iss(src);
-	
-// 	do
-// 	{
-// 		std::string subs;
-// 		iss >> subs;
-// 		if (subs.size() > 0)
-// 		dst.push_back(subs);
-// 	} while (iss);
-// }
-
-
 struct data
 {
     int id; // id for request
@@ -31,7 +16,7 @@ struct data
         id = -666;
     }
 };
-// template<class FILE>
+
 void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
 {
     // data save;
@@ -48,15 +33,6 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
     }
     // std::cout << save.method << std::endl << save.path << std::endl;
 }
-
-// 
-// GET /// file / versiohttp
-/* 
-
-
-4
-requset_4
- */
 
 void parsing_header(std::fstream &fs, data &d)
 {
@@ -84,25 +60,90 @@ void parsing_header(std::fstream &fs, data &d)
             d.referer = lines.erase(0, strlen("Referer: "));
             // std::cout << "line == >" << lines << std::endl; 
         }
-        else if (lines.find("\r\n\r\n") != std::string::npos) // To be checked
+            std::cout << "size ==> " << lines.length() << std::endl;
+        if (lines.length()) //TODO: check this.
+        {
             break ;
+        }
     }
 }
 
 
+/* 
+int main()
+{
+    int fd = open("../just_test", O_RDONLY);
 
+    char *test[10000];
+    read(fd, test, 10000);
+    std::cout << test << std::endl;
+}
+ */
 
 int main() {
 
     std::fstream fs;
     data data_to_save;
     // fs.open ("ex_3", std::fstream::in | std::fstream::out | std::fstream::app);
-    fs.open ("ex_3", std::fstream::in | std::fstream::out);
+    // fs.open ("../just_test", std::fstream::in | std::fstream::out | std::fstream::binary);
+    fs.open ("../just_test", std::fstream::in | std::fstream::out);
+    // fs.open ("POST_REQUEST", std::fstream::in | std::fstream::out | std::fstream::app);
     std::string line_save;
-   // fs << "\r\n\r\n";
+//    fs << "\r\n\r\n";
     std::getline(fs, line_save);
     first_line(line_save, data_to_save);
     parsing_header(fs, data_to_save); // Parsing the rest of the request. (Header)
-    // getline(f, s, ';');
-    // std:
+  //  check_
 }
+// std::istream& safeGetline(std::istream& is, std::string& t)
+// {
+//     t.clear();
+
+//     // The characters in the stream are read one-by-one using a std::streambuf.
+//     // That is faster than reading them one-by-one using the std::istream.
+//     // Code that uses streambuf this way must be guarded by a sentry object.
+//     // The sentry object performs various tasks,
+//     // such as thread synchronization and updating the stream state.
+
+//     std::istream::sentry se(is, true);
+//     std::streambuf* sb = is.rdbuf();
+//     // char test[500];
+//     // sb->sgetn(test, )
+//     for(;;) {
+//         int c = sb->sbumpc();
+        
+//         switch (c) {
+//         case '\n':
+//             return is;
+//         case '\r':
+//             std::cout << " yessss " << std::endl;
+//             if(sb->sgetc() == '\n')
+//                 sb->sbumpc();
+//             return is;
+//         case EOF:
+//             // Also handle the case when the last line has no line ending
+//             if(t.empty())
+//                 is.setstate(std::ios::eofbit);
+//             return is;
+//         default:
+//             t += (char)c;
+//         }
+//     }
+// }
+// int main()
+// {
+//     std::string path = "../just_test";  // insert path to test file here
+
+//     std::ifstream ifs(path.c_str());
+//     if(!ifs) {
+//         std::cout << "Failed to open the file." << std::endl;
+//         return EXIT_FAILURE;
+//     }
+
+//     int n = 0;
+//     std::string t;
+//     while(!safeGetline(ifs, t).eof())
+//         ++n;
+//     std::cout << "The file contains " << n << " lines." << std::endl;
+//     return EXIT_SUCCESS;
+// }
