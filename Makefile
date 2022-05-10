@@ -1,11 +1,11 @@
 CC 		= c++
 NAME 	= webserv
-FLAGS 	= -std=c++98 -g\
+FLAGS 	= -std=c++98 -g -fsanitize=address\
 		# -Wall -Wextra -Werror
 DFLAGS 	= -std=c++98 -Wall -Wextra -Werror -g \
 			-fsanitize=address
 HEADER	= parsing/parsing.hpp parsing/configFile/Config.hpp
-FILE	= webserv.cpp parsing/parsing.cpp parsing/configFile/Config.cpp execution/fast_poxi.cpp
+FILE	= webserv.cpp parsing/parsing.cpp parsing/configFile/Config.cpp 
 
 UNAME_S	= $(shell uname -s)
 

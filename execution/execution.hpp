@@ -13,5 +13,5 @@
 #include <fcntl.h> // fcntl hreader 
 #include <stdio.h> // for remove() function
 #include "../parsing/parsing.hpp"
-
-void install_servers(ConfigFile conf);
+#include <map>
+void install_servers(ConfigFile &conf);

@@ -18,8 +18,7 @@ int main(int ac, char **av)
 
 
 	// webServ entery oint?
-	// config , data 
-	install_servers(config);
+	install_servers(config); // innlude config file setting
 	// std::cout << config.__Servers[0].__Host << std::endl;
 	// system("leaks webserv");
 }

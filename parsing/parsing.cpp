@@ -241,7 +241,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 	if (tmp.size() != 2 && tmp[1] != "{")
 		exitMessage(1, "missing '{' in line: ", ln);
 	else if (tmp.size() > 2)
-		exitMessage(1, "unknown argument in line: ", ln);
+		exitMessage(1, "Unknown argument in line: ", ln);
 
 	while (tmp[0] != "}") // Location block loop.
 	{
@@ -266,13 +266,13 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 		else if (tmp.size() > 0 && tmp[0] == "\"Default\":")
 			defaultFile(tmp, location, ln);
 		else if (tmp[0] != "}" && tmp.size() > 0)
-			exitMessage(1, "unknown directive line: ", ln);
+			exitMessage(1, "Unknown directive line: ", ln);
 		else if (tmp.size() == 1 && tmp[0] == "}")
 			break ;
 		// else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
 	}
 	if (tmp.size() > 1)
-		exitMessage(1, "unknown directive line: ", ln);
+		exitMessage(1, "Unknown directive line: ", ln);
 	config.__Locations.push_back(location);
 }
 
@@ -313,17 +313,38 @@ void	serverBlock(std::ifstream &ifs, int &ln, ConfigFile &config)
 			locationBlock(ifs, line, ln, server);
 		// else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
 		else if (tmp[0] != "}" && tmp.size() > 0)
-			exitMessage(1, "unknown directive line: ", ln);
+			exitMessage(1, "Unknown directive line: ", ln);
 		// LOG("value: " << std::boolalpha << (tmp[0] != "}" && tmp.size() != 1) << " in line: " << ln);
 	}
 	if (line.size() > 1)
-		exitMessage(1,"unknown directive after '}' in line: ", ln);
+		exitMessage(1,"Unknown directive after '}' in line: ", ln);
 	checkMandatory(server, start); //* Probably should be in serverBlock(). (to check each server object one at the time)
 	// log_data(server);
 	config.__Servers.push_back(server);
 }
 
 
+void  filter_servers(ConfigFile& config)
+{
+	for(int i = 0; i < config.__Servers.size(); i++)
+	{
+		for (int j = 0; i < config.__Servers.size(); j++)
+		{
+			if (j != i) // to avoid checking the server with itself.
+			{
+				if ((config.__Servers[i].__Port == config.__Servers[j].__Port) && (config.__Servers[i].__Host == config.__Servers[j].__Host))
+				{
+					if (!config.__Servers[i].__ServerNames.size()) // no server_name
+						exitMessage(1, "Error! two servers have the same host:port but without server_names."); 
+					else if (config.__Servers[i].__ServerNames == config.__Servers[j].__ServerNames) // same server_name
+						exitMessage(1, "Error! two servers have the same host:port but with the same server_names.");
+				}
+
+			}
+		}
+	}
+	// to have unique host:ports only we should fill the host:ports in a map before binding.
+}
 
 
 //TODO: list of things to check later.
@@ -354,10 +375,10 @@ void	parse(char *file, ConfigFile &config)
 		if (line == "server {") // Beginning of the server block.
 			serverBlock(ifs, __LN, config);
 		else if (!line.empty())
-			exitMessage(1, "unknown directive in line: ", __LN);
+			exitMessage(1, "Unknown directive in line: ", __LN);
 	}
 	// checkMandatory(server); //* Probably should be in serverBlock(). (to check each server object one at the time)
-	
+	filter_servers(config);
 	// Debugging function.
 	// log_data(server);
 	// config.__Servers.push_back(server);

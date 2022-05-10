@@ -24,7 +24,7 @@
 server {
 	"port": 2000
 	"host": 127.0.0.1
-#"serverNames": example.com
+	"serverNames": example.com
 #"errorPages": 401 pathexample
 #"limitSize": 90
 #"location": {
@@ -33,9 +33,9 @@ server {
 
 }
 server {
-	"port": 2001
+	"port": 2000
 	"host": 127.0.0.1
-#"serverNames": example.com
+	"serverNames": example1.com
 #"errorPages": 401 pathexample
 #"limitSize": 90
 #"location": {
@@ -44,9 +44,9 @@ server {
 
 }
 server {
-	"port": 2002
+	"port": 2000
 	"host": 127.0.0.1
-#"serverNames": example.com
+#"serverNames": example2.com
 #"errorPages": 401 pathexample
 #"limitSize": 90
 #"location": {
