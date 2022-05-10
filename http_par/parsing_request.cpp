@@ -2,20 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-
-struct data
-{
-    int id; // id for request
-    std::string path;
-    std::string method;
-    std::string host;
-    std::string lenth;
-    std::string referer;
-    data()
-    {
-        id = -666;
-    }
-};
+#include "../webserve_data.hpp"
 
 void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
 {

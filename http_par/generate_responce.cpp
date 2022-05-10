@@ -1,9 +1,11 @@
-#include <iostream>
+// #include <iostream>
+#include  "../webserve_data.hpp"
 
 
 
-int test()
+int genrate(data d)
 {
+    // first check method
     
 }
 

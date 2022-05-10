@@ -65,6 +65,10 @@ int receive_basic(int s, fd_set &current_sockets)
             std::string bood(chunk);
             if (bood.find("\r\n\r\n") != std::string::npos)
                 std::cout << "test is working" << std::endl;
+                // add if contenrt lenth 0 pars request
+                {
+                                        
+                }
             fs << chunk;
           std::cout << " ------------------------- chuck --------------------" << std::endl;
       memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
