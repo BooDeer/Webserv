@@ -12,6 +12,6 @@
 #include <arpa/inet.h> // header for inet_addr
 #include <fcntl.h> // fcntl hreader 
 #include <stdio.h> // for remove() function
+#include "../parsing/parsing.hpp"
 
-
-void        install_servers( void );
+void install_servers(ConfigFile conf);

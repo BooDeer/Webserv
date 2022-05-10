@@ -22,12 +22,35 @@
 #server {
 
 server {
-	"port": 80
-	"host": 1.2.3.6.5
-	"serverNames": example.com
-	"errorPages": 401 pathexample
-	"limitSize": 90;
-	"location": {
-		
-	}
+	"port": 2000
+	"host": 127.0.0.1
+#"serverNames": example.com
+#"errorPages": 401 pathexample
+#"limitSize": 90
+#"location": {
+#		
+#	}
+
+}
+server {
+	"port": 2001
+	"host": 127.0.0.1
+#"serverNames": example.com
+#"errorPages": 401 pathexample
+#"limitSize": 90
+#"location": {
+#		
+#	}
+
+}
+server {
+	"port": 2002
+	"host": 127.0.0.1
+#"serverNames": example.com
+#"errorPages": 401 pathexample
+#"limitSize": 90
+#"location": {
+#		
+#	}
+
 }

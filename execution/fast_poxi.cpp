@@ -1,6 +1,6 @@
 
 #include "execution.hpp"
-
+#include "../webserv.hpp"
 #define servers 100
 #define CHUNK_SIZE 10000
 void prepare_socket(char *ip, short port, int &save)
@@ -130,24 +130,25 @@ void start_server(int *fd_savior, fd_set *socket_list)
     }
 }
 
-void install_servers()
+void install_servers(ConfigFile conf) // intall servers 
 {
     // create socket first;
+    //add parameters from config class 
     int fd_savior[servers];
     char ip[]= "127.0.0.1";
     short port = 2008;
     fd_set socket_list[servers];
-   for(int i  = 0; i < servers; i++)
-   {
-        prepare_socket(ip, port + i, fd_savior[i]);
-        FD_ZERO(&socket_list[i]);
-        FD_SET(fd_savior[i], &socket_list[i]);
-   }
-    start_server(fd_savior, socket_list);
+    for(int i  = 0; i < servers; i++)
+    {
+        prepare_socket(ip, port + i, fd_savior[i]); // create one socket each server in config file
+        FD_ZERO(&socket_list[i]); // clear bit fd_set to 0
+        FD_SET(fd_savior[i], &socket_list[i]); // set bit in ft_set bytes 
+    }
+    start_server(fd_savior, socket_list); // all work from select to send response
 }
 
 // test 1 
-int main()
-{
-    install_servers();
-}
+// int main()
+// {
+//     install_servers();
+// }

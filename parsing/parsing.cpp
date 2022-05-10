@@ -12,7 +12,6 @@
 
 
 #include "parsing.hpp"
-#include "../utils/Colors.hpp"
 #include <cstdlib>
 #include <map>
 #define LOG(X)	std::cout << X << std::endl
@@ -320,7 +319,7 @@ void	serverBlock(std::ifstream &ifs, int &ln, ConfigFile &config)
 	if (line.size() > 1)
 		exitMessage(1,"unknown directive after '}' in line: ", ln);
 	checkMandatory(server, start); //* Probably should be in serverBlock(). (to check each server object one at the time)
-	log_data(server);
+	// log_data(server);
 	config.__Servers.push_back(server);
 }
 
