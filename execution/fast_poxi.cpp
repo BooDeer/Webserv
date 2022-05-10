@@ -1,15 +1,5 @@
-#include <cstdint>
-#include <ostream>
-#include <sys/socket.h> // sokcet header :p
-#include <sys/select.h> //  select header
-#include <iostream>
-#include <stdlib.h>
-#include <unistd.h> // for close 
-#include <fstream>  // header for create file 
-#include <netinet/in.h> // structer sockaddr_in header
-#include <arpa/inet.h> // header for inet_addr
-#include <fcntl.h> // fcntl hreader 
-#include <stdio.h> // for remove() function
+
+#include "execution.hpp"
 
 #define servers 100
 #define CHUNK_SIZE 10000
@@ -67,7 +57,7 @@ int receive_basic(int s, fd_set &current_sockets)
                 std::cout << "test is working" << std::endl;
                 // add if contenrt lenth 0 pars request
                 {
-                                        
+                         // parsing request               
                 }
             fs << chunk;
           std::cout << " ------------------------- chuck --------------------" << std::endl;
