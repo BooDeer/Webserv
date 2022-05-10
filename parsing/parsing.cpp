@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: boodeer <boodeer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/05/06 18:29:53 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/05/10 22:05:36 by boodeer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -312,7 +312,7 @@ void	serverBlock(std::ifstream &ifs, int &ln, ConfigFile &config)
 		else if (tmp.size() > 0 && tmp[0] == "\"location\":") //todo: doesn't check whether there is an opening bracket or not
 			locationBlock(ifs, line, ln, server);
 		// else if (tmp.size() > 0 && (tmp[0] != "}" && tmp.size() != 1))
-		else if (tmp[0] != "}" && tmp.size() > 0)
+		else if (tmp.size() > 0 && tmp[0] != "}")
 			exitMessage(1, "Unknown directive line: ", ln);
 		// LOG("value: " << std::boolalpha << (tmp[0] != "}" && tmp.size() != 1) << " in line: " << ln);
 	}
@@ -328,7 +328,7 @@ void  filter_servers(ConfigFile& config)
 {
 	for(int i = 0; i < config.__Servers.size(); i++)
 	{
-		for (int j = 0; i < config.__Servers.size(); j++)
+		for (int j = 0; j < config.__Servers.size(); j++)
 		{
 			if (j != i) // to avoid checking the server with itself.
 			{
