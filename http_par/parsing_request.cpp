@@ -60,7 +60,7 @@ void parsing_header(std::fstream &fs, data &d)
             d.referer = lines.erase(0, strlen("Referer: "));
             // std::cout << "line == >" << lines << std::endl; 
         }
-            std::cout << "size ==> " << lines.length() << std::endl;
+            //std::cout << "size ==> " << lines.length() << std::endl;
         if (lines.length()) //TODO: check this.
         {
             break ;
