@@ -26,6 +26,7 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
     {
 
         tmp.erase(0, d+1); // &
+        save.path.erase(d, save.path.size() - d);
     }
     // std::string s = "scott>=tiger>=mushroom";
 
@@ -35,16 +36,16 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
     {
         token = tmp.substr(0, pos);
         save.paramter.push_back(token);
-        std::cout << token << std::endl;
+        // std::cout << "token ==> " << token << std::endl;
         tmp.erase(0, pos + delimiter.length());
-        
-        // std::cout << token << std::endl;
     }
+    save.paramter.push_back(tmp);
     std::vector<std::string>::iterator it = save.paramter.begin();
     for(; it != save.paramter.end(); it++)
     {
-        std::cout << "pra >> " << *it << std::endl;
+        std::cout << "pram >> " << *it << std::endl;
     }
+    std::cout << "path ==> " << save.path <<std::endl;
     // std::cout << save.method << std::endl << save.path << std::endl;
 }
 
