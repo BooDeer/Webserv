@@ -151,13 +151,13 @@ void install_servers(ConfigFile &conf) // intall servers
     //add parameters from config class
     // change servers
     // here
-    std::map<unsigned short, std::string> uniqueServers;
+    std::map<unsigned short, std::string> uniqueServers; // host:port
 
     filterByServer(conf, uniqueServers);
     size_t server_size = uniqueServers.size();
-    //  std::map<unsigned short, std::string>::iterator it = uniqueServers.begin();
-    // for(; it != uniqueServers.end() ; it++)
-    //     std::cout <<  "port == > "  << it->first << std::endl;
+     std::map<unsigned short, std::string>::iterator it = uniqueServers.begin();
+    for(; it != uniqueServers.end() ; it++)
+        std::cout <<  "port == > "  << it->first << std::endl;
 
     // while (1)
     //     ;

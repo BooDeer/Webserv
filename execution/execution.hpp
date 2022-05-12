@@ -6,6 +6,7 @@
 #include <sys/select.h> //  select header
 #include <iostream>
 #include <stdlib.h>
+#include <cstring>
 #include <unistd.h> // for close 
 #include <fstream>  // header for create file 
 #include <netinet/in.h> // structer sockaddr_in header

@@ -15,6 +15,8 @@ struct data
     std::string lenth;
     std::string referer;
     int status_code;
+    std::vector<std::string> paramter;
+    std::string extension;
     data()
     {
         id = -666; // hehe

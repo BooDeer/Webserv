@@ -1,4 +1,4 @@
-GET /favicon.ico HTTP/1.1
+GET /favicon.ico?test=1 HTTP/1.1
 Host: 127.0.0.1:2082
 Connection: keep-alive
 sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"

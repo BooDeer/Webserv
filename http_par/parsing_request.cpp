@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <string.h>
 #include "../webserve_data.hpp"
 
 void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
@@ -24,29 +25,23 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
     // std::cout << (d =save.path.find("?"));
     if ((d =save.path.find("?")) != std::string::npos) // <example> GET /cart.php?list=2&id=2 HTTP/1.1
     {
-
         tmp.erase(0, d+1); // &
         save.path.erase(d, save.path.size() - d);
     }
-    // std::string s = "scott>=tiger>=mushroom";
-
     size_t pos = 0;
     std::string token;
     while ((pos = tmp.find(delimiter)) != std::string::npos) 
     {
         token = tmp.substr(0, pos);
         save.paramter.push_back(token);
-        // std::cout << "token ==> " << token << std::endl;
         tmp.erase(0, pos + delimiter.length());
     }
     save.paramter.push_back(tmp);
-    std::vector<std::string>::iterator it = save.paramter.begin();
-    for(; it != save.paramter.end(); it++)
-    {
-        std::cout << "pram >> " << *it << std::endl;
-    }
-    std::cout << "path ==> " << save.path <<std::endl;
-    // std::cout << save.method << std::endl << save.path << std::endl;
+    std::string tmp2(save.path); // case1: there is "?<...>" case2: there is no "?" at the end
+    size_t pt, qstmark;
+    if ((pt = tmp2.find(".")) != std::string::npos)
+        tmp2 = tmp2.substr(pt+1, tmp2.size() - pt);
+    save.extension = tmp2;
 }
 
 void parsing_header(std::fstream &fs, data &d)
@@ -98,7 +93,7 @@ int main() {
     data data_to_save;
     // fs.open ("ex_3", std::fstream::in | std::fstream::out | std::fstream::app);
     // fs.open ("../just_test", std::fstream::in | std::fstream::out | std::fstream::binary);
-    fs.open ("../Tests/just_test", std::fstream::in | std::fstream::out);
+    fs.open ("GET_REQUEST", std::fstream::in | std::fstream::out);
     // fs.open ("POST_REQUEST", std::fstream::in | std::fstream::out | std::fstream::app);
     std::string line_save;
 //    fs << "\r\n\r\n";
