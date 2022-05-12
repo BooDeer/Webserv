@@ -153,7 +153,7 @@ void install_servers(ConfigFile &conf) // intall servers
     // here
     std::map<unsigned short, std::string> uniqueServers; // host:port
 
-    filterByServer(conf, uniqueServers);
+    filterByServer(conf, uniqueServers); // This is wrong, it takes unique port (it discards the case of similar ip and different host servers)
     size_t server_size = uniqueServers.size();
      std::map<unsigned short, std::string>::iterator it = uniqueServers.begin();
     for(; it != uniqueServers.end() ; it++)

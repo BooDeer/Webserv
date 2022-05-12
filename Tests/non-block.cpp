@@ -94,6 +94,7 @@ int main(int argc, char const *argv[])
 
   char hello[600] = "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Type: text/html\nContent-Length: 700\n\n<h1>Hello world!</h1>";
   char ip[] = "127.0.0.1";
+  char ip2[] = "127.0.0.2";
   //int fd = open("non-block.cpp", O_RDONLY);
   // int fd2 = open("non-block.cpp", O_RDONLY);
   // int fd3 = open("non-block.cpp", O_RDONLY);
@@ -101,112 +102,114 @@ int main(int argc, char const *argv[])
   std::string test1;
   std::map<int, std::string> m;
   fd_set current_sockets[NB_SRV], ready_sockets[NB_SRV], write_fd;
-  for(int i = 0; i < NB_SRV; i++)
-  {
-    prepare_socket(ip, PORT + i, server_fd[i]);
-    FD_ZERO(&current_sockets[i]);
-    FD_SET(server_fd[i], &current_sockets[i]);
-  }
-  int faical = 0;
-  // if ((server_fd2 = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+  // for(int i = 0; i < NB_SRV; i++)
   // {
-  //     perror("In socket");
-  //     exit(EXIT_FAILURE);
+    prepare_socket(ip, 2000, server_fd[0]);
+    prepare_socket(ip2, 2000, server_fd[1]);
+
+  //   FD_ZERO(&current_sockets[i]);
+  //   FD_SET(server_fd[i], &current_sockets[i]);
   // }
+  // int faical = 0;
+  // // if ((server_fd2 = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+  // // {
+  // //     perror("In socket");
+  // //     exit(EXIT_FAILURE);
+  // // }
 
 
-  while(1)
-    {
-      for (int j = 0; j < NB_SRV; j++)
-      {
-        usleep(1000);
-        std::cout << "port == " << PORT + j << "\n";
-        ready_sockets[j] = current_sockets[j];
-        //  write_fd =  ready_sockets;
-          int test;
-        printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-        if ((test = select(FD_SETSIZE, &ready_sockets[j], NULL, NULL, &tm)) < 0)
-          {
-            perror("select error");
-            exit(EXIT_FAILURE);
-          }
-          std::cout << " value --> " << test << std::endl;
-        int client_socket;
-        for (size_t i = 0; i < 9; i++)
-          {
-            if (FD_ISSET(i, &ready_sockets[j]))
-              {
-                //std::cout << "i ===> " << i << " server  socket ==> " << server_fd <<  std::endl;
-                if(i == server_fd[j])
-                  {
-                    //std::cout << "check is server fd read " << std::endl;
-                    client_socket = accept(server_fd[j], (struct sockaddr *)&address, (socklen_t*)&addrlen);
-                    //  std::cout << "client socket ===> " << client_socket << std::endl;
-                    FD_SET(client_socket, &current_sockets[j]);
+  // while(1)
+  //   {
+  //     for (int j = 0; j < NB_SRV; j++)
+  //     {
+  //       usleep(1000);
+  //       std::cout << "port == " << PORT + j << "\n";
+  //       ready_sockets[j] = current_sockets[j];
+  //       //  write_fd =  ready_sockets;
+  //         int test;
+  //       printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+  //       if ((test = select(FD_SETSIZE, &ready_sockets[j], NULL, NULL, &tm)) < 0)
+  //         {
+  //           perror("select error");
+  //           exit(EXIT_FAILURE);
+  //         }
+  //         std::cout << " value --> " << test << std::endl;
+  //       int client_socket;
+  //       for (size_t i = 0; i < 9; i++)
+  //         {
+  //           if (FD_ISSET(i, &ready_sockets[j]))
+  //             {
+  //               //std::cout << "i ===> " << i << " server  socket ==> " << server_fd <<  std::endl;
+  //               if(i == server_fd[j])
+  //                 {
+  //                   //std::cout << "check is server fd read " << std::endl;
+  //                   client_socket = accept(server_fd[j], (struct sockaddr *)&address, (socklen_t*)&addrlen);
+  //                   //  std::cout << "client socket ===> " << client_socket << std::endl;
+  //                   FD_SET(client_socket, &current_sockets[j]);
 
-                    //    close(client_socket);
-                  }
-                else
-                  {
-                    // handle request
-                    printf("------------------Hello message sent-------------------\n");
-                    int j = receive_basic(client_socket, m, current_sockets[j]);
-                    //std::cout << "----------------------------------------------------client >> " << i << std::endl;
+  //                   //    close(client_socket);
+  //                 }
+  //               else
+  //                 {
+  //                   // handle request
+  //                   printf("------------------Hello message sent-------------------\n");
+  //                   int j = receive_basic(client_socket, m, current_sockets[j]);
+  //                   //std::cout << "----------------------------------------------------client >> " << i << std::endl;
 
-                    //std::cout << "test 2 ==> " << m[i] << std::endl;
-                    // std::cerr << "Debugging: client_socket: " << client_socket << std::endl << "buffer: " << hello << std::endl;
-                    // send(client_socket, hello, strlen(hello), 0);
-                  //   if (j == 666)
-                  //     {
-                  //       faical++;
-                      // std::cout << " faical 3ami9" << std::endl;
-                      //   if(faical  == 1)
-                      //     {
-                          //   write(i , hello , strlen(hello));
-                          //     // close(client_socket);
-                          //     save_data = client_socket;close(client_socket);
-                          //     close(save_data);
-                          // }
-                      //   else if (faical == 2)
-                      //     {
-                      //     std::cout << " mara wela " << std::endl;
-                      //       char koko[29000];
-                      //       char hello1[50600] = "HTTP/1.1 200 OK\nContent-Type: image/jpg\nContent-Length: 21560\r\n\r\n"; // add size image 
-                      //       memset(koko, 0, 29000);
-                      //       int fd2 = open("/Users/ssamadi/Desktop/Webserv/socket.jpg", O_RDONLY);
-                      //       int size = read(fd2, koko, 29000);
-                      //       std::cout << "size is === > " << size  << std::endl;
-                      //       //char *wldfaicla = strjoin1(hello1, koko);
-                      //       //char *wldfaicla = (char *)memcpy(hello1 + strlen(hello1), koko, size);
-                      //       char *wldfaicla;
-                      //       wldfaicla = (char *)malloc(50000 * sizeof(char));
-                      //       memcpy(wldfaicla, hello1, strlen(hello1));
-                      //       memcpy(wldfaicla + strlen(hello1), koko, size);
-                      //       write(i, wldfaicla, strlen(hello1) + size);
-                      //     // send()
-                      //      // FD_CLR(i, &current_sockets);
-                      //         close(client_socket);
-                      //         close(save_data);
-                      //     }
-                      //   close(client_socket);
-                      // }
-                    // std::cout << "Current value: " << d << std::endl;
-                  }
-              }
-              // if  (FD_ISSET(i, &write_fd))
-              // {
-              //   std::cout << "hna  ------------------9+++++++++++++++*++++++++++++++" <<  std::endl;
-              //     char hello1[50600] = "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Type: text/html\nContent-Length: 15\n\n<h1>Hello world!</h1>"; // add size image 
-              //     char * wldfaicla = (char *)malloc(50000 * sizeof(char));
-              //     memcpy(wldfaicla, hello1, strlen(hello1));
-              //     memcpy(wldfaicla + strlen(hello1), "HELLOW test", 11);
-              //     write(i, wldfaicla, strlen(hello1) + 11);
-              //     close(client_socket);
+  //                   //std::cout << "test 2 ==> " << m[i] << std::endl;
+  //                   // std::cerr << "Debugging: client_socket: " << client_socket << std::endl << "buffer: " << hello << std::endl;
+  //                   // send(client_socket, hello, strlen(hello), 0);
+  //                 //   if (j == 666)
+  //                 //     {
+  //                 //       faical++;
+  //                     // std::cout << " faical 3ami9" << std::endl;
+  //                     //   if(faical  == 1)
+  //                     //     {
+  //                         //   write(i , hello , strlen(hello));
+  //                         //     // close(client_socket);
+  //                         //     save_data = client_socket;close(client_socket);
+  //                         //     close(save_data);
+  //                         // }
+  //                     //   else if (faical == 2)
+  //                     //     {
+  //                     //     std::cout << " mara wela " << std::endl;
+  //                     //       char koko[29000];
+  //                     //       char hello1[50600] = "HTTP/1.1 200 OK\nContent-Type: image/jpg\nContent-Length: 21560\r\n\r\n"; // add size image 
+  //                     //       memset(koko, 0, 29000);
+  //                     //       int fd2 = open("/Users/ssamadi/Desktop/Webserv/socket.jpg", O_RDONLY);
+  //                     //       int size = read(fd2, koko, 29000);
+  //                     //       std::cout << "size is === > " << size  << std::endl;
+  //                     //       //char *wldfaicla = strjoin1(hello1, koko);
+  //                     //       //char *wldfaicla = (char *)memcpy(hello1 + strlen(hello1), koko, size);
+  //                     //       char *wldfaicla;
+  //                     //       wldfaicla = (char *)malloc(50000 * sizeof(char));
+  //                     //       memcpy(wldfaicla, hello1, strlen(hello1));
+  //                     //       memcpy(wldfaicla + strlen(hello1), koko, size);
+  //                     //       write(i, wldfaicla, strlen(hello1) + size);
+  //                     //     // send()
+  //                     //      // FD_CLR(i, &current_sockets);
+  //                     //         close(client_socket);
+  //                     //         close(save_data);
+  //                     //     }
+  //                     //   close(client_socket);
+  //                     // }
+  //                   // std::cout << "Current value: " << d << std::endl;
+  //                 }
+  //             }
+  //             // if  (FD_ISSET(i, &write_fd))
+  //             // {
+  //             //   std::cout << "hna  ------------------9+++++++++++++++*++++++++++++++" <<  std::endl;
+  //             //     char hello1[50600] = "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Type: text/html\nContent-Length: 15\n\n<h1>Hello world!</h1>"; // add size image 
+  //             //     char * wldfaicla = (char *)malloc(50000 * sizeof(char));
+  //             //     memcpy(wldfaicla, hello1, strlen(hello1));
+  //             //     memcpy(wldfaicla + strlen(hello1), "HELLOW test", 11);
+  //             //     write(i, wldfaicla, strlen(hello1) + 11);
+  //             //     close(client_socket);
 
-              // }
+  //             // }
 
-          }
-      }
-    }
-  return 0;
+  //         }
+  //     }
+  //   }
+  // return 0;
   }
