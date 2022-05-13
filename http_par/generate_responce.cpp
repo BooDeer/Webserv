@@ -17,9 +17,8 @@ int check_first_line(data &d) // parsing the first line.
 {
 	// check method
 
-	// check if LOWERCASE
+	// first check if LOWERCASE
 	const char *save = d.method.c_str();
-
 	for(size_t i = 0; save[i] != '\0'; i++)
 	{
 		if(islower(save[i]))
@@ -28,8 +27,10 @@ int check_first_line(data &d) // parsing the first line.
 			d.status_code = 400;
 			break;
 		}
-
 	}
+
+	// check if file exist or have permision
+	
 	return 0;
 
 }
@@ -39,7 +40,7 @@ int main()
 {
 	data d;
 
-	d.method = "GET";
+	d.method = "GeT";
 	check_first_line(d);
 	std::cout << "code = > " << d.status_code << std::endl;
 
