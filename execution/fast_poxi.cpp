@@ -83,55 +83,55 @@
 
 
 
-// void start_server(int *fd_savior, fd_set *socket_list)
-// {
-//     struct timeval tm;
-//     for(int i = 0; i < 4; i++)
-//     {
-//         std::cout << fd_savior[i] << std::endl;
-//     }
-//     tm.tv_sec = 0;
-//     tm.tv_usec = 10;
-//     // struct sockaddr_in address;
-//     // socklen_t addrlen = sizeof(ad/dress);
-//     fd_set read_check[servers];
-//     int client_socket;
-//     char hello[82] = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 20\n\n<h1>Hello world!</h1>";
-//     // int selewct_check;
-//     while(1)
-//     {
-//         for(int i = 0; i <  servers; i++)
-//         {
-//             read_check[i] = socket_list[i];
-//             if(select(FD_SETSIZE, &read_check[i], NULL, NULL, &tm) < 0)
-//             {
-//                 std::cout << " select problem " << std::endl;
-//                 exit(EXIT_FAILURE);
-//             }
-//             for(size_t j = 0 ; j < FD_SETSIZE; j++)
-//             {
-//                 if(FD_ISSET(j, &read_check[i]))
-//                 {
-//                     // std::cout << " here " << std::endl;
-//                     if (j == fd_savior[i])
-//                     {
-//                         client_socket = accept(fd_savior[i], NULL, NULL);
-//                         FD_SET(client_socket, &socket_list[i]);
-//                         // std::cout << " is out " << std::endl;
-//                         usleep(10);
-//                     }
-//                     else
-//                     {
-//                         receive_basic(client_socket, socket_list[i]);
-//                         // std::cout << "send response " << std::endl;
-//                         // send(sj, hello, )
-//                         write(j, hello, strlen(hello));
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
+void start_server(int *fd_savior, fd_set *socket_list)
+{
+    struct timeval tm;
+    for(int i = 0; i < 4; i++)
+    {
+        std::cout << fd_savior[i] << std::endl;
+    }
+    tm.tv_sec = 0;
+    tm.tv_usec = 10;
+    // struct sockaddr_in address;
+    // socklen_t addrlen = sizeof(ad/dress);
+    fd_set read_check[servers];
+    int client_socket;
+    char hello[82] = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 20\n\n<h1>Hello world!</h1>";
+    // int selewct_check;
+    while(1)
+    {
+        for(int i = 0; i <  servers; i++)
+        {
+            read_check[i] = socket_list[i];
+            if(select(FD_SETSIZE, &read_check[i], NULL, NULL, &tm) < 0)
+            {
+                std::cout << " select problem " << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            for(size_t j = 0 ; j < FD_SETSIZE; j++)
+            {
+                if(FD_ISSET(j, &read_check[i]))
+                {
+                    // std::cout << " here " << std::endl;
+                    if (j == fd_savior[i])
+                    {
+                        client_socket = accept(fd_savior[i], NULL, NULL);
+                        FD_SET(client_socket, &socket_list[i]);
+                        // std::cout << " is out " << std::endl;
+                        usleep(10);
+                    }
+                    else
+                    {
+                        receive_basic(client_socket, socket_list[i]);
+                        // std::cout << "send response " << std::endl;
+                        // send(sj, hello, )
+                        write(j, hello, strlen(hello));
+                    }
+                }
+            }
+        }
+    }
+}
 
 void filterByServer(ConfigFile &conf, std::map<unsigned short, std::string> &unq)
 {
@@ -157,13 +157,13 @@ void install_servers(ConfigFile &conf) // intall servers
         std::cout <<  "port == > "  << it->first << std::endl;
 
 
-    // int fd_savior[conf.__Servers.size()]; // save fd of select 
-    // fd_set socket_list[conf.__Servers.size()]; // create fd_set for each server
-    // for(int i  = 0; i < conf.__Servers.size(); i++)
-    // {
-    //     prepare_socket(conf.__Servers[i], fd_savior[i]); // create one socket each server in config file
-    //     FD_ZERO(&socket_list[i]); // clear bit fd_set to 0
-    //     FD_SET(fd_savior[i], &socket_list[i]); // set bit in ft_set bytes 
-    // }
-//    start_server(fd_savior, socket_list); // all work from select to send response
+    int fd_savior[conf.__Servers.size()]; // save fd of select 
+    fd_set socket_list[conf.__Servers.size()]; // create fd_set for each server
+    for(int i  = 0; i < conf.__Servers.size(); i++)
+    {
+        prepare_socket(conf.__Servers[i], fd_savior[i]); // create one socket each server in config file
+        FD_ZERO(&socket_list[i]); // clear bit fd_set to 0
+        FD_SET(fd_savior[i], &socket_list[i]); // set bit in ft_set bytes 
+    }
+   start_server(fd_savior, socket_list); // all work from select to send response
 }
