@@ -13,15 +13,34 @@ class ConfigFile
 
  */
 
-int check_first_line(data &d, ConfigFile& data) // parsing the first line.
+int check_first_line(data &d) // parsing the first line.
 {
-    // first check method
-	// if (data.__Servers[0].)
-    
+	// check method
+
+	// check if LOWERCASE
+	const char *save = d.method.c_str();
+
+	for(size_t i = 0; save[i] != '\0'; i++)
+	{
+		if(islower(save[i]))
+		{
+			std::cout << "bad" << std::endl;
+			d.status_code = 400;
+			break;
+		}
+
+	}
+	return 0;
+
 }
 
 
 int main()
 {
-	
+	data d;
+
+	d.method = "GET";
+	check_first_line(d);
+	std::cout << "code = > " << d.status_code << std::endl;
+
 }
