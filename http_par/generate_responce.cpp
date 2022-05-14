@@ -40,37 +40,45 @@ class ConfigFile
 // 	return 0;
 
 // }
-void create_request(int client_socket, int server_socket)
-{
-	// Had zmer fih bzf redundent work and I hate it but it's fucking OOP :D
-	std::stringstream save, save2;
-	save << client_socket;
-	std::string id_c;
-	save >> id_c;
-	save2 << server_socket;
-	std::string id_s;
-	save2 >> id_s;
-    std::string file_name("webServ_" + id_c + "_" + id_s + ".tmp");
-	std::fstream	fd(file_name)
+// void create_file_request(int client_socket, int server_socket)
+// {
+// 	// Had zmer fih bzf redundent work and I hate it but it's fucking OOP :D
+// 	std::stringstream save, save2, time;
+// 	save << client_socket;
+// 	std::string id_c;
+// 	save >> id_c;
+// 	save2 << server_socket;
+// 	std::string id_s;
+// 	save2 >> id_s;
+//     std::string file_name("webServ_" + id_c + "_" + id_s + ".tmp");
+// 	std::fstream	fd(file_name);
 
-	if(fd.good())
-
-}
+// 	if (fd.is_open())
+// 	{
+// 		// fd.open()
+// 	}
+// 	else
+// 	{
+// 		std::cout << "mkaynx" << std::endl;
+// 	}
+// }
 
 
 int main()
 {
 	// data d;
-
+	data d;
 	// create_request(5, 10);
-	std::fstream	fd("a.ouasdasdt");
+	std::fstream	fd("zeb");
 
-	if (fd.good())
+	if (fd.is_open())
 	{
-		std::cout << "It exists" << std::endl;
-		return 1;
+		std::cout << "kayn" << std::endl;
 	}
-	std::cout << "It doesn't exists" << std::endl;
+	else
+	{
+		std::cout << "mkaynx" << std::endl;
+	}
 		return 1;
 	// d.method = "GeT";
 	// check_first_line(d);
