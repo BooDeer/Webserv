@@ -19,7 +19,7 @@ int main()
 	m.insert(b);
 	std::cout << m.size() << std::endl;
 	// std::pair<int, int> t1(10, 10);
-
+	std::cout << FD_SETSIZE << std::endl;
     // int fd = open("../just_test", O_RDONLY);
 
     // char test[200];
