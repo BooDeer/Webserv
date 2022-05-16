@@ -144,7 +144,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                     }
                     else
                     {
-                         request_info[client_socket] = tmp; //  std::ofstream file =  std::ofstream file 
+                        //  request_info[client_socket] = tmp; //  std::ofstream file =  std::ofstream file 
                         std::cout << "REACHED HERE AFTER CREATING THE FILE: " << request_info[j]._fileName << std::endl;
                         receive_basic(j, socket_list[i], fd_savior[i], request_info[j]);
                         // count++;
