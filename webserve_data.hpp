@@ -23,27 +23,13 @@ struct data
     int status_code;
     std::vector<std::string> paramter;
     std::string extension;
-    data(int client, int server)
+    data()
     {
-        struct timeval	time;
-		long long t;
-        gettimeofday(&time, NULL);
-        t = (time.tv_usec / 1000) + (time.tv_sec * 1000);
-        id = -666; // hehe
-        std::stringstream save, save2, time222;
-        save << client_socket;
-        std::string id_c;
-        save >> id_c;
-        save2 << server_socket;
-        std::string id_s;
-        save2 >> id_s;
-        time222 << t;
-        std::string time_;
-        time222 >> time_;
-        _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + time_ + ".tmp");
-        fd_file.open(_fileName, std::fstream::out);
-        std::cout << " file create fot this request is " <<  _fileName << std::endl;
+        this->id  = 0;
+        this->client_socket = 0;
+        this->server_socket = 0;
     }
+    void create_file(int fd_socket, int client_socket); // create file 
     ~data()
     {
         fd_file.close();

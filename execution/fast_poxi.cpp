@@ -34,7 +34,7 @@ void prepare_socket(std::map<unsigned short, std::string>::iterator& it, int &sa
     }
 }
 
-int receive_basic(int s, fd_set &current_sockets)
+int receive_basic(int s, fd_set &current_sockets, int fd_socket)
 {
 
 //   std::cout << " test hna 200 " << std::endl;
@@ -65,6 +65,7 @@ int receive_basic(int s, fd_set &current_sockets)
                          // parsing request               
                 }
             fs << chunk;
+            
           std::cout << " ------------------------- chuck --------------------" << std::endl;
       memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
     return total_size;
@@ -90,7 +91,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
     struct timeval tm;
     for(int i = 0; i < servers; i++)
     {
-        std::cout << fd_savior[i] << std::endl;
+        std::cout << "fd of socker server " << fd_savior[i] << std::endl;
     }
     tm.tv_sec = 0;
     tm.tv_usec = 10;
@@ -100,6 +101,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
     int client_socket;
     char hello[82] = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 20\n\n<h1>Hello world!</h1>";
     // int selewct_check;
+    std::vector<data> request_info; // request parse and info about file create
     while(1)
     {
         for(int i = 0; i <  servers; i++)
@@ -115,16 +117,18 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                 if(FD_ISSET(j, &read_check[i]))
                 {
                     // std::cout << " here " << std::endl;
+                    data tmp; //  to save current info about requset
                     if (j == fd_savior[i])
                     {
-                        client_socket = accept(fd_savior[i], NULL, NULL);
-                        FD_SET(client_socket, &socket_list[i]);
+                        client_socket = accept(fd_savior[i], NULL, NULL); // accept connection from browser
+                        FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set 
                         // std::cout << " is out " << std::endl;
                         usleep(10);
                     }
                     else
                     {
-                        receive_basic(j, socket_list[i]);
+                        request_info.push_back(tmp);
+                        receive_basic(j, socket_list[i], fd_savior[i]);
                         // std::cout << "send response " << std::endl;
                         // send(sj, hello, )
                         write(j, hello, strlen(hello));
@@ -161,7 +165,7 @@ void install_servers(ConfigFile &conf) // intall servers
 
     // while (1)
     //     ;
-    int fd_savior[server_size]; // save fd of select 
+    int fd_savior[server_size]; // save fd socker server 
     fd_set socket_list[server_size]; // create fd_set for each server
     std::map<unsigned short, std::string>::iterator it2 =  uniqueServers.begin();
     for(int i  = 0; i < server_size; i++)
