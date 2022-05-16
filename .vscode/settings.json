@@ -65,6 +65,27 @@
 		"type_traits": "cpp",
 		"typeinfo": "cpp",
 		"unordered_map": "cpp",
-		"utility": "cpp"
+		"utility": "cpp",
+		"*.tcc": "cpp",
+		"cinttypes": "cpp",
+		"clocale": "cpp",
+		"codecvt": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"condition_variable": "cpp",
+		"list": "cpp",
+		"set": "cpp",
+		"unordered_set": "cpp",
+		"memory_resource": "cpp",
+		"numeric": "cpp",
+		"random": "cpp",
+		"source_location": "cpp",
+		"future": "cpp",
+		"numbers": "cpp",
+		"semaphore": "cpp",
+		"stop_token": "cpp",
+		"thread": "cpp",
+		"valarray": "cpp",
+		"variant": "cpp"
 	}
 }
