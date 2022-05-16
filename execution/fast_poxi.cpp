@@ -46,8 +46,8 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket, data& req)
       
 //      std::string name = "test_file";
     //   name  + std::to_string(s);
-        fs.open(req._fileName, std::ofstream::out | std::ofstream::app);
-    std::cout << "SECOND TIME HERE writing in : " << req._fileName << std::endl;;
+    //     fs.open(req._fileName, std::ofstream::out | std::ofstream::app);
+    // std::cout << "SECOND TIME HERE writing in : " << req._fileName << std::endl;;
         
         
         size_read = recv(s , chunk , CHUNK_SIZE, 0);
@@ -66,7 +66,7 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket, data& req)
             // bood2 << "test2";
             // req.fd_file << chunk;
             // req.fd_file->operator<<("test");
-            fs << chunk;
+            req.fd_file << chunk;
             if(size_read == 0)
             {
                 close(s);
@@ -150,7 +150,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                         // count++;
                         // std::cout << "send response " << std::endl;
                         // send(sj, hello, )
-                        write(j, hello, strlen(hello));
+                        write(j, hello, strlen(hello)); // send
                     }
                 }
             }
