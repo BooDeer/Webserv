@@ -1,6 +1,6 @@
 
 server {
-	"port": 2004
+	"port": 2030
 	"host": 127.0.0.1
 	"serverNames": example.com
 #"errorPages": 401 pathexample
@@ -11,17 +11,7 @@ server {
 
 }
 server {
-	"port": 2004
-	"host": 127.0.0.2
-	"serverNames": example1.com
-#"errorPages": 401 pathexample
-#"limitSize": 90
-#"location": {
-#		
-#	}
-}
-server {
-	"port": 2003
+	"port": 2020
 	"host": 127.0.0.1
 	"serverNames": example1.com
 #"errorPages": 401 pathexample

@@ -28,13 +28,31 @@ struct data
         this->id  = 0;
         this->client_socket = 0;
         this->server_socket = 0;
+        // this->fd_file = new std::ofstream();
+    }
+    void operator=(data &o)
+    {
+        this->id = o.id;
+        this->_fileName = o._fileName;
+        this->fd_file.open(_fileName);
+        this->client_socket = o.client_socket;
+        this->server_socket = o.server_socket;
+        this->path = o.path;
+        this->method = o.method;
+        this->host = o.host;
+        this->lenth = o.lenth;
+        this->referer = o.referer;
+        this->status_code = o.status_code;
+        this->paramter = o.paramter;
+        this->extension = o.extension;
     }
     void create_file(int fd_socket, int client_socket); // create file 
     ~data()
     {
-        fd_file.close();
-        remove(_fileName.c_str()); // remove file 
+       // fd_file->close();
+        //remove(_fileName.c_str()); // remove file 
     }
+    
 };
 
 

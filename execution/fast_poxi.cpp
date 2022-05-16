@@ -1,4 +1,3 @@
-
 #include "execution.hpp"
 #include "../webserv.hpp"
 
@@ -34,7 +33,7 @@ void prepare_socket(std::map<unsigned short, std::string>::iterator& it, int &sa
     }
 }
 
-int receive_basic(int s, fd_set &current_sockets, int fd_socket)
+int receive_basic(int s, fd_set &current_sockets, int fd_socket, data& req)
 {
 
 //   std::cout << " test hna 200 " << std::endl;
@@ -43,19 +42,16 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket)
   memset(chunk ,0 , CHUNK_SIZE);
 
         int size_read;
-     std::fstream fs;
+     std::ofstream fs;
       
 //      std::string name = "test_file";
     //   name  + std::to_string(s);
-        fs.open ("just_test", std::fstream::in | std::fstream::out | std::fstream::binary);
+        fs.open(req._fileName, std::ofstream::out | std::ofstream::app);
+    std::cout << "SECOND TIME HERE writing in : " << req._fileName << std::endl;;
+        
+        
         size_read = recv(s , chunk , CHUNK_SIZE, 0);
-        if(size_read == 0)
-        {
-            close(s);
-            std::cout << "close and clear file" << std::endl;
-            // open again // remove
-            FD_CLR(s, &current_sockets);
-        }
+       
             std::cout << chunk << std::endl;
             std::string bood(chunk);
             if (bood.find("\r\n\r\n") != std::string::npos)
@@ -64,8 +60,21 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket)
                 {
                          // parsing request               
                 }
-            fs << chunk;
+            // fs << chunk;
             
+            //  std::ofstream bood2("BoodTest22222.txt", std::fstream::out);
+            // bood2 << "test2";
+            // req.fd_file << chunk;
+            // req.fd_file->operator<<("test");
+            fs << chunk;
+            if(size_read == 0)
+            {
+                close(s);
+                fs.close();
+                std::cout << "close and clear file" << std::endl;
+                // open again // remove
+                FD_CLR(s, &current_sockets);
+            }
           std::cout << " ------------------------- chuck --------------------" << std::endl;
       memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
     return total_size;
@@ -97,11 +106,14 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
     tm.tv_usec = 10;
     // struct sockaddr_in address;
     // socklen_t addrlen = sizeof(ad/dress);
+    std::cout << socket_list[0].fds_bits[0] << std::endl;
     fd_set read_check[servers];
     int client_socket;
     char hello[82] = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 20\n\n<h1>Hello world!</h1>";
     // int selewct_check;
-    std::vector<data> request_info; // request parse and info about file create
+    std::map<int , data> request_info; // std::map<client_socket, data struct(contains headers ect)>
+    // test map 
+    // test int count 
     while(1)
     {
         for(int i = 0; i <  servers; i++)
@@ -121,14 +133,21 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                     if (j == fd_savior[i])
                     {
                         client_socket = accept(fd_savior[i], NULL, NULL); // accept connection from browser
+                        // tmp.client_socket = client_socket;
+                        tmp.create_file(fd_savior[i],  client_socket); // machi hna
+                        request_info[client_socket] = tmp;
+                        // tmp.server_socket = fd_savior[i];
+                        // tmp.create_file(fd_savior[i],  client_socket);
                         FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set 
                         // std::cout << " is out " << std::endl;
                         usleep(10);
                     }
                     else
                     {
-                        request_info.push_back(tmp);
-                        receive_basic(j, socket_list[i], fd_savior[i]);
+                         request_info[client_socket] = tmp; //  std::ofstream file =  std::ofstream file 
+                        std::cout << "REACHED HERE AFTER CREATING THE FILE: " << request_info[j]._fileName << std::endl;
+                        receive_basic(j, socket_list[i], fd_savior[i], request_info[j]);
+                        // count++;
                         // std::cout << "send response " << std::endl;
                         // send(sj, hello, )
                         write(j, hello, strlen(hello));
