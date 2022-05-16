@@ -124,7 +124,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                     }
                     else
                     {
-                        receive_basic(client_socket, socket_list[i]);
+                        receive_basic(j, socket_list[i]);
                         // std::cout << "send response " << std::endl;
                         // send(sj, hello, )
                         write(j, hello, strlen(hello));

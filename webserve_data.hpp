@@ -23,7 +23,7 @@ struct data
     int status_code;
     std::vector<std::string> paramter;
     std::string extension;
-    data()
+    data(int client, int server)
     {
         struct timeval	time;
 		long long t;
@@ -40,15 +40,14 @@ struct data
         time222 << t;
         std::string time_;
         time222 >> time_;
-        _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + time_ +".tmp");
-        // std::string file_name("thisisatest");
-        fd_file.open(_fileName, std::fstream::out );
-        std::cout << _fileName << std::endl;
+        _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + time_ + ".tmp");
+        fd_file.open(_fileName, std::fstream::out);
+        std::cout << " file create fot this request is " <<  _fileName << std::endl;
     }
     ~data()
     {
         fd_file.close();
-        remove(_fileName.c_str());
+        remove(_fileName.c_str()); // remove file 
     }
 };
 
