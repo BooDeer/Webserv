@@ -41,7 +41,7 @@ void data::create_file(int fd_socket, int client_socket)
     std::string time_;
     time222 >> time_;
     _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + "_" + time_ + ".txt");
-	fd_file.open(_fileName);
+	// fd_file.open(_fileName, std::ofstream::out | std::ofstream::app);
     std::cout << "writing in : " << _fileName << std::endl;
 	// fd_file->operator<<("help");
     //  std::ofstream bood2("BoodTest22222.txt", std::fstream::out);

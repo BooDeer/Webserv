@@ -27,9 +27,12 @@ struct bod {
 };
 int main()
 {
-    bod te;
-    {
-      te.create_file();
-    }
-    te.test << " reset" << std::endl;
+    // bod te;
+    // {
+    //   te.create_file();
+    // }
+    // te.test << " reset" << std::endl;
+	std::cout << 0777 << std::endl;
+	int fd = open("/tmp/BoodTest", O_RDWR | O_CREAT, 0666);
+	write(fd, "best", 5);
 }
