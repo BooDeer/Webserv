@@ -11,7 +11,7 @@
 struct data
 {
     int id; // id for request
-    std::fstream fd_file; // file stream
+    std::ofstream fd_file; // file stream
     std::string _fileName;
     int client_socket;
     int server_socket;
@@ -28,13 +28,15 @@ struct data
         this->id  = 0;
         this->client_socket = 0;
         this->server_socket = 0;
+        this->status_code = 0;
         // this->fd_file = new std::ofstream();
     }
     void operator=(data &o)
     {
+        std::cout << "---------------operator =" << std::endl;
         this->id = o.id;
         this->_fileName = o._fileName;
-        this->fd_file.open(_fileName);
+        this->fd_file.open(_fileName); // open file again with name
         this->client_socket = o.client_socket;
         this->server_socket = o.server_socket;
         this->path = o.path;

@@ -36,20 +36,15 @@ void prepare_socket(std::map<unsigned short, std::string>::iterator& it, int &sa
 int receive_basic(int s, fd_set &current_sockets, int fd_socket, data& req)
 {
 
+std::cout << "name of file ==> " << req._fileName << std::endl;
 //   std::cout << " test hna 200 " << std::endl;
   int size_recv , total_size= 0;
   char chunk[CHUNK_SIZE];
   memset(chunk ,0 , CHUNK_SIZE);
 
         int size_read;
-     std::ofstream fs;
-      
-//      std::string name = "test_file";
-    //   name  + std::to_string(s);
-    //     fs.open(req._fileName, std::ofstream::out | std::ofstream::app);
-    // std::cout << "SECOND TIME HERE writing in : " << req._fileName << std::endl;;
-        
-        
+    //  std::ofstream fs;
+    
         size_read = recv(s , chunk , CHUNK_SIZE, 0);
        
             std::cout << chunk << std::endl;
@@ -60,18 +55,15 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket, data& req)
                 {
                          // parsing request               
                 }
-            // fs << chunk;
-            
-            //  std::ofstream bood2("BoodTest22222.txt", std::fstream::out);
-            // bood2 << "test2";
-            // req.fd_file << chunk;
-            // req.fd_file->operator<<("test");
             req.fd_file << chunk;
+            // exit(1);
             if(size_read == 0)
             {
                 close(s);
-                fs.close();
+             //   fs.close();
                 std::cout << "close and clear file" << std::endl;
+
+                // req.fd_file << "test 11 1 1";
                 // open again // remove
                 FD_CLR(s, &current_sockets);
             }
@@ -98,10 +90,10 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket, data& req)
 void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
 {
     struct timeval tm;
-    for(int i = 0; i < servers; i++)
-    {
-        std::cout << "fd of socker server " << fd_savior[i] << std::endl;
-    }
+    // for(int i = 0; i < servers; i++)
+    // {
+    //     std::cout << "fd of socker server " << fd_savior[i] << std::endl;
+    // }
     tm.tv_sec = 0;
     tm.tv_usec = 10;
     // struct sockaddr_in address;
@@ -114,6 +106,8 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
     std::map<int , data> request_info; // std::map<client_socket, data struct(contains headers ect)>
     // test map 
     // test int count 
+    int save1;
+    std::vector<data> test11;
     while(1)
     {
         for(int i = 0; i <  servers; i++)
@@ -129,27 +123,38 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                 if(FD_ISSET(j, &read_check[i]))
                 {
                     // std::cout << " here " << std::endl;
-                    data tmp; //  to save current info about requset
+                 //  to save current info about requset
+                    data tmp; 
                     if (j == fd_savior[i])
                     {
                         client_socket = accept(fd_savior[i], NULL, NULL); // accept connection from browser
-                        // tmp.client_socket = client_socket;
-                        tmp.create_file(fd_savior[i],  client_socket); // machi hna
-                        request_info[client_socket] = tmp;
-                        // tmp.server_socket = fd_savior[i];
-                        // tmp.create_file(fd_savior[i],  client_socket);
+                        tmp.create_file(fd_savior[i],  client_socket); // create file of request
+                        // tmp.fd_file << "test sucss\n";
+                        // tmp.fd_file << "best sucss\n";
+                        // tmp.fd_file << "cest sucss\n";
+                        // tmp.fd_file << "test\n";
+                        request_info[client_socket] = tmp; // add to map
+                        tmp.fd_file.close();
+                    //    test11.push_back(tmp);
+                        // test11[0].fd_file <<  "test 111";
+                        // test 2
+                        // request_info[client_socket].fd_file.open("/tmp/test.txt", std::ios::out);
+                       // request_info[client_socket].fd_file.open("one_file1.txt", std::fstream::out);
+                        // request_info[client_socket].fd_file << "test sucss\n";
+                        // request_info[client_socket].fd_file << "best sucss\n";
+                        // request_info[client_socket].fd_file << "cest sucss\n";
+                        // std::cout << "file name test 2 "  << request_info[client_socket]._fileName << std::endl;
+                        // request_info[client_socket].fd_file << "test2\n";
+                        // tmp.clear();
                         FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set 
                         // std::cout << " is out " << std::endl;
                         usleep(10);
+                       // exit(1);
                     }
                     else
                     {
-                        //  request_info[client_socket] = tmp; //  std::ofstream file =  std::ofstream file 
                         std::cout << "REACHED HERE AFTER CREATING THE FILE: " << request_info[j]._fileName << std::endl;
                         receive_basic(j, socket_list[i], fd_savior[i], request_info[j]);
-                        // count++;
-                        // std::cout << "send response " << std::endl;
-                        // send(sj, hello, )
                         write(j, hello, strlen(hello)); // send
                     }
                 }

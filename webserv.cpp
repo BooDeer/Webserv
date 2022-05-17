@@ -23,10 +23,9 @@
 // }
 void data::create_file(int fd_socket, int client_socket)
 {
-
     this->server_socket = fd_socket;
     this->client_socket = client_socket;
-	std::cout << "start create file" << std::endl;
+	std::cout << "start create file-----" << std::endl;
 	struct timeval	time;
 	long long t;
     gettimeofday(&time, NULL);
@@ -41,17 +40,11 @@ void data::create_file(int fd_socket, int client_socket)
     time222 << t;
     std::string time_;
     time222 >> time_;
-    _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + time_ + ".txt");
-    // _fileName = std::string("/tmp/Bood.txt");
-    // fd_file->open(_fileName, std::fstream::out);
-	// open again with appaned mode 
-    std::ofstream fd_file;
-	fd_file.open(_fileName, std::ofstream::out);
-    std::cout << "writing in : " << _fileName << std::endl;;
-    fd_file.close();
+    _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + "_" + time_ + ".txt");
+	fd_file.open(_fileName);
+    std::cout << "writing in : " << _fileName << std::endl;
 	// fd_file->operator<<("help");
     //  std::ofstream bood2("BoodTest22222.txt", std::fstream::out);
-    //         bood2 << "test2";
     std::cout << " file create fot this request is " <<  _fileName << std::endl;
 }
 

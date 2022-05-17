@@ -12,33 +12,24 @@
 
 
 struct bod {
-  std::string name;
+  // std::string name;
+  std::fstream test;
   bod()
   {
     std::cout << "Reacehd here" << std::endl;
   }
   // int  a;
+  void create_file()
+  {
+    test.open("brah.txt",  std::fstream::out);
 
+  }
 };
 int main()
 {
-// 	std::fstream fd_file1;
-// 	std::fstream &fd_file2 = fd_file1;
-    // std::ofstream bood("/tmp/BoodTest.txt", std::fstream::out);
-    // bood << "test";
-    // bood.close();
-    // bood.open("/tmp/BoodTest.txt", )
-    // for (int i = 0; i < 5; i++)
-    // {
-    //   bod lol;
-    //   std::cout << &lol << std::endl;
-    //   if (i == 3) {
-    //     lol.name = "beep boop";
-    //   }
-
-    //   std::cout << lol.name << std::endl;
-    // }
-    std::fstream fd1, fd2;
-    fd1 = fd2;
-	// fd_file2 << fd_file1.rdbuf();
+    bod te;
+    {
+      te.create_file();
+    }
+    te.test << " reset" << std::endl;
 }
