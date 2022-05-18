@@ -1,0 +1,56 @@
+TERM_PROGRAM=vscode
+HOMEBREW_TEMP=/tmp/fbouibao/Homebrew/Temp
+TERM=xterm-256color
+SHELL=/bin/zsh
+TMPDIR=/var/folders/zz/zyxvpxvq6csfxvn_n000064m0001j5/T/
+Apple_PubSub_Socket_Render=/private/tmp/com.apple.launchd.d8FW53CKQR/Render
+TERM_PROGRAM_VERSION=1.66.2
+TERM_SESSION_ID=w0t0p0:DCF924CE-052D-4FB7-B880-524758FFCCFE
+ZSH=/Users/fbouibao/.oh-my-zsh
+USER=fbouibao
+COMMAND_MODE=unix2003
+SSH_AUTH_SOCK=/private/tmp/com.apple.launchd.5XBUtWBTNi/Listeners
+__CF_USER_TEXT_ENCODING=0x625:0x0:0x0
+PAGER=less
+HOMEBREW_CACHE=/tmp/fbouibao/Homebrew/Caches
+LSCOLORS=Gxfxcxdxbxegedabagacad
+PATH=/Users/fbouibao/.brew/bin:/Users/fbouibao/.brew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki:/Users/fbouibao/.brew/bin
+PWD=/Users/fbouibao/Desktop/cgi
+LANG=en_US.UTF-8
+ITERM_PROFILE=Default
+XPC_FLAGS=0x0
+XPC_SERVICE_NAME=0
+SHLVL=3
+HOME=/Users/fbouibao
+COLORFGBG=7;0
+LC_TERMINAL_VERSION=3.4.15
+ITERM_SESSION_ID=w0t0p0:DCF924CE-052D-4FB7-B880-524758FFCCFE
+LESS=-R
+LOGNAME=fbouibao
+LC_TERMINAL=iTerm2
+SECURITYSESSIONID=186a8
+COLORTERM=truecolor
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL=true
+ORIGINAL_XDG_CURRENT_DESKTOP=undefined
+VSCODE_GIT_IPC_HANDLE=/var/folders/zz/zyxvpxvq6csfxvn_n000064m0001j5/T/vscode-git-b3101fa58f.sock
+VSCODE_GIT_ASKPASS_NODE=/Applications/Visual Studio Code.app/Contents/MacOS/Electron
+VSCODE_GIT_ASKPASS_EXTRA_ARGS=--ms-enable-electron-run-as-node
+VSCODE_GIT_ASKPASS_MAIN=/Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass-main.js
+GIT_ASKPASS=/Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass.sh
+OLDPWD=/Users/fbouibao/Desktop
+_=/Users/fbouibao/Desktop/cgi/./a.out
+CONTENT_LENGTH=
+CONTENT_TYPE=
+
+
+
+
+
+
+ ---------------43----------------------
+
+
+
+
+
+

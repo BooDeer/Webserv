@@ -1,0 +1,12 @@
+#!/bin/sh
+#REQUEST_DATA="var_1=val_1&var_2=val_2"
+export GATEWAY_INTERFACE="CGI/1.1"
+export SERVER_PROTOCOL="HTTP/1.1"
+#export QUERY_STRING="test=querystring"
+export REDIRECT_STATUS="200"
+export SCRIPT_FILENAME="test.php"
+export REQUEST_METHOD="POST"
+export CONTENT_LENGTH=239
+#export CONTENT_TYPE="multipart/form-data; boundary=----WebKitFormBoundarylpWRPiMZMcFM46QB"
+export CONTENT_TYPE="multipart/form-data;charset=utf-8"
+cat body-msg | /usr/bin/php-cgi
