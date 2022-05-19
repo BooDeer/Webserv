@@ -13,8 +13,10 @@
 struct data
 {
     int id; // id for request
-    std::ofstream fd_file; // file stream
+   // std::ofstream fd_file; // file stream
 	int	_fileFd;
+    bool is_header; // check is header
+    bool remove; // remove from header
     std::string _fileName;
     int client_socket;
     int server_socket;
@@ -32,6 +34,8 @@ struct data
         this->client_socket = 0;
         this->server_socket = 0;
         this->status_code = 0;
+        is_header = false;
+        remove = false;
     }
     data& operator=(data &o)
     {
@@ -54,7 +58,13 @@ struct data
     void create_file(int fd_socket, int client_socket); // create file 
     ~data()
     {
-        //remove(_fileName.c_str()); // remove file 
+         this->id  = 0;
+        this->client_socket = 0;
+        this->server_socket = 0;
+        this->status_code = 0;
+        is_header = false;
+        remove = false;
+      //  close(_fileFd);
     }
     
 };

@@ -33,26 +33,66 @@ void prepare_socket(std::map<unsigned short, std::string>::iterator& it, int &sa
     }
 }
 
-int receive_basic(int s, fd_set &current_sockets, int fd_socket, data& req)
+int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req)
 {
 
-  int size_recv , total_size= 0;
-  char chunk[CHUNK_SIZE];
-  memset(chunk ,0 , CHUNK_SIZE);
-        int size_read;
-        size_read = recv(s , chunk , CHUNK_SIZE, 0);
-		write(req._fileFd, chunk, std::strlen(chunk));
-            if(size_read == 0)
-            {
-                close(s);
-                FD_CLR(s, &current_sockets);
-             //   fs.close();
-                std::cout << "close and clear file" << std::endl;
-
-            }
-			usleep(10);
-		  std::cout << " ------------------------- chuck --------------------" << std::endl;
-      memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
+    int size_recv , total_size= 0;
+    char chunk[CHUNK_SIZE];
+    memset(chunk ,0 , CHUNK_SIZE);
+    int size_read;
+    size_read = recv(s , chunk , CHUNK_SIZE, 0);
+    // parse here
+    // CHECK IF POST
+    std::stringstream check(chunk);
+    std::string tmp;
+    std::cout << "socket number " << s << std::endl;
+    if(req[s].is_header ==  false) // parsing the header.
+    {
+        // std::string tmp;
+        // parse here requset check errors and throw or return
+        // get line 
+        std::getline(check, tmp); // get first line in header
+        // if (tmp.find("HTTP") != std::string::npos)
+        first_line(tmp, req[s]);
+        // try catch
+        // check_first_line(req, ) // -------------- check throw
+        // if (tmp.find("\r\n\r\n") != std::string::npos)
+        parsing_header(check, req[s]);
+        tmp = std::string(chunk);
+        
+        tmp.erase(0, tmp.find("\r\n\r\n") + 4);
+        std::cout << "|" << tmp  << "|" << std::endl;
+        req[s].is_header = true;
+        // here
+       
+        std::cout << "end of parsing " << std::endl;
+    }
+    // else write if POST on file or pipe
+    
+     if(req[s].is_header ==  true && tmp.length() != 0)
+     {	        
+         std::cout << "name of file get here -> " << req[s]._fileName << std::endl;
+         write(req[s]._fileFd, tmp.c_str(),  tmp.length());
+         tmp.clear();
+     }
+     else if (req[s].is_header == false)
+     {
+        std::cout << "chunk here -------> " << req[s]._fileName << std::endl;
+	    write(req[s]._fileFd, chunk, std::strlen(chunk));
+     }
+    // if recv return 0  close connectoin  /// check limite size and close client socket
+    if(size_read == 0)
+    {
+        close(s);
+        std::cout << "test clear" << std::endl;
+        req[s].remove = true; // set remove to remove data from map
+        FD_CLR(s, &current_sockets);
+     //   fs.close();
+        std::cout << "close and clear file" << std::endl;
+    }
+	usleep(10);
+	std::cout << " ------------------------- chuck --------------------" << std::endl;
+    memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
     return total_size;
 }
 
@@ -115,8 +155,9 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                     {
                         std::cout << "REACHED HERE AFTER CREATING THE FILE: " << request_info[j]._fileName << "with fd of : "<< request_info[j]._fileFd<< std::endl;
 						// std::cout << "here " << std::endl;
-                        receive_basic(j, socket_list[i], fd_savior[i], request_info[j]);
+                        receive_basic(j, socket_list[i], fd_savior[i], request_info);
                         write(j, hello, strlen(hello)); // send
+                        request_info.erase(j); // erase socket data parsing from map after send response
 						// FD_CLR(fd_savior[i], &socket_list[i]);
                     }
                 }
@@ -163,3 +204,15 @@ void install_servers(ConfigFile &conf) // intall servers
     }
    start_server(fd_savior, socket_list, server_size); // all work from select to send response
 }
+
+
+/* 
+
+    location /kapouet {
+        <config>
+    }
+    location / {
+        <config>
+    }
+    }
+ */
