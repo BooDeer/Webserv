@@ -84,10 +84,8 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int ,
     if(size_read == 0)
     {
         close(s);
-        std::cout << "test clear" << std::endl;
         req[s].remove = true; // set remove to remove data from map
         FD_CLR(s, &current_sockets);
-     //   fs.close();
         std::cout << "close and clear file" << std::endl;
     }
 	usleep(10);
@@ -157,7 +155,9 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
 						// std::cout << "here " << std::endl;
                         receive_basic(j, socket_list[i], fd_savior[i], request_info);
                         write(j, hello, strlen(hello)); // send
+                        // remove(request_info[j]._fileName.c_str())
                         request_info.erase(j); // erase socket data parsing from map after send response
+                        
 						// FD_CLR(fd_savior[i], &socket_list[i]);
                     }
                 }
