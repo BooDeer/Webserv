@@ -6,7 +6,7 @@
 /*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/05/06 18:29:53 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/05/19 09:46:22 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int l
 	std::vector<std::string>::iterator it;
 	if (line.size() < 2)
 		exitMessage(1, "Error! too few arguments in line: ", ln);
+	if (dir == false && line.size() % 2 == 0) //* The errorPages directive needs to be pair (status code + <URL>)
+		exitMessage(1, "Error! Incomplete arguments in line: ", ln);
 	it = line.begin();
 	it++;
 	for (; it != line.end(); ++it)
