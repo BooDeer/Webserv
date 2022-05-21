@@ -129,7 +129,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
         for(int i = 0; i <  servers; i++)
         {
             read_check[i] = socket_list[i];
-            if(select(FD_SETSIZE, &read_check[i], NULL, NULL, &tm) < 0)
+            if(select(FD_SETSIZE, &read_check[i], NULL, NULL, &tm) < 0) // add ready to readls 
             {
                 std::cout << " select problem " << std::endl;
                 exit(EXIT_FAILURE);
@@ -139,7 +139,6 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                 if(FD_ISSET(j, &read_check[i]))
                 {
                     data tmp;
-
                     if (j == fd_savior[i])
                     {
                         client_socket = accept(fd_savior[i], NULL, NULL); // accept connection from browser

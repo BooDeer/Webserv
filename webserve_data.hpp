@@ -18,8 +18,8 @@ struct data
     bool is_header; // check is header
     bool remove; // remove from header
     std::string _fileName;
-    int client_socket;
-    int server_socket;
+    int client_socket; // client id socket 
+    int server_socket; //  server is socket
     std::string path;
     std::string method;
     std::string host;
@@ -28,6 +28,7 @@ struct data
     int status_code;
     std::vector<std::string> paramter;
     std::string extension;
+    // add config check
     data()
     {
         this->id  = 0;
