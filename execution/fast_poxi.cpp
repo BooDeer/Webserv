@@ -58,8 +58,13 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int ,
         // check_first_line(req, ) // -------------- check throw
         // if (tmp.find("\r\n\r\n") != std::string::npos)
         parsing_header(check, req[s]);
+        std::cout << "name of file get here -> " <<  req[s]._fileName  << " check limit == > " << req[s].lenth  << "check server block " << req[s].config_block.__ClientLimit << std::endl;
+        if(req[s].lenth != -666)
+        {
+            if(req[s].lenth > req[s].config_block.__ClientLimit)
+                throw 413;
+        }
         tmp = std::string(chunk);
-        
         tmp.erase(0, tmp.find("\r\n\r\n") + 4);
         std::cout << "|" << tmp  << "|" << std::endl;
         req[s].is_header = true;
@@ -68,12 +73,11 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int ,
         std::cout << "end of parsing " << std::endl;
     }
     // else write if POST on file or pipe
-    
      if(req[s].is_header ==  true && tmp.length() != 0)
-     {	        
-         std::cout << "name of file get here -> " << req[s]._fileName << std::endl;
-         write(req[s]._fileFd, tmp.c_str(),  tmp.length());
-         tmp.clear();
+     {
+         // check limmite size and throw error
+        write(req[s]._fileFd, tmp.c_str(),  tmp.length());
+        tmp.clear();
      }
      else if (req[s].is_header == false)
      {
@@ -109,7 +113,7 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int ,
 
 
 
-void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
+void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFile &conf)
 {
     struct timeval tm;
    
@@ -152,6 +156,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers)
                     {
                         std::cout << "REACHED HERE AFTER CREATING THE FILE: " << request_info[j]._fileName << "with fd of : "<< request_info[j]._fileFd<< std::endl;
 						// std::cout << "here " << std::endl;
+                        request_info[j].config_block = conf.__Servers[i];
                         receive_basic(j, socket_list[i], fd_savior[i], request_info);
                         write(j, hello, strlen(hello)); // send
                         // remove(request_info[j]._fileName.c_str())
@@ -201,7 +206,7 @@ void install_servers(ConfigFile &conf) // intall servers
         FD_SET(fd_savior[i], &socket_list[i]); // set bit in ft_set bytes 
         it2++;
     }
-   start_server(fd_savior, socket_list, server_size); // all work from select to send response
+   start_server(fd_savior, socket_list, server_size, conf); // all work from select to send response
 }
 
 

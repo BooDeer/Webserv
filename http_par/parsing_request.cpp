@@ -54,11 +54,15 @@ void parsing_header(std::stringstream &fs, data &d)
         }
         else if (lines.find("Content-Length:") != std::string::npos) // Content-Length: 69
         {
-            d.lenth =  lines.erase(0, strlen("Content-Length: "));
+            // problem if 100GB
+            // d.lenth =  lines.erase(0, strlen("Content-Length: "));
+            std::string save = lines.erase(0, strlen("Content-Length: "));
+            std::istringstream(save) >> d.lenth;
+            //  save << 
         }
         else if (lines.find("Content-Type:") != std::string::npos) // Content-Length: 69
         {
-            d.lenth =  lines.erase(0, strlen("Content-Type: "));
+            d.type =  lines.erase(0, strlen("Content-Type: "));
         }
         else if (lines.find("Referer:") != std::string::npos) // Referer: http://127.0.0.1:2082/
         {

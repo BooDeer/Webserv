@@ -7,7 +7,6 @@
 #include <sys/time.h>
 #include <sstream>
 #include <fstream>
-#include "execution/execution.hpp"
 #include "webserv.hpp"
 
 struct data
@@ -23,18 +22,22 @@ struct data
     std::string path;
     std::string method;
     std::string host;
-    std::string lenth;
+    unsigned long long lenth;
+    std::string type;
     std::string referer;
     int status_code;
     std::vector<std::string> paramter;
     std::string extension;
-    // add config check
+    ServerBlock config_block; // server block config
+    
+    public:
     data()
     {
         this->id  = 0;
         this->client_socket = 0;
         this->server_socket = 0;
         this->status_code = 0;
+        this->lenth = 0;
         is_header = false;
         remove = false;
     }
