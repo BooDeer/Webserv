@@ -2,20 +2,8 @@
 #include "../parsing/parsing.hpp"
 
 
-/* 
-
-class ConfigFile
-{
-		std::vector<ServerBlock>		__Servers;
-};
-
- */
-
 void check_first_line(data &d, ConfigFile &conf) // parsing the first line.
 {
-// 	// check method
-
-// 	// first check if LOWERCASE
  	const char *save = d.method.c_str();
 	for(size_t i = 0; save[i] != '\0'; i++)
 	{
@@ -26,35 +14,23 @@ void check_first_line(data &d, ConfigFile &conf) // parsing the first line.
 			throw 400;
 		}
 	}
-	// GET POST DELETE 
+	// GET POST DELETE
 	if(d.method != "GET" || d.method != "POST" || d.method != "DELETE")
 	{
 		d.status_code = 405;
 		throw 405;
 	}
 }
-// void create_file_request(int client_socket, int server_socket)
-// {
-// 	// Had zmer fih bzf redundent work and I hate it but it's fucking OOP :D
-// 	std::stringstream save, save2, time;
-// 	save << client_socket;
-// 	std::string id_c;
-// 	save >> id_c;
-// 	save2 << server_socket;
-// 	std::string id_s;
-// 	save2 >> id_s;
-//     std::string file_name("webServ_" + id_c + "_" + id_s + ".tmp");
-// 	std::fstream	fd(file_name);
 
-// 	if (fd.is_open())
-// 	{
-// 		// fd.open()
-// 	}
-// 	else
-// 	{
-// 		std::cout << "mkaynx" << std::endl;
-// 	}
-// }
+void check_url(data &req) // check url ==> GET /index.html http
+{
+	// 1 - location block == > /test/test/test/index.html
+	// locations /test/test
+	// 2 - file exists :(
+	// 3 - file's permissions
+	// 4 - file's extension
+}
+
 
 
 // (int main()

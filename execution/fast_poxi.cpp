@@ -33,14 +33,12 @@ void prepare_socket(std::map<unsigned short, std::string>::iterator& it, int &sa
     }
 }
 
-int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req)
+void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req)
 {
 
-    int size_recv , total_size= 0;
     char chunk[CHUNK_SIZE];
     memset(chunk ,0 , CHUNK_SIZE);
-    int size_read;
-    size_read = recv(s , chunk , CHUNK_SIZE, 0);
+    int size_read = recv(s , chunk , CHUNK_SIZE, 0);
     // parse here
     // CHECK IF POST
     std::stringstream check(chunk);
@@ -48,18 +46,11 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int ,
     std::cout << "socket number " << s << std::endl;
     if(req[s].is_header ==  false) // parsing the header.
     {
-        // std::string tmp;
-        // parse here requset check errors and throw or return
-        // get line 
         std::getline(check, tmp); // get first line in header
-        // if (tmp.find("HTTP") != std::string::npos)
-        first_line(tmp, req[s]);
-        // try catch
-        // check_first_line(req, ) // -------------- check throw
-        // if (tmp.find("\r\n\r\n") != std::string::npos)
-        parsing_header(check, req[s]);
+        first_line(tmp, req[s]); // just parse first line
+        parsing_header(check, req[s]); // paring all headers
         std::cout << "name of file get here -> " <<  req[s]._fileName  << " check limit == > " << req[s].lenth  << "check server block " << req[s].config_block.__ClientLimit << std::endl;
-        if(req[s].lenth != -666)
+        if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
             if(req[s].lenth > req[s].config_block.__ClientLimit)
                 throw 413;
@@ -69,17 +60,16 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int ,
         std::cout << "|" << tmp  << "|" << std::endl;
         req[s].is_header = true;
         // here
-       
         std::cout << "end of parsing " << std::endl;
     }
     // else write if POST on file or pipe
-     if(req[s].is_header ==  true && tmp.length() != 0)
+     if(req[s].is_header ==  true && tmp.length() != 0 && req[s].method == "POST") // add delete if need
      {
          // check limmite size and throw error
         write(req[s]._fileFd, tmp.c_str(),  tmp.length());
         tmp.clear();
      }
-     else if (req[s].is_header == false)
+     else if (req[s].is_header == false && req[s].method == "POST")
      {
         std::cout << "chunk here -------> " << req[s]._fileName << std::endl;
 	    write(req[s]._fileFd, chunk, std::strlen(chunk));
@@ -95,23 +85,7 @@ int receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int ,
 	usleep(10);
 	std::cout << " ------------------------- chuck --------------------" << std::endl;
     memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
-    return total_size;
 }
-
-// // template<class T>
-// // void create_sockets(T data, int *&fds)
-// // {
-// //     for(int i = 0; i <= data.nb_of_servers; i++)
-// //     {
-// //         prepare_socket(data.ip, data.port, fds[i]);
-// //     }
-// //     //return fds;
-// // }
-
-// // template<class T>
-
-
-
 
 void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFile &conf)
 {
@@ -158,10 +132,10 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
 						// std::cout << "here " << std::endl;
                         request_info[j].config_block = conf.__Servers[i];
                         receive_basic(j, socket_list[i], fd_savior[i], request_info);
+                        // change code ...
                         write(j, hello, strlen(hello)); // send
                         // remove(request_info[j]._fileName.c_str())
                         request_info.erase(j); // erase socket data parsing from map after send response
-                        
 						// FD_CLR(fd_savior[i], &socket_list[i]);
                     }
                 }

@@ -37,8 +37,7 @@ struct data
         this->client_socket = 0;
         this->server_socket = 0;
         this->status_code = 0;
-        this->lenth = 0;
-        is_header = false;
+        this->is_header = false;
         remove = false;
     }
     data& operator=(data &o)

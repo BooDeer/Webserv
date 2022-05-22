@@ -60,7 +60,7 @@ void parsing_header(std::stringstream &fs, data &d)
             std::istringstream(save) >> d.lenth;
             //  save << 
         }
-        else if (lines.find("Content-Type:") != std::string::npos) // Content-Length: 69
+       else if (lines.find("Content-Type:") != std::string::npos) // Content-Length: 69
         {
             d.type =  lines.erase(0, strlen("Content-Type: "));
         }

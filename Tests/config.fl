@@ -17,6 +17,7 @@ server {
 #"errorPages": 401 pathexample
 #"limitSize": 90
 #"location": {
-#		
+#		route:	"/test/abc/lol"
+#		path == route	
 #	}
 }
