@@ -1,16 +1,17 @@
 #ifndef WEBSERVE_DATA_HPP
 #define WEBSERVE_DATA_HPP
 
+#include "webserv.hpp"//
 #include <iostream>
 #include <iostream>
 #include <vector>
 #include <sys/time.h>
 #include <sstream>
 #include <fstream>
-#include "webserv.hpp"
 
 struct data
 {
+    public:
     int id; // id for request
    // std::ofstream fd_file; // file stream
 	int	_fileFd;
@@ -26,6 +27,7 @@ struct data
     std::string type;
     std::string referer;
     int status_code;
+    Locations  location;
     std::vector<std::string> paramter;
     std::string extension;
     ServerBlock config_block; // server block config
@@ -71,7 +73,6 @@ struct data
     }
     
 };
-
 
 
 
