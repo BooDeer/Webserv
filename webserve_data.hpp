@@ -8,6 +8,8 @@
 #include <sys/time.h>
 #include <sstream>
 #include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 struct data
 {

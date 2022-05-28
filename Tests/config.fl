@@ -16,9 +16,10 @@ server {
 	"serverNames": example1.com
 #"errorPages": 401 pathexample
 #"limitSize": 90
-#"location": {
-#		route:	"/test/abc/lol"
-#		path == route	
+#"location": / {
+#		cgi 	///
+#		route:	"/test1/test2/"
+#		root: "/tmp/www"	
 #	}
-
+	
 }
