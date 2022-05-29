@@ -78,7 +78,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         tmp.clear();
      }
      // req[s].is_header == false 
-     else if (req[s].is_header == true && req[s].method == "POST") // forget why :(
+     else if (req[s].is_header == true && req[s].method == "POST") // if we recv chunk not in body of header
      {
         std::cout << "chunk here -------> " << req[s]._fileName << std::endl;
 	    write(req[s]._fileFd, chunk, std::strlen(chunk));
@@ -157,6 +157,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         // std::cout << request_info[j].size_read_complet << std::endl;
                     if(request_info[j].size_read_complet < 0) // if we complet Content-Length send responce 
                     {
+                        std::cout << "send req" << std::endl;
                         write(j, hello, strlen(hello)); // send
                         // FD_CLR(j, &read_check); 
                         FD_CLR(j, &socket_list[i]);

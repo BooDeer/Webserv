@@ -50,9 +50,8 @@ void data::create_file(int fd_socket, int client_socket)
 
 int main(int ac, char **av)
 {
-	// ServerBlock	config;
 	ConfigFile		config; // <=== All the parsing data. (AKA the server blocks)
-	if (ac != 2) ///TODO:Should use the default config file if no config file has been given.
+	if (ac != 2) //TODO:Should use the default config file if no config file has been given.
 	{
 		std::cerr << "usage: ./webserv " << CYAN << "[Configuration file]" << std::endl;
 		return (1);
@@ -65,7 +64,7 @@ int main(int ac, char **av)
 
 
 
-	// webServ entery oint?
+	// webServ entery point?
 	install_servers(config); // include config file setting
 	// std::cout << config.__Servers[0].__Host << std::endl;
 	// system("leaks webserv");
