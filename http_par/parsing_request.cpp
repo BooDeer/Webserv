@@ -36,7 +36,8 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
     std::string tmp2(save.path); // case1: there is "?<...>" case2: there is no "?" at the end
     size_t pt, qstmark;
     if ((pt = tmp2.find(".")) != std::string::npos)
-        tmp2 = tmp2.substr(pt+1, tmp2.size() - pt);
+        tmp2 = tmp2.substr(pt, tmp2.size() - pt);
+    std::cout << "exxxxx ===> " << tmp2 << std::endl;
     save.extension = tmp2;
 }
 

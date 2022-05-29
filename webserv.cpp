@@ -1,26 +1,5 @@
 #include "webserv.hpp"
 
-// void	create_uniqueName(int fd_socket, int client_socket)
-// {
-// 	this->server_socket = fd_socket;
-//     this->client_socket = client_socket;
-// 	std::cout << "start create file" << std::endl;
-// 	struct timeval	time;
-// 	long long t;
-//     gettimeofday(&time, NULL);
-//     t = (time.tv_usec / 1000) + (time.tv_sec * 1000);
-//     std::stringstream save, save2, time222;
-//     save << client_socket;
-//     std::string id_c;
-//     save >> id_c;
-//     save2 << server_socket;
-//     std::string id_s;
-//     save2 >> id_s;
-//     time222 << t;
-//     std::string time_;
-//     time222 >> time_;
-//     _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + time_ + ".txt");
-// }
 void data::create_file(int fd_socket, int client_socket)
 {
     this->server_socket = fd_socket;
@@ -41,10 +20,7 @@ void data::create_file(int fd_socket, int client_socket)
     std::string time_;
     time222 >> time_;
     _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + "_" + time_ + ".txt");
-	// fd_file.open(_fileName, std::ofstream::out | std::ofstream::app);
     std::cout << "writing in : " << _fileName << std::endl;
-	// fd_file->operator<<("help");
-    //  std::ofstream bood2("BoodTest22222.txt", std::fstream::out);
     std::cout << " file create fot this request is " <<  _fileName << std::endl;
 }
 
@@ -58,15 +34,9 @@ int main(int ac, char **av)
 	}
 
 	parse(av[1], config); // parse data  from config file 
-	// std::cout << config.__Servers.size() << std::endl;
 
 
-
-
-
-	// webServ entery point?
 	install_servers(config); // include config file setting
-	// std::cout << config.__Servers[0].__Host << std::endl;
 	// system("leaks webserv");
 }
 

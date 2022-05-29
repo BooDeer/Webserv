@@ -2,7 +2,7 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
-     #include <fcntl.h>
+#include <fcntl.h>
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -27,12 +27,7 @@ struct bod {
 };
 int main()
 {
-    // bod te;
-    // {
-    //   te.create_file();
-    // }
-    // te.test << " reset" << std::endl;
-	std::cout << 0777 << std::endl;
-	int fd = open("/tmp/BoodTest", O_RDWR | O_CREAT, 0666);
-	write(fd, "best", 5);
+  int i;
+
+  std::cout << (i = 10) << std::endl;
 }

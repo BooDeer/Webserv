@@ -4,10 +4,8 @@ int is_dir_and_exist(const char *path)
 {
     struct stat path_stat;
     int exist = stat(path, &path_stat);
-	if(exist == 0)
-		std::cout << "found" << std::endl;
-	else
-		std::cout << "not found" << std::endl;
+	if(exist != 0)
+		throw 404;
     return S_ISDIR(path_stat.st_mode);
 }
 
@@ -56,12 +54,18 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	//std::cout << " final string is  ==> " << finalString << std::endl; 
 	req.path.clear();
 	req.path = finalString; // path final ex ==> T1/T2/T3
+	std::cout << "path =========> " << req.path << std::endl;
 	
 	// 	replace route to root
+
 	if(req.location.__Root.length() == 0)
-		req.path.replace(0, req.location.__Route.length() - 1, "./default");
+	{
+		req.path.replace(0, 0, "./default/");
+		std::cout << "path =========> " << req.path << std::endl;
+	}
 	else
 		req.path.replace(0, req.location.__Route.length() - 1, req.location.__Root);
+
 	std::cout << "last info" << std::endl;
 	std::cout << "final path ===> " << req.path << std::endl;
 	std::cout << "location route ===> " << req.location.__Route << std::endl;
@@ -76,7 +80,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		else if (req.location.__DirList  == true)
 		{
 			// autoindex
-
+		
 		}
 		else
 			throw 403;
@@ -88,9 +92,13 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	{
 		int fd  = open(req.path.c_str(), O_RDONLY);
 		if(fd < 0)
-			std::cout << "you dont have permission" << std::endl;
+		{
+			std::cout << "here " << std::endl;
+			close(fd);
+			throw 403;
+		}
 		std::cout << "is safe file you can read from it" << std::endl;
-		close(fd);
+		
 	}
 	/* 
 		url: ./default/T3
@@ -104,20 +112,51 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 }
 
 
+void response::generate_response_header(const std::string &status, data &req)
+{
+	this->status_code = status;
+	this->reason_phrase = data_base[status];
+	this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n"; // first line for response
+	this->header_resp.append("Server: webserv\r\n");
+	this->header_resp.append("Content-Length: ");
+	std::ifstream in(req.path.c_str(), std::ifstream::ate | std::ifstream::binary);
+	long long a = in.tellg();
+	std::stringstream b;
+	b << a;
+	std::string tmp;
+	b >> tmp;
+	this->lenth = a;
+	this->header_resp.append(tmp);
+	this->header_resp.append("\r\n");
+	this->header_resp.append("Content-Type: ");
+	if(Common_types.find(req.extension) != Common_types.end())
+		this->header_resp.append(Common_types[req.extension]);
+	else
+		this->header_resp.append("application/octet-stream");
+	this->header_resp.append("\r\n");
+	this->header_resp.append("\r\n");
+	std::cout << header_resp << std::endl;
+}
+
+void response::send_response(data &req)
+{
+	this->fd = open(req.path.c_str(), O_RDONLY);
+
+	write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
+	char *buff = new char[this->lenth];
+	read(this->fd, buff, this->lenth);
+	write(req.client_socket, buff, this->lenth);
+	delete buff;
+
+}
 
 // int main()
 // {
-// 	std::string  test = "";
-// 	Locations	temp[4];
-// 	temp[0].__Route =  "/test1";
-// 	temp[1].__Route =  "/test1/test2";
-// 	// temp[1].__Root = "/tmp";
-	
-// 	temp[2].__Route =  "/test1/test2/test3";
-// 	temp[3].__Route =  "/";
-// 	data da;
-// 	da.path = "/test1/test2/test4/index.html";
+// 	response a;
+// 	data req;
 
-// 	check_url_path(da, temp);
+// 	req.extension = ".html";
+// 	req.path = "boodTest.cpp";
+// 	a.generate_response_header("200", req);
 // 	// /test/test/test/test/
 // }

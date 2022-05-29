@@ -29,7 +29,7 @@ void	ft_split(std::string const& src, const char delimiter, std::vector<std::str
 	} while (iss);
 }
 
-void	exitMessage(int exitStatus, std::string message, int ln=0)
+void	exitMessage(int exitStatus, std::string message, int ln)
 {
 	std::cerr << RED << message;
 	if (ln)

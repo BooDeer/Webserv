@@ -5,7 +5,7 @@ FLAGS 	=  -g -fsanitize=address\
 DFLAGS 	= -std=c++98 -Wall -Wextra -Werror -g \
 			-fsanitize=address
 HEADER	= parsing/parsing.hpp parsing/configFile/Config.hpp
-FILE	= webserv.cpp parsing/parsing.cpp parsing/configFile/Config.cpp execution/fast_poxi.cpp  http_par/parsing_request.cpp
+FILE	= webserv.cpp parsing/parsing.cpp parsing/configFile/Config.cpp execution/fast_poxi.cpp  http_par/parsing_request.cpp http_par/generate_responce.cpp
 
 UNAME_S	= $(shell uname -s)
 
