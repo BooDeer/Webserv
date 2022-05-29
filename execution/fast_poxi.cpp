@@ -39,6 +39,13 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     char chunk[CHUNK_SIZE];
     memset(chunk ,0 , CHUNK_SIZE);
     int size_read = recv(s , chunk , CHUNK_SIZE, 0);
+    if(size_read < 0 )
+    {
+        std::cout << "error in recv :(" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    std::cout << "size read = " << size_read << "byte" << std::endl; 
+    req[s].size_read_complet = req[s].lenth  - size_read;
     // parse here
     // CHECK IF POST
     std::stringstream check(chunk);
@@ -49,7 +56,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         std::getline(check, tmp); // get first line in header
         first_line(tmp, req[s]); // just parse first line
         parsing_header(check, req[s]); // paring all headers
-        std::cout << "name of file get here -> " <<  req[s]._fileName  << " check limit == > " << req[s].lenth  << "check server block " << req[s].config_block.__ClientLimit << std::endl;
+        std::cout << "name of file get here ->  " <<  req[s]._fileName  << "  check limit == >  " << req[s].lenth  << " check server block  " << req[s].config_block.__ClientLimit << std::endl;
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
             if(req[s].lenth > req[s].config_block.__ClientLimit)
@@ -70,7 +77,8 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         write(req[s]._fileFd, tmp.c_str(),  tmp.length());
         tmp.clear();
      }
-     else if (req[s].is_header == false && req[s].method == "POST") // forget why :(
+     // req[s].is_header == false 
+     else if (req[s].is_header == true && req[s].method == "POST") // forget why :(
      {
         std::cout << "chunk here -------> " << req[s]._fileName << std::endl;
 	    write(req[s]._fileFd, chunk, std::strlen(chunk));
@@ -79,7 +87,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     if(size_read == 0)
     {
         // close(s);
-        req[s].remove = true; // set remove to remove data from map
+       // req[s].remove = true; // set remove to remove data from map
        // FD_CLR(s, &current_sockets);
         std::cout << "close and clear file" << std::endl;
     }
@@ -124,7 +132,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         client_socket = accept(fd_savior[i], NULL, NULL); // accept connection from browser
                         if (client_socket < 0 )
                         {
-                            std::cout << " accept  " << std::endl;
+                            std::cout << " accept  error " << std::endl;
                             exit(EXIT_FAILURE);
                         }
                         //tmp.create_file(fd_savior[i],  client_socket); // create file of request
@@ -132,7 +140,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         request_info[client_socket] = tmp; // add to map
                         FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set
                         // FD_SET(client_socket, &read_check); 
-                        std::cout << "-------------> end of scope fd socket  " << std::endl;
+                        std::cout << "-------------> end of scope fd socket " << std::endl;
                         usleep(10);
                     }
                     else
@@ -146,13 +154,16 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                 if(FD_ISSET(j, &write_check))
                 {
                         // scope for check if you can write in client fd
-                    write(j, hello, strlen(hello)); // send
-                    FD_CLR(j, &read_check);
-                    close(j);
-                    FD_CLR(j, &socket_list[i]);
-                    // remove(request_info[j]._fileName.c_str())
-                    request_info.erase(j); // erase socket data parsing from map after send response
-                    
+                        // std::cout << request_info[j].size_read_complet << std::endl;
+                    if(request_info[j].size_read_complet < 0) // if we complet Content-Length send responce 
+                    {
+                        write(j, hello, strlen(hello)); // send
+                        // FD_CLR(j, &read_check); 
+                        FD_CLR(j, &socket_list[i]);
+                        close(j);
+                        // remove(request_info[j]._fileName.c_str())
+                        request_info.erase(j); // erase socket data parsing from map after send response
+                    }
                 }
             }
           

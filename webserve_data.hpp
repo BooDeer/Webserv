@@ -18,14 +18,15 @@ struct data
    // std::ofstream fd_file; // file stream
 	int	_fileFd;
     bool is_header; // check is header
-    bool remove; // remove from header
+    //bool remove; // remove from header
     std::string _fileName;
     int client_socket; // client id socket 
     int server_socket; //  server is socket
-    std::string path;
+    std::string path; 
     std::string method;
     std::string host;
-    unsigned long long lenth;
+    unsigned long long lenth; // Content-Length:
+    long long size_read_complet;
     std::string type;
     std::string referer;
     int status_code;
@@ -37,12 +38,15 @@ struct data
     public:
     data()
     {
+        // set all default
         this->id  = 0;
         this->client_socket = 0;
         this->server_socket = 0;
         this->status_code = 0;
+        this->lenth = 0;
         this->is_header = false;
-        remove = false;
+        this->size_read_complet = 0;
+       // this->remove = false;
     }
     data& operator=(data &o)
     {
@@ -70,7 +74,7 @@ struct data
         this->server_socket = 0;
         this->status_code = 0;
         is_header = false;
-        remove = false;
+        //remove = false;
       //  close(_fileFd);
     }
     
