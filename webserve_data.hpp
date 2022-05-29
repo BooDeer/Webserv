@@ -46,7 +46,7 @@ struct data
     }
     data& operator=(data &o)
     {
-        std::cout << "---------------operator =" << std::endl;
+       //std::cout << "---------------operator =" << std::endl;
         this->id = o.id;
         this->_fileName = o._fileName;
 		this->_fileFd = open(o._fileName.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
