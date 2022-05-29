@@ -84,13 +84,13 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
 	    write(req[s]._fileFd, chunk, std::strlen(chunk));
      }
     // if recv return 0  close connectoin  /// check limite size and close client socket
-    if(size_read == 0)
-    {
-        // close(s);
-       // req[s].remove = true; // set remove to remove data from map
-       // FD_CLR(s, &current_sockets);
-        std::cout << "close and clear file" << std::endl;
-    }
+    // if(size_read == 0)
+    // {
+    //     // close(s);
+    //    // req[s].remove = true; // set remove to remove data from map
+    //    // FD_CLR(s, &current_sockets);
+    //     std::cout << "close and clear file" << std::endl;
+    // }
 	usleep(10);
 	std::cout << " ------------------------- chuck --------------------" << std::endl;
     memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
@@ -153,12 +153,25 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                 }
                 if(FD_ISSET(j, &write_check))
                 {
-                        // scope for check if you can write in client fd
-                        // std::cout << request_info[j].size_read_complet << std::endl;
+                             // scope for check if you can write in client fd
+                    // std::cout << request_info[j].size_read_complet << std::endl;
                     if(request_info[j].size_read_complet < 0) // if we complet Content-Length send responce 
                     {
                         std::cout << "send req" << std::endl;
-                        write(j, hello, strlen(hello)); // send
+                        try
+                        {
+                            check_url_path(request_info[j], request_info[j].config_block.__Locations); // check first line error
+                            // genrate body
+                            write(j, hello, strlen(hello)); // send
+                        }
+                        catch(int error)
+                        {
+                            // genrate_body_for_errors(error);
+                            // send data
+                            std::cerr << error << '\n';
+                        }
+                        
+                        //write(j, hello, strlen(hello)); // send
                         // FD_CLR(j, &read_check); 
                         FD_CLR(j, &socket_list[i]);
                         close(j);
