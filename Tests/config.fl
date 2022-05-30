@@ -3,6 +3,7 @@ server {
 	"port": 2030
 	"host": 127.0.0.1
 	"serverNames": example.com
+	
 #"errorPages": 401 pathexample
 #"limitSize": 90
 #"location": {
@@ -16,10 +17,10 @@ server {
 	"serverNames": example1.com
 #"errorPages": 401 pathexample
 #"limitSize": 90
-#"location": / {
+"location": {
 #		cgi 	///
-#		route:	"/test1/test2/"
-#		root: "/tmp/www"	
-#	}
+		"route":	"/test1/test2/"
+#		"root": "/tmp/www"	
+	}
 	
 }
