@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: boodeer <boodeer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/05/10 22:05:36 by boodeer          ###   ########.fr       */
+/*   Updated: 2022/05/30 18:06:48 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,7 +242,6 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 		exitMessage(1, "missing '{' in line: ", ln);
 	else if (tmp.size() > 2)
 		exitMessage(1, "Unknown argument in line: ", ln);
-
 	while (tmp[0] != "}") // Location block loop.
 	{
 		tmp.clear();
@@ -250,12 +249,14 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 		if (!std::getline(ifs, line)) // Reached the end of the file.
 			exitMessage(1, "missing '}' after line: ", start);
 		else if (line[0] == '#')
+		{
+			ft_split(line, ' ', tmp);
 			continue ;
-
+		}
 		ft_split(line, ' ', tmp);
 		if (tmp.size() > 0 && tmp[0] == "\"route\":")
 			route(tmp, location, ln);
-		if (tmp.size() > 0 && tmp[0] == "\"methods\":")
+		else if (tmp.size() > 0 && tmp[0] == "\"methods\":")
 			allowedMethods(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"redirection\":") // there's only two arguments for redirections.
 			redirections(tmp, location, ln);
