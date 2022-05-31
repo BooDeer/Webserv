@@ -10,7 +10,7 @@ int is_dir_and_exist(const char *path)
     struct stat path_stat;
     int exist = stat(path, &path_stat);
 	if(exist != 0)
-		throw 404;
+		throw "404";
     return S_ISDIR(path_stat.st_mode);
 }
 
@@ -30,7 +30,7 @@ void  auto_index(data &req) // pass class data
     struct dirent *entry;
 
     struct stat st;
-
+	// problem note : 
     while( (entry= readdir(dir)) != NULL) // read all file in folder
     {
       if(entry->d_name[0] != '.')
@@ -57,8 +57,8 @@ void  auto_index(data &req) // pass class data
       }
 
     }
-	req.path = "/tmp/autoindex.html";
     MyFile << "</pre><hr></body>\n</html>\n";
+	req.path = "/tmp/autoindex.html";
 	MyFile.close();
     closedir(dir);
 }
@@ -143,7 +143,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		if(req.location.__DefaultFile.length() != 0)
 		{
 			// default file
-			
+			req.path.append(req.location.__DefaultFile);
 		}
 		else if (req.location.__DirList  == true)
 		{
@@ -151,7 +151,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 			auto_index(req); // create file html c++ and change path to name the file html
 		}
 		else
-			throw 403;
+			throw "403";
 	}
 	else
 	{
@@ -160,7 +160,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		{
 			std::cout << "here " << std::endl;
 			close(fd);
-			throw 403;
+			throw "403";
 		}
 		std::cout << "is safe file you can read from it" << std::endl;
 		

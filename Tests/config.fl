@@ -1,19 +1,19 @@
 
 server {
 	"port": 2030
-	"host": 127.0.0.1
+	"host": 0.0.0.0
 	"serverNames": example.com
 	
 #"errorPages": 401 pathexample
 #"limitSize": 90
-#"location": {
-#		
-#	}
+"location": {
+	"route":	"/"		
+	}
 
 }
 server {
-	"port": 2020
-	"host": 0.0.0.0
+	"port": 2031
+	"host": 127.0.0.1
 	"serverNames": example1.com
 #"errorPages": 401 pathexample
 #"limitSize": 90
@@ -21,6 +21,7 @@ server {
 #		cgi 	///
 		"route":	"/test1/test2/"
 #		"root": "/tmp/www"	
+		"default": index.html
 	}
 	
 }

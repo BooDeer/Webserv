@@ -71,6 +71,7 @@ int receive_basic(int s, std::map<int, std::string>& m, fd_set &current_sockets)
         // }
       // else
       // {
+        std::cout << "chunk == > " << chunk << std::endl;
       memset(chunk ,0 , CHUNK_SIZE);	//clear the variable
         //   return 666;
 
@@ -93,7 +94,7 @@ int main(int argc, char const *argv[])
   int addrlen = sizeof(address);
 
   char hello[600] = "HTTP/1.1 200 OK\nContent-Type: image/png\nContent-Type: text/html\nContent-Length: 700\n\n<h1>Hello world!</h1>";
-  char ip[] = "127.0.0.1";
+  char ip[] = "0.0.0.0";
   char ip2[] = "127.0.0.1";
   //int fd = open("non-block.cpp", O_RDONLY);
   // int fd2 = open("non-block.cpp", O_RDONLY);

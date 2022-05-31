@@ -91,7 +91,11 @@ void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int l
 	it++;
 	for (; it != line.end(); ++it)
 		if(dir == true)
+		{
+			if (line.size() > 2)
+				exitMessage(1, "Error! Too many arguments in line: ", ln);
 			config.__ServerNames.push_back(*it);
+		}
 		else
 			config.__DefaultErrorpg.push_back(*it);
 	//TODO: In the case of errorPages (dir == false) check each pair(status code)
@@ -264,7 +268,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 			root(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"autoindex\":") // AKA directory listing.
 			directoryListing(tmp, location, ln);
-		else if (tmp.size() > 0 && tmp[0] == "\"Default\":")
+		else if (tmp.size() > 0 && tmp[0] == "\"default\":")
 			defaultFile(tmp, location, ln);
 		else if (tmp[0] != "}" && tmp.size() > 0)
 			exitMessage(1, "Unknown directive line: ", ln);

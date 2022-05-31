@@ -27,14 +27,34 @@ void prepare_socket(std::map<unsigned short, std::string>& it, int &save, unsign
     if(listen(save, INT32_MAX) < 0)
 		exitMessage(1, "listen error");
 }
+void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, host(servernames/host), port
+{
+    std::vector<ServerBlock>::iterator it;
 
-void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req)// s ==> client socket
+    it = conf.__Servers.begin();
+
+    for (; it != conf.__Servers.end(); it++)
+    {
+        if ((*it).__Port == req.port && ("127.0.0.1" == req.ip_server_name || (*it).__ServerNames[0] == req.ip_server_name))
+        {
+            std::cout << "======================================================================================" << std::endl;
+            std::cout << "port from server block: " << (*it).__Port  << std::endl;
+            std::cout << "host from server block: " << (*it).__Host << std::endl;
+            std::cout << "======================================================================================" << std::endl;
+            req.config_block = *it;
+            // std::cout << "route of the above: " << req.config_block.__Locations[0].__Route << std::endl;
+        }
+    }
+}
+
+void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req, ConfigFile& conf)// s ==> client socket
 {
     req[s].client_socket = s;
     req[s].server_socket = fd_socket;
     char chunk[CHUNK_SIZE];
     memset(chunk ,0 , CHUNK_SIZE);
     int size_read = recv(s , chunk , CHUNK_SIZE, 0);
+   // std::cout << chunk << std::endl;
     if(size_read < 0 )
     {
         std::cout << "error in recv :(" << std::endl;
@@ -52,17 +72,20 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         std::getline(check, tmp); // get first line in header
         first_line(tmp, req[s]); // just parse first line
         parsing_header(check, req[s]); // paring all headers
+        findServerBlock(req[s], conf);
         std::cout << "name of file get here ->  " <<  req[s]._fileName  << "  check limit == >  " << req[s].lenth  << " check server block  " << req[s].config_block.__ClientLimit << std::endl;
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
             if(req[s].lenth > req[s].config_block.__ClientLimit)
-                throw 413;
+                throw "413";
         }
+
         tmp = std::string(chunk);
         tmp.erase(0, tmp.find("\r\n\r\n") + 4);
         std::cout << "body ====> " << "|" << tmp  << "|" << std::endl;
         req[s].is_header = true;
         // here
+        std::cout << "host is ==>  " << req[s].host << std::endl;
         std::cout << "end of parsing " << std::endl;
     }
     // else write if POST on file or pipe
@@ -116,7 +139,6 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
    
     tm.tv_sec = 0;
     tm.tv_usec = 10;
-    char hello[82] = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 20\n\n<h1>Hello world!</h1>";
     while(1)
     {
         for(int i = 0; i <  servers; i++)
@@ -146,11 +168,14 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                             // if not socket fd start to read request and parse
                         std::cout << " ----------------------------------- in else in read request -------------------------" << std::endl;
                         // iterate through the map until index i
-                      //  request_info[j].config_block = conf.__Servers[i]; // change to new logic 
+                       // request_info[j].config_block = conf.__Servers[i]; // change to new logic 
                         std::cout << "i == >" << i << std::endl;
-                        std::cout << " ===> " << request_info[j].config_block.__Port << std::endl;
                         // std::cout <<"serverroute ======== ===> " << request_info[j].config_block.__Locations[0].__Route << std::endl;
-                        receive_basic(j, socket_list[i], fd_savior[i], request_info);
+                        receive_basic(j, socket_list[i], fd_savior[i], request_info, conf);
+                        std::cout << " ===>==============================test if work  " << std::endl;
+                        std::cout << " ===>====================================>>>>>> " << request_info[j].config_block.__Port << std::endl;
+                        std::cout << " ===>====================================>>>>>> " << request_info[j].config_block.__Locations[0].__Route << std::endl;
+                        std::cout << " ===>============================== end ================================== " << std::endl;
                     }
                 }
                 if(FD_ISSET(j, &write_check))
@@ -171,12 +196,14 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                            // write(j, hello, strlen(hello)); // send
                             
                         }
-                        catch(int error)
+                        catch(char const* error)
                         {
                             std::cout << "error" << std::endl;
                             // genrate_body_for_errors(error);
                             // send data
                             //    resp.generate_response_header("200", request_info[j]);
+                            resp.generate_response_header(error, request_info[j]);
+                            resp.send_response(request_info[j]);
                             std::cerr << error << '\n';
                         }
                         

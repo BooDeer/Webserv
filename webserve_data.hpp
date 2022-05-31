@@ -34,6 +34,8 @@ struct data
     std::vector<std::string> paramter;
     std::string extension;
     ServerBlock config_block; // server block config
+    unsigned short  port; // port fe
+    std::string ip_server_name;
     
     public:
     data()
