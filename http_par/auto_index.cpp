@@ -1,8 +1,6 @@
-#include <iostream>
 #include <sys/types.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <ctime>
@@ -62,40 +60,4 @@ void  auto_index() // pass class data
     MyFile << "</pre><hr></body>\n</html>\n";
 
     closedir(dir);
-}
-
-
-int main()
-{
-    // DIR *dir;
-    // struct dirent *ent;
-    //
-    // if ((dir = opendir ("./")) != NULL)
-    // {
-    //     while ((ent = readdir (dir)) != NULL)
-    //     {
-    //         std::string filename(ent->d_name);
-
-    //         std::cout << filename << "\n";
-    //     }
-    //     closedir(dir);
-    // }
-    // DIR *dir;
-    // struct dirent *entry;
-
-    // struct stat st;
-    // std::string tmp2(ctime(&st.st_ctime));
-    // tmp2.erase(tmp2.length()-1);
-    // std::cout << "testaa" <<  std::setw(tmp2.length() + 20 + 6) << tmp2 << std::endl;
-    // std::cout << "aaaaaaaa" <<  std::setw(tmp2.length() + 20 + 8) << tmp2 << std::endl;
-    // std::cout << "ddddddddddddd" <<  std::setw(tmp2.length() + 20 + 13) << tmp2 << std::endl;
-    // std::cout << "testaaaaaaaaaaaaa" <<  std::setw(tmp2.length() + 20 + 17) << tmp2 << std::endl;
-    auto_index();
-
-    // std::cout << "testaa"           <<  std::setw(60 - 6)  << tmp2 << std::setw(10)  << "1337" << std::endl;
-    // std::cout << "aaaaaaaa"         <<  std::setw(60 - 8)  << tmp2 << std::setw(10)  << "1337" << std::endl;
-    // std::cout << "ddddddddddddd"    <<  std::setw(60 - 13) << tmp2 << std::setw(10)  << "1337" << std::endl;
-    // std::cout << "testaaaaaaaaaaaa" <<  std::setw(60 - 16) << tmp2 << std::setw(10)  << "1337" << std::endl;
-
-
 }
