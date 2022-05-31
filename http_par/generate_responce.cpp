@@ -16,14 +16,11 @@ int is_dir_and_exist(const char *path)
 
 void  auto_index(data &req) // pass class data
 {
-    // name_dir == path
-    // std::string name_dir = "test";
     std::string html_save = "<html>\n<head><title>Index of " + req.path + "</title></head>\n<body>\n<h1>Index of " + req.path + "</h1><hr><pre><a href=\"../\">../</a>\n";
    std::fstream MyFile;
     MyFile.open("/tmp/autoindex.html", std::ios::out); // create uniq file // now just test
     MyFile << html_save;
     html_save.clear();
-    //std::cout << html_save << std::endl;
     DIR *dir;
 
     dir = opendir("./");
@@ -34,37 +31,33 @@ void  auto_index(data &req) // pass class data
 
     struct stat st;
 
-    while( (entry= readdir(dir)) != NULL)
+    while( (entry= readdir(dir)) != NULL) // read all file in folder
     {
       if(entry->d_name[0] != '.')
       {
-          std::string tmp(entry->d_name);
-          stat(entry->d_name, &st);
-        // struct tm * timeinfo = localtime(&st.st_ctime);
-        //    std::cout << asctime(timeinfo);
-        std::string tmp2(ctime(&st.st_ctime));
-        tmp2.erase(tmp2.length()-1);
-          if(tmp.length() < 33)
-          {
-            html_save = "<a href=\""+ tmp + "\">" +  tmp  + "</a>";
-          }
-          else
-          {
-              html_save = "<a href=\""+ tmp + "\">";
-              for(int i = 0; i <  33; i++)
-              {
-                html_save.append(1, tmp[i]);
-              }
-               html_save.append("..&gt;</a>");
-          }
-            MyFile << html_save           <<  std::setw(60 - tmp.length())  << tmp2 << std::setw(10)  << st.st_size << std::endl;
-          tmp.clear();
-          tmp2.clear();
-          html_save.clear();
+			std::string tmp(entry->d_name);
+			stat(entry->d_name, &st);
+			std::string tmp2(ctime(&st.st_ctime));
+			tmp2.erase(tmp2.length()-1); // remove "\n" in ctime(&st.st_ctime)
+			if(tmp.length() < 33)
+			  html_save = "<a href=\""+ tmp + "\">" +  tmp  + "</a>";
+			else
+			{
+			    html_save = "<a href=\""+ tmp + "\">";
+			    for(int i = 0; i <  33; i++)
+			    {
+			      html_save.append(1, tmp[i]);
+			    }
+			     html_save.append("..&gt;</a>");
+			}
+			MyFile << html_save           <<  std::setw(60 - tmp.length())  << tmp2 << std::setw(10)  << st.st_size << std::endl;
+			tmp.clear();
+			tmp2.clear();
+			html_save.clear();
       }
 
     }
-	req.path = "/tmp/autoindex.txt";
+	req.path = "/tmp/autoindex.html";
     MyFile << "</pre><hr></body>\n</html>\n";
 	MyFile.close();
     closedir(dir);
@@ -150,7 +143,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		if(req.location.__DefaultFile.length() != 0)
 		{
 			// default file
-
+			
 		}
 		else if (req.location.__DirList  == true)
 		{
