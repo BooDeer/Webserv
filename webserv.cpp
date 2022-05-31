@@ -34,8 +34,7 @@ int main(int ac, char **av)
 	}
 
 	parse(av[1], config); // parse data  from config file 
-
-
+// here ?
 	install_servers(config); // include config file setting
 	// system("leaks webserv");
 }

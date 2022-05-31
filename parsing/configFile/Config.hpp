@@ -47,4 +47,9 @@ class ConfigFile
 	public: //* To be changed to private if desired later.
 		std::vector<ServerBlock>		__Servers;
 		int								serverFd; // <==== ?
+	// ConfigFile &operator==(const ConfigFile &copy)
+	// {
+	// 	this->__Servers = 
+	// 	return *this;
+	// }
 };

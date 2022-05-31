@@ -8,19 +8,19 @@
  * 
  * @param {it:string} Host (e.g: 127.0.0.1).
  * @param {save:number} Server's socket.
- * @return {lol}.
+ * @return {void}.
  */
-void prepare_socket(std::map<unsigned short, std::string>::iterator& it, int &save)
+void prepare_socket(std::map<unsigned short, std::string>& it, int &save, unsigned short port )
 {
     
     struct sockaddr_in server_info;
 
-    std::cout << "------------crearte socket----------- with port "  <<  (*it).first << std::endl;
+    std::cout << "------------crearte socket----------- with port "  <<  port << std::endl;
     if ((save = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 		exitMessage(1, "socket error");
     server_info.sin_family = PF_INET;
-    server_info.sin_addr.s_addr = inet_addr((*it).second.c_str());
-    server_info.sin_port =  htons((*it).first);
+    server_info.sin_addr.s_addr = inet_addr(it[port].c_str());
+    server_info.sin_port =  htons(port);
     fcntl(save, F_SETFL, O_NONBLOCK);
     if(bind(save, (sockaddr *)&server_info, sizeof(server_info)) < 0)
 		exitMessage(1, "bind error");
@@ -101,8 +101,13 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
  * @param {conf:struct} Struct of servers vector.
  * @return {none}.
  */
-void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFile &conf)
+void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFile &conf, std::map<unsigned short, std::string> &uniqueServers)
 {
+    ServerBlock meTest;
+
+    meTest = conf.__Servers[1];
+    if (conf.__Servers[1].__Locations.size())
+            std::cout << "Here ===============+++++>" << meTest.__Locations[0].__Route << std::endl;
     struct timeval tm;
     fd_set read_check;
     fd_set  write_check;
@@ -140,7 +145,11 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     {
                             // if not socket fd start to read request and parse
                         std::cout << " ----------------------------------- in else in read request -------------------------" << std::endl;
-                        request_info[j].config_block = conf.__Servers[i];
+                        // iterate through the map until index i
+                      //  request_info[j].config_block = conf.__Servers[i]; // change to new logic 
+                        std::cout << "i == >" << i << std::endl;
+                        std::cout << " ===> " << request_info[j].config_block.__Port << std::endl;
+                        // std::cout <<"serverroute ======== ===> " << request_info[j].config_block.__Locations[0].__Route << std::endl;
                         receive_basic(j, socket_list[i], fd_savior[i], request_info);
                     }
                 }
@@ -167,6 +176,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                             std::cout << "error" << std::endl;
                             // genrate_body_for_errors(error);
                             // send data
+                            //    resp.generate_response_header("200", request_info[j]);
                             std::cerr << error << '\n';
                         }
                         
@@ -205,18 +215,19 @@ void install_servers(ConfigFile &conf)
 
     filterByServer(conf, uniqueServers);
     size_t server_size = uniqueServers.size();
-	
+	std::cout << "size == > " << server_size << std::endl;
 	// number of servers.
     int fd_savior[server_size];
 	// fd_set of each server.
     fd_set socket_list[server_size];
-    std::map<unsigned short, std::string>::iterator it2 =  uniqueServers.begin();
+    //std::map<unsigned short, std::string>::iterator it2 =  uniqueServers.begin();
+    // map[2020]
     for(int i  = 0; i < server_size; i++)
     {
-        prepare_socket(it2, fd_savior[i]);
+        prepare_socket(uniqueServers, fd_savior[i], conf.__Servers[i].__Port);
         FD_ZERO(&socket_list[i]);
         FD_SET(fd_savior[i], &socket_list[i]);
-        it2++;
+        // it2++;
     }
-   start_server(fd_savior, socket_list, server_size, conf);
+   start_server(fd_savior, socket_list, server_size, conf, uniqueServers);
 }

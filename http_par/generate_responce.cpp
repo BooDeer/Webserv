@@ -9,6 +9,10 @@ int is_dir_and_exist(const char *path)
     return S_ISDIR(path_stat.st_mode);
 }
 
+void auto_index()
+{
+
+}
 //! Should have a SeverBlock parametre instead of locations.
 //TODO: iterate through the locations vector instead of loop.
 void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GET /index.html http
@@ -18,6 +22,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	// 2 - file exists :(
 	// 3 - file's permissions
 	// 4 - file's extension
+	std::cout << "rout befor " <<req.location.__Route << std::endl; 
 	bool is= false;
 	std::istringstream to_split(req.path);
 	std::string tmp;
@@ -58,10 +63,20 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	
 	// 	replace route to root
 
-	if(req.location.__Root.length() == 0)
+	if(req.location.__Root.length() == 0) // []/t1/t2/t3
 	{
-		req.path.replace(0, 0, "./default/");
-		std::cout << "path =========> " << req.path << std::endl;
+		//  /t1/2/t3
+		int len;
+		if(req.location.__Route.length() > 1)
+		{
+
+			len = req.location.__Route.length() - 1;
+		}
+		else
+			len  = 0;
+		std::cout << "len ==> " << len  <<  " route ==> " << req.location.__Route.length() << "route is ==> " << req.location.__Route  << std::endl;
+		req.path.replace(0, len, "./default/");
+		// std::cout << "path =========> " << req.path << std::endl;
 	}
 	else
 		req.path.replace(0, req.location.__Route.length() - 1, req.location.__Root);
@@ -72,6 +87,9 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	if(is_dir_and_exist(req.path.c_str()) != 0)
 	{
 		std::cout << "is dir" << std::endl;
+		//1. default file
+		//2. autoindex
+		//3. throw error
 		if(req.location.__DefaultFile.length() != 0)
 		{
 			// default file
@@ -80,13 +98,10 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		else if (req.location.__DirList  == true)
 		{
 			// autoindex
-		
+			// auto_index()
 		}
 		else
 			throw 403;
-		//1. default file
-		//2. autoindex
-		//3. throw error
 	}
 	else
 	{
@@ -146,8 +161,7 @@ void response::send_response(data &req)
 	char *buff = new char[this->lenth];
 	read(this->fd, buff, this->lenth);
 	write(req.client_socket, buff, this->lenth);
-	delete buff;
-
+	delete[] buff;
 }
 
 // int main()

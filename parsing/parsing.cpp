@@ -156,7 +156,7 @@ void	route(std::vector<std::string>& line, Locations& location, int ln)
 {
 	if (line.size() != 2)
 		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
-	location.__DefaultFile = line[1];
+	location.__Route = line[1];
 }
 /*============================================================================*/
 //TODO: I should probably make a generic function that fills a vector.
