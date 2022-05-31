@@ -20,7 +20,7 @@ void  auto_index(data &req) // pass class data
     // std::string name_dir = "test";
     std::string html_save = "<html>\n<head><title>Index of " + req.path + "</title></head>\n<body>\n<h1>Index of " + req.path + "</h1><hr><pre><a href=\"../\">../</a>\n";
    std::fstream MyFile;
-    MyFile.open("autoindex.txt", std::ios::out); // create uniq file // now just test
+    MyFile.open("/tmp/autoindex.html", std::ios::out); // create uniq file // now just test
     MyFile << html_save;
     html_save.clear();
     //std::cout << html_save << std::endl;
@@ -64,8 +64,9 @@ void  auto_index(data &req) // pass class data
       }
 
     }
+	req.path = "/tmp/autoindex.txt";
     MyFile << "</pre><hr></body>\n</html>\n";
-
+	MyFile.close();
     closedir(dir);
 }
 
@@ -154,7 +155,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		else if (req.location.__DirList  == true)
 		{
 			// autoindex
-			// auto_index()
+			auto_index(req); // create file html c++ and change path to name the file html
 		}
 		else
 			throw 403;
@@ -212,9 +213,9 @@ void response::generate_response_header(const std::string &status, data &req)
 void response::send_response(data &req)
 {
 	this->fd = open(req.path.c_str(), O_RDONLY);
-
 	write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
 	char *buff = new char[this->lenth];
+
 	read(this->fd, buff, this->lenth);
 	write(req.client_socket, buff, this->lenth);
 	delete[] buff;
