@@ -10,6 +10,22 @@ server {
 	"route":	/
 #	"root":
 	"autoindex": on
+
+	}
+
+}
+
+server {
+	"port": 2031
+	"host": 127.0.0.1
+	"serverNames": example.com
+	
+#"errorPages": 401 pathexample
+#"limitSize": 90
+"location": {
+	"route":	/test/test1/test2
+#	"root":
+	"autoindex": on
 	}
 
 }

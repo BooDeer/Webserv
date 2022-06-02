@@ -14,9 +14,24 @@ int is_dir_and_exist(const char *path)
     return S_ISDIR(path_stat.st_mode);
 }
 
+int check_file(std::string &file_name)
+{
+	struct stat fileStat;
+	
+  int exist = stat("test.html", &fileStat);
+  if(exist != 0)
+      return 404;
+  if (!(fileStat.st_mode & S_IRUSR))
+    return 403;
+	return 0;
+}
+
 void  auto_index(data &req) // pass class data
 {
-    std::string html_save = "<html>\n<head><title>Index of " + req.path + "</title></head>\n<body>\n<h1>Index of " + req.path + "</h1><hr><pre><a href=\"../\">../</a>\n";
+	std::string tmp_path(req.path);
+	tmp_path.erase(0, req.location.__Root.length());
+    std::string html_save = "<html>\n<head><title>Index of " + tmp_path + "</title></head>\n<body>\n<h1>Index of " + tmp_path + "</h1><hr><pre><a href=\"../\">../</a>\n";
+	tmp_path.clear();
    	std::fstream MyFile;
     MyFile.open("/tmp/autoindex.html", std::ios::out | std::ios::trunc); // create uniq file // now just test
     MyFile << html_save;
@@ -190,12 +205,21 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		//1. default file
 		//2. autoindex
 		//3. throw error
+		bool tr = false;
 		if(req.location.__DefaultFile.length() != 0)
 		{
 			// default file
 			req.path.append(req.location.__DefaultFile);
+			int ret = check_file(req.path);
+			if(ret == 404 && req.location.__DirList  == false)
+				throw "404";
+			if(ret == 404 && req.location.__DirList == true)
+				tr = true;
+			if(ret == 403)
+				throw "403";
+
 		}
-		else if (req.location.__DirList  == true)
+		if ((req.location.__DirList  == true && tr == false) || (tr == true && req.location.__DirList  == true))
 		{
 			// autoindex
 			std::cout << "======================== "<< std::endl;
@@ -209,13 +233,13 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	}
 	else
 	{
+		/// if file
 		int fd  = open(req.path.c_str(), O_RDONLY);
-		if(fd < 0)
-		{
-			std::cout << "here " << std::endl;
-			close(fd);
+		int ret = check_file(req.path);
+		if(ret == 404)
+			throw "404";
+		if(ret == 403)
 			throw "403";
-		}
 		std::cout << "is safe file you can read from it" << std::endl;
 		
 	}

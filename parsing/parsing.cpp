@@ -248,6 +248,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 		exitMessage(1, "Unknown argument in line: ", ln);
 	while (tmp[0] != "}") // Location block loop.
 	{
+		std::cout << "Current line ----> :" << ln << std::endl;
 		tmp.clear();
 		ln++;
 		if (!std::getline(ifs, line)) // Reached the end of the file.
@@ -270,7 +271,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 			directoryListing(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"default\":")
 			defaultFile(tmp, location, ln);
-		else if (tmp[0] != "}" && tmp.size() > 0)
+		else if (tmp[0] != "}" && tmp.size() > 0 )
 			exitMessage(1, "Unknown directive line: ", ln);
 		else if (tmp.size() == 1 && tmp[0] == "}")
 			break ;
