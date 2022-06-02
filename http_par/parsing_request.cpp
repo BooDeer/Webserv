@@ -71,9 +71,12 @@ void parsing_header(std::stringstream &fs, data &d)
         {
             // problem if 100GB
             // d.lenth =  lines.erase(0, strlen("Content-Length: "));
+            std::cerr << "===================================================== info =======================================" << std::endl;
+            std::cerr << "line >>> " << lines << std::endl; 
             std::string save = lines.erase(0, strlen("Content-Length: "));
             std::istringstream(save) >> d.lenth;
-            //  save << 
+            std::cerr << "save  len ==> " << save << std::endl;
+            std::cerr << "===================================================== end info =======================================" << std::endl;
         }
        else if (lines.find("Content-Type:") != std::string::npos) // Content-Length: 69
         {

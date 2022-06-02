@@ -42,6 +42,7 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
             std::cout << "host from server block: " << (*it).__Host << std::endl;
             std::cout << "======================================================================================" << std::endl;
             req.config_block = *it;
+            // req.location = (*it).__Locations;
             // std::cout << "route of the above: " << req.config_block.__Locations[0].__Route << std::endl;
         }
     }
@@ -54,7 +55,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     char chunk[CHUNK_SIZE];
     memset(chunk ,0 , CHUNK_SIZE);
     int size_read = recv(s , chunk , CHUNK_SIZE, 0);
-   // std::cout << chunk << std::endl;
+    std::cout << chunk << std::endl;
     if(size_read < 0 )
     {
         std::cout << "error in recv :(" << std::endl;
@@ -73,6 +74,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         first_line(tmp, req[s]); // just parse first line
         parsing_header(check, req[s]); // paring all headers
         findServerBlock(req[s], conf);
+        // found good server
         std::cout << "name of file get here ->  " <<  req[s]._fileName  << "  check limit == >  " << req[s].lenth  << " check server block  " << req[s].config_block.__ClientLimit << std::endl;
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
@@ -128,9 +130,9 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
 {
     ServerBlock meTest;
 
-    meTest = conf.__Servers[1];
-    if (conf.__Servers[1].__Locations.size())
-            std::cout << "Here ===============+++++>" << meTest.__Locations[0].__Route << std::endl;
+    // meTest = conf.__Servers[1];
+    // if (conf.__Servers[1].__Locations.size())
+    //         std::cout << "Here ===============+++++>" << meTest.__Locations[0].__Route << std::endl;
     struct timeval tm;
     fd_set read_check;
     fd_set  write_check;

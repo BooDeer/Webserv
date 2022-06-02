@@ -17,13 +17,15 @@ int is_dir_and_exist(const char *path)
 void  auto_index(data &req) // pass class data
 {
     std::string html_save = "<html>\n<head><title>Index of " + req.path + "</title></head>\n<body>\n<h1>Index of " + req.path + "</h1><hr><pre><a href=\"../\">../</a>\n";
-   std::fstream MyFile;
-    MyFile.open("/tmp/autoindex.html", std::ios::out); // create uniq file // now just test
+   	std::fstream MyFile;
+    MyFile.open("/tmp/autoindex.html", std::ios::out | std::ios::trunc); // create uniq file // now just test
     MyFile << html_save;
     html_save.clear();
     DIR *dir;
 
-    dir = opendir("./");
+
+	std::cout << "=======================>>>>>>>>>>>path is ==> "  <<req.path.c_str()  << std::endl;
+    dir = opendir(req.path.c_str());
     if (dir == NULL)
         throw "403";
     
@@ -31,19 +33,44 @@ void  auto_index(data &req) // pass class data
 
     struct stat st;
 	// problem note : 
+
     while( (entry= readdir(dir)) != NULL) // read all file in folder
     {
       if(entry->d_name[0] != '.')
       {
+		  	
 			std::string tmp(entry->d_name);
-			stat(entry->d_name, &st);
+			std::string name_search = req.path + "/" + tmp;
+			if(stat(name_search.c_str(), &st) < 0)
+			{
+				std::cout << "file name == >" << entry->d_name << std::endl;
+				perror("stat: ");
+				std::cerr << "error in stat" << std::endl;
+				exit(1);
+			}
+			if(S_ISDIR(st.st_mode))
+			{
+				tmp.append("/");
+				name_search.erase(0, req.location.__Root.length());
+			}
+			// std::cerr << "time -==> " << ctime(&st.st_ctime) << std::endl;
 			std::string tmp2(ctime(&st.st_ctime));
 			tmp2.erase(tmp2.length()-1); // remove "\n" in ctime(&st.st_ctime)
+			if(!(S_ISDIR(st.st_mode)))
+				name_search.erase(0, req.location.__Root.length());
 			if(tmp.length() < 33)
-			  html_save = "<a href=\""+ tmp + "\">" +  tmp  + "</a>";
+			{
+				if(name_search[0] != '/')
+					html_save = "<a href=\"/"+ name_search + "\">" +  tmp  + "</a>";
+				else
+					html_save = "<a href=\""+ name_search + "\">" +  tmp  + "</a>";
+			}
 			else
 			{
-			    html_save = "<a href=\""+ tmp + "\">";
+			    if(name_search[0] != '/')
+					html_save = "<a href=\"/"+ name_search + "\">" +  tmp  + "</a>";
+				else
+					html_save = "<a href=\""+ name_search + "\">" +  tmp  + "</a>";
 			    for(int i = 0; i <  33; i++)
 			    {
 			      html_save.append(1, tmp[i]);
@@ -78,6 +105,17 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	std::string tmp;
 	std::string finalString = "/";
 	
+	std::vector<Locations>::iterator itB = conf.begin();
+	for (; itB != conf.end(); itB++)
+	{
+		std::cout << "CURRENT LOCATION: " << (*itB).__Route << std::endl;
+		// std::cout << std::boolalpha << ((*itB).__Route[0]) << std::endl;
+		if ("/" == (*itB).__Route)
+		{
+			req.location = (*itB);
+			break ;
+		}
+	}
 	while (getline(to_split, tmp, '/')) // loop to check location // location /t1/t2/
 	{
 		if (tmp.size() > 0)
@@ -85,13 +123,19 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 			//std::cout << "line --> " << tmp << std::endl;
 			// finalString + tmp;
 			std::vector<Locations>::iterator it = conf.begin();
+
 			for (; it != conf.end(); it++)
 			{
+				// std::cout << ">=====================>>>>>=>FinalString + tmp: " << (finalString + tmp) << "    route: "  <<(*it).__Route << std::endl;
 				if ((finalString + tmp) == (*it).__Route)
 				{
+				// std::cout << "==========================================================================================ana hna help ======================================================\n" ;
 					// std::cout << "true string ==> " << (finalString + tmp) << std::endl;
 					// std::cout << " true" << std::endl;
 					req.location = (*it);
+					// std::cout << "=================== location ====================" << std::endl;
+					// std::cout << "Final chosen location route: " << req.location.__Route << std::endl;
+					// std::cout << "=======================end location =============" << std::endl;
 					break ;
 				}
 			} 
@@ -112,10 +156,11 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	std::cout << "path =========> " << req.path << std::endl;
 	
 	// 	replace route to root
-
+	
 	if(req.location.__Root.length() == 0) // []/t1/t2/t3
 	{
 		//  /t1/2/t3
+		req.location.__Root = "./default/";
 		int len;
 		if(req.location.__Route.length() > 1)
 		{
@@ -125,7 +170,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		else
 			len  = 0;
 		std::cout << "len ==> " << len  <<  " route ==> " << req.location.__Route.length() << "route is ==> " << req.location.__Route  << std::endl;
-		req.path.replace(0, len, "./default/");
+		req.path.replace(0, len,req.location.__Root);
 		// std::cout << "path =========> " << req.path << std::endl;
 	}
 	else
@@ -136,7 +181,12 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	std::cout << "location route ===> " << req.location.__Route << std::endl;
 	if(is_dir_and_exist(req.path.c_str()) != 0)
 	{
+		std::cout << "======================== "<< std::endl;
+		std::cout << req.port << std::endl;
+		std::cout << "route: " << req.location.__Route <<  std::endl;
 		std::cout << "is dir" << std::endl;
+		std::cout << std::boolalpha << req.location.__DirList << std::endl;
+		std::cout << "======================== "<< std::endl;
 		//1. default file
 		//2. autoindex
 		//3. throw error
@@ -148,6 +198,10 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		else if (req.location.__DirList  == true)
 		{
 			// autoindex
+			std::cout << "======================== "<< std::endl;
+			std::cout << "active autoindex" << std::endl;
+			std::cout << "======================== "<< std::endl;
+			req.extension = ".html";
 			auto_index(req); // create file html c++ and change path to name the file html
 		}
 		else
@@ -205,13 +259,17 @@ void response::generate_response_header(const std::string &status, data &req)
 
 void response::send_response(data &req)
 {
+	std::cout << " ===============================> new path "  <<  req.path.c_str() << std::endl;
 	this->fd = open(req.path.c_str(), O_RDONLY);
 	write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
-	char *buff = new char[this->lenth];
-
-	read(this->fd, buff, this->lenth);
-	write(req.client_socket, buff, this->lenth);
-	delete[] buff;
+	// std::cerr << " len ==> "  << this->lenth << std::endl;
+	if(this->lenth > 0)
+	{
+		char *buff = new char[this->lenth];
+		read(this->fd, buff, this->lenth);
+		write(req.client_socket, buff, this->lenth);
+		delete[] buff;
+	}
 }
 
 // int main()
