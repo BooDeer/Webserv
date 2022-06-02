@@ -9,8 +9,9 @@ server {
 "location": {
 	"route":	/
 #	"root":
+	"default": index_default.html
 	"autoindex": on
-
+	
 	}
 
 }

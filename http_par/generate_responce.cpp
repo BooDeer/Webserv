@@ -17,8 +17,7 @@ int is_dir_and_exist(const char *path)
 int check_file(std::string &file_name)
 {
 	struct stat fileStat;
-	
-  int exist = stat("test.html", &fileStat);
+  int exist = stat(file_name.c_str(), &fileStat);
   if(exist != 0)
       return 404;
   if (!(fileStat.st_mode & S_IRUSR))
@@ -205,21 +204,26 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		//1. default file
 		//2. autoindex
 		//3. throw error
-		bool tr = false;
+		bool tr = true;
+		int ret = 0;
 		if(req.location.__DefaultFile.length() != 0)
 		{
 			// default file
 			req.path.append(req.location.__DefaultFile);
-			int ret = check_file(req.path);
+			if (req.path.find_last_of(".") != std::string::npos)
+				req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
+			std::cout << "extension is ======================> :" << req.extension << std::endl;
+			ret = check_file(req.path);
+			std::cout << "throw is >> " << ret <<std::endl;
+			if(ret == 0)
+				tr = false;
 			if(ret == 404 && req.location.__DirList  == false)
 				throw "404";
-			if(ret == 404 && req.location.__DirList == true)
-				tr = true;
-			if(ret == 403)
+			else if(ret == 403)
 				throw "403";
-
+				
 		}
-		if ((req.location.__DirList  == true && tr == false) || (tr == true && req.location.__DirList  == true))
+		if (req.location.__DirList  == true && tr == true)
 		{
 			// autoindex
 			std::cout << "======================== "<< std::endl;
@@ -228,14 +232,17 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 			req.extension = ".html";
 			auto_index(req); // create file html c++ and change path to name the file html
 		}
-		else
+		if(req.location.__DirList  == false && req.location.__DefaultFile.length() == 0)
 			throw "403";
+		
 	}
 	else
 	{
 		/// if file
 		int fd  = open(req.path.c_str(), O_RDONLY);
 		int ret = check_file(req.path);
+		std::cout << "return check file is ==> " << ret << std::endl;
+		
 		if(ret == 404)
 			throw "404";
 		if(ret == 403)
