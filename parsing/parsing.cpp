@@ -6,7 +6,7 @@
 /*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/05/30 18:06:48 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/06/02 22:02:32 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,9 +246,8 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 		exitMessage(1, "missing '{' in line: ", ln);
 	else if (tmp.size() > 2)
 		exitMessage(1, "Unknown argument in line: ", ln);
-	while (tmp[0] != "}") // Location block loop.
+	while (!tmp.size() || tmp[0] != "}") // Location block loop.
 	{
-		std::cout << "Current line ----> :" << ln << std::endl;
 		tmp.clear();
 		ln++;
 		if (!std::getline(ifs, line)) // Reached the end of the file.
@@ -271,7 +270,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 			directoryListing(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"default\":")
 			defaultFile(tmp, location, ln);
-		else if (tmp[0] != "}" && tmp.size() > 0 )
+		else if ( tmp.size() > 0  && tmp[0] != "}")
 			exitMessage(1, "Unknown directive line: ", ln);
 		else if (tmp.size() == 1 && tmp[0] == "}")
 			break ;
