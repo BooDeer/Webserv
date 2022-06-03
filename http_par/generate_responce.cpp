@@ -38,7 +38,7 @@ void  auto_index(data &req) // pass class data
     DIR *dir;
 
 
-	std::cout << "=======================>>>>>>>>>>>path is ==> "  <<req.path.c_str()  << std::endl;
+	// std::cout << "=======================>>>>>>>>>>>path is ==> "  <<req.path.c_str()  << std::endl;
     dir = opendir(req.path.c_str());
     if (dir == NULL)
         throw "403";
@@ -57,7 +57,7 @@ void  auto_index(data &req) // pass class data
 			std::string name_search = req.path + "/" + tmp;
 			if(stat(name_search.c_str(), &st) < 0)
 			{
-				std::cout << "file name == >" << entry->d_name << std::endl;
+				// std::cout << "file name == >" << entry->d_name << std::endl;
 				perror("stat: ");
 				std::cerr << "error in stat" << std::endl;
 				exit(1);
@@ -113,7 +113,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	// 2 - file exists :(
 	// 3 - file's permissions
 	// 4 - file's extension
-	std::cout << "rout befor " <<req.location.__Route << std::endl; 
+	// std::cout << "rout befor " <<req.location.__Route << std::endl; 
 	bool is= false;
 	std::istringstream to_split(req.path);
 	std::string tmp;
@@ -122,7 +122,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	std::vector<Locations>::iterator itB = conf.begin();
 	for (; itB != conf.end(); itB++)
 	{
-		std::cout << "CURRENT LOCATION: " << (*itB).__Route << std::endl;
+		// std::cout << "CURRENT LOCATION: " << (*itB).__Route << std::endl;
 		// std::cout << std::boolalpha << ((*itB).__Route[0]) << std::endl;
 		if ("/" == (*itB).__Route)
 		{
@@ -167,7 +167,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	//std::cout << " final string is  ==> " << finalString << std::endl; 
 	req.path.clear();
 	req.path = finalString; // path final ex ==> T1/T2/T3
-	std::cout << "path =========> " << req.path << std::endl;
+	// std::cout << "path =========> " << req.path << std::endl;
 	
 	// 	replace route to root
 	
@@ -183,24 +183,24 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		}
 		else
 			len  = 0;
-		std::cout << "len ==> " << len  <<  " route ==> " << req.location.__Route.length() << "route is ==> " << req.location.__Route  << std::endl;
+		// std::cout << "len ==> " << len  <<  " route ==> " << req.location.__Route.length() << "route is ==> " << req.location.__Route  << std::endl;
 		req.path.replace(0, len,req.location.__Root);
 		// std::cout << "path =========> " << req.path << std::endl;
 	}
 	else
 		req.path.replace(0, req.location.__Route.length() - 1, req.location.__Root);
 
-	std::cout << "last info" << std::endl;
-	std::cout << "final path ===> " << req.path << std::endl;
-	std::cout << "location route ===> " << req.location.__Route << std::endl;
+	// std::cout << "last info" << std::endl;
+	// std::cout << "final path ===> " << req.path << std::endl;
+	// std::cout << "location route ===> " << req.location.__Route << std::endl;
 	if(is_dir_and_exist(req.path.c_str()) != 0)
 	{
-		std::cout << "======================== "<< std::endl;
-		std::cout << req.port << std::endl;
-		std::cout << "route: " << req.location.__Route <<  std::endl;
-		std::cout << "is dir" << std::endl;
-		std::cout << std::boolalpha << req.location.__DirList << std::endl;
-		std::cout << "======================== "<< std::endl;
+		// std::cout << "======================== "<< std::endl;
+		// std::cout << req.port << std::endl;
+		// std::cout << "route: " << req.location.__Route <<  std::endl;
+		// std::cout << "is dir" << std::endl;
+		// std::cout << std::boolalpha << req.location.__DirList << std::endl;
+		// std::cout << "======================== "<< std::endl;
 		//1. default file
 		//2. autoindex
 		//3. throw error
@@ -212,7 +212,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 			std::string tmp_file = req.path  + req.location.__DefaultFile;
 			// std::cout << "extension is ======================> :" << req.extension << std::endl;
 			ret = check_file(tmp_file);
-			std::cout << "throw is >> " << ret <<std::endl;
+			// std::cout << "throw is >> " << ret <<std::endl;
 			if(ret == 0)
 			{
 				tr = false;
@@ -224,7 +224,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 				throw "404";
 			else if(ret == 403)
 				throw "403";
-			std::cerr << "test what is throw " << ret << std::endl;
+			// std::cerr << "test what is throw " << ret << std::endl;
 			// req.path.append(req.location.__DefaultFile);
 			//if (req.path.find_last_of(".") != std::string::npos)
 			//	req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
@@ -232,9 +232,9 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		if (req.location.__DirList  == true && tr == true)
 		{
 			// autoindex
-			std::cout << "======================== "<< std::endl;
-			std::cout << "active autoindex" << std::endl;
-			std::cout << "======================== "<< std::endl;
+			// std::cout << "======================== "<< std::endl;
+			// std::cout << "active autoindex" << std::endl;
+			// std::cout << "======================== "<< std::endl;
 			req.extension = ".html";
 			auto_index(req); // create file html c++ and change path to name the file html
 		}
@@ -247,13 +247,13 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		/// if file
 		int fd  = open(req.path.c_str(), O_RDONLY);
 		int ret = check_file(req.path);
-		std::cout << "return check file is ==> " << ret << std::endl;
+		// std::cout << "return check file is ==> " << ret << std::endl;
 		
 		if(ret == 404)
 			throw "404";
 		if(ret == 403)
 			throw "403";
-		std::cout << "is safe file you can read from it" << std::endl;
+		// std::cout << "is safe file you can read from it" << std::endl;
 		
 	}
 	/* 
@@ -291,12 +291,12 @@ void response::generate_response_header(const std::string &status, data &req)
 		this->header_resp.append("application/octet-stream");
 	this->header_resp.append("\r\n");
 	this->header_resp.append("\r\n");
-	std::cout << header_resp << std::endl;
+	// std::cout << header_resp << std::endl;
 }
 
 void response::send_response(data &req)
 {
-	std::cout << " ===============================> new path "  <<  req.path.c_str() << std::endl;
+	// std::cout << " ===============================> new path "  <<  req.path.c_str() << std::endl;
 	this->fd = open(req.path.c_str(), O_RDONLY);
 	write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
 	// std::cerr << " len ==> "  << this->lenth << std::endl;

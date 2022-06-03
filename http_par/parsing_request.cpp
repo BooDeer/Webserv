@@ -8,7 +8,7 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
     std::string delimiter = "&";
     // std::cout << line << std::endl;
     size_t d;
-    std::cout << " check is ==> " << line << std::endl;
+    // std::cout << " check is ==> " << line << std::endl;
     for(int i = 0; i < 3; i++)
     {
         iss >> buff;
@@ -37,27 +37,27 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
     size_t pt, qstmark;
     if ((pt = tmp2.find(".")) != std::string::npos)
         tmp2 = tmp2.substr(pt, tmp2.size() - pt);
-    std::cout << "exxxxx ===> " << tmp2 << std::endl;
+    // std::cout << "exxxxx ===> " << tmp2 << std::endl;
     save.extension = tmp2;
-    std::cout << "method ==> " << save.method << " path == > " <<  save.path << std::endl; 
+    // std::cout << "method ==> " << save.method << " path == > " <<  save.path << std::endl; 
 }
 
 void parsing_header(std::stringstream &fs, data &d)
 {
     // find host  Referer lenth
-    std::cout << "start parse header" << std::endl;
+    // std::cout << "start parse header" << std::endl;
     std::string lines;
     while (std::getline(fs, lines))
     {
         if (lines.find("Host:") != std::string::npos) // Host: 127.0.0.1:2082
         {
-            std::cout <<"host's value" << d.host << std::endl;
+            // std::cout <<"host's value" << d.host << std::endl;
             // std::cout << "Reached here ==> "  << lines << std::endl;
             d.host = lines.erase(0, strlen("Host: "));
             int test;
             if ((test = d.host.find(":")) != std::string::npos)
             {
-                std::cout << "found" << std::endl;
+                // std::cout << "found" << std::endl;
                  std::stringstream ss; 
                  ss << d.host.substr(test+1);
                 ss >> d.port; // port from host from parse
