@@ -209,19 +209,25 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		if(req.location.__DefaultFile.length() != 0)
 		{
 			// default file
-			req.path.append(req.location.__DefaultFile);
-			if (req.path.find_last_of(".") != std::string::npos)
-				req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
-			std::cout << "extension is ======================> :" << req.extension << std::endl;
-			ret = check_file(req.path);
+			std::string tmp_file = req.path  + req.location.__DefaultFile;
+			// std::cout << "extension is ======================> :" << req.extension << std::endl;
+			ret = check_file(tmp_file);
 			std::cout << "throw is >> " << ret <<std::endl;
 			if(ret == 0)
+			{
 				tr = false;
+				req.path.append(req.location.__DefaultFile);
+				if (req.path.find_last_of(".") != std::string::npos)
+					req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
+			}
 			if(ret == 404 && req.location.__DirList  == false)
 				throw "404";
 			else if(ret == 403)
 				throw "403";
-				
+			std::cerr << "test what is throw " << ret << std::endl;
+			// req.path.append(req.location.__DefaultFile);
+			//if (req.path.find_last_of(".") != std::string::npos)
+			//	req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
 		}
 		if (req.location.__DirList  == true && tr == true)
 		{
