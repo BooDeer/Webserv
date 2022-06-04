@@ -1,7 +1,7 @@
 
 server {
 	"port": 2030
-	"host": 10.11.12.6
+	"host": 127.0.0.1
 	"serverNames": example.com
 	
 #"errorPages": 401 pathexample
@@ -31,9 +31,14 @@ server {
 	"location": {
 		
 		"route": .php
-		"root": _path_cgi
-		
+		"root": /goinfre/ssamadi/.brew/bin/php-cgi
 	}
+#		"location": {
+		
+#		"route": .test
+#		"root": _path_cgi
+		
+#	}
 }
 
 

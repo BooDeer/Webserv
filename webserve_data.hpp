@@ -86,7 +86,7 @@ struct data
 
 class response
 {
-    private:
+    public:
         std::string header_resp;
         std::string status_code;
         std::string reason_phrase;
@@ -94,6 +94,8 @@ class response
         std::map<std::string, std::string> Common_types;
         int fd; //  for file want to send
         long long lenth;
+        std::string output_file_name;
+        std::string content_type; // content type from cgi
         
 
     public:
@@ -198,6 +200,27 @@ class response
     }
 
 };
+
+class errors
+{
+    public:
+    const std::string err_number;
+    std::string error_page_fd;
+    std::string phrase;
+    std::string error_header;
+    bool you_can_genrate; // if not default page error you can genrate one
+     
+
+    errors(const std::string &err): err_number(err)
+    {
+        this->you_can_genrate = false;
+        if(err_number[0] == '2')
+            error_header =  "Successful"; // if 2xx Successful responce not genrate an error
+        
+    }
+
+};
+
 
 
 

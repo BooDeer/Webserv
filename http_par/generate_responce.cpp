@@ -273,6 +273,7 @@ void response::generate_response_header(const std::string &status, data &req)
 	{
 		std::cout << "start cgi" << std::endl;
 		cgi_generate_response(req);
+		req.path = output_file_name;
 	}
 	else
 	{
@@ -307,9 +308,10 @@ void response::send_response(data &req)
 {
 	std::cout << " ===============================> new path "  <<  req.path.c_str() << std::endl;
 	this->fd = open(req.path.c_str(), O_RDONLY);
-	write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
+	if(req.root_cgi.length() == 0)
+		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
 	// std::cerr << " len ==> "  << this->lenth << std::endl;
-	
+	std::cout << "len of file ==> " << this->lenth << std::endl;
 	if(this->lenth > 0)
 	{
 		char *buff = new char[this->lenth];

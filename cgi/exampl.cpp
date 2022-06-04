@@ -13,8 +13,8 @@ int main()
         NULL
     };
 
-    // int input = open("body-msg", O_RDONLY);                    // path of the reques file
-    int output = open("response.txt", O_CREAT | O_WRONLY | O_TRUNC, 0777);     // path of where you ant to save the body response
+    // int input = open("body-msg", O_RDONLY);// path of the reques file
+    int output = open("response.txt", O_CREAT | O_RDWR | O_TRUNC, 0600);     // path of where you ant to save the body response
 
     int pid = fork(); // 
     if (pid == 0)
@@ -29,7 +29,7 @@ int main()
         // setenv("CONTENT_TYPE", "multipart/form-data; boundary=----WebKitFormBoundaryrEvtmhEJEIqn43cE",1);
         setenv("CONTENT_TYPE", "application/x-httpd-php", 1);
 
-        // dup2(input, 0); 
+        //dup2(input, 0);
         dup2(output, 1);
         execve("/goinfre/ssamadi/.brew/bin/php-cgi", (char**)args, environ);
 
