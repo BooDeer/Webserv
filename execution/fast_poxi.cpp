@@ -1,7 +1,7 @@
 #include "execution.hpp"
 #include "../webserv.hpp"
 
-#define CHUNK_SIZE 10000
+#define CHUNK_SIZE 65536
 
 /**
  * Creates the server socket, bind it, sets it to non-blocking and starts listening.
@@ -57,19 +57,22 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     req[s].server_socket = fd_socket;
     char chunk[CHUNK_SIZE];
     memset(chunk ,0 , CHUNK_SIZE);
-    int size_read = recv(s , chunk , CHUNK_SIZE, 0);
-    // std::cout << chunk << std::endl;
+    int size_read = recv(s , chunk , CHUNK_SIZE - 1, 0);
+    std::cout << chunk << std::endl;
     if(size_read < 0 )
     {
         std::cout << "error in recv :(" << std::endl;
         exit(EXIT_FAILURE);
     }
-    // std::cout << "size read = " << size_read << "byte" << std::endl; 
-    req[s].size_read_complet = req[s].lenth  - size_read;
+    // std::cout << "size read = " << size_read << "byte" << std::endl;
+    std::cout  << "lenth ==> " << req[s].lenth  << "size _read === " << size_read  << std::endl;
+    
+
     // parse here
     // CHECK IF POST
     std::stringstream check(chunk);
     std::string tmp;
+    int headerLength = 0;
     // std::cout << "socket number " << s << std::endl;
     if(req[s].is_header ==  false) // parsing the header.
     {
@@ -86,27 +89,50 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         }
 
         tmp = std::string(chunk);
+        headerLength = tmp.find("\r\n\r\n") + 4;
         tmp.erase(0, tmp.find("\r\n\r\n") + 4);
+        req[s].size_read_complet = req[s].lenth;
         // std::cout << "body ====> " << "|" << tmp  << "|" << std::endl;
         req[s].is_header = true;
         // here
        // std::cout << "host is ==>  " << req[s].host << std::endl;
        // std::cout << "end of parsing " << std::endl;
     }
+   
+    
     // else write if POST on file or pipe
-     if(req[s].is_header ==  true && tmp.length() != 0 && req[s].method == "POST") // add delete if need
+    // std::cout << "tmp ========================= >> " << tmp.length() << std::endl;
+    //  if(req[s].is_header ==  true && tmp.length() != 0 && req[s].method == "POST") // add delete if need
+    //  {
+    //      // check limmite size and throw error
+    //      std::cout << "tessssssssssssssssssssst" << std::endl;
+    //    // req[s].create_file(fd_socket, s);
+    //     write(req[s]._fileFd, tmp.c_str(),  tmp.length());
+    //     tmp.clear();
+    //  }
+    //  // req[s].is_header == false 
+
+
+
+    if (req[s].is_header == true && req[s].method == "POST"  && (size_read  - headerLength > 0)) // if we recv chunk not in body of header
      {
-         // check limmite size and throw error
-        req[s].create_file(fd_socket, s);
-        write(req[s]._fileFd, tmp.c_str(),  tmp.length());
-        tmp.clear();
-     }
-     // req[s].is_header == false 
-     else if (req[s].is_header == true && req[s].method == "POST") // if we recv chunk not in body of header
-     {
+         
+         std::cout << "=============================================================================== ana hnaa ======================================" << std::endl;
+          req[s].size_read_complet  -= size_read - headerLength;
+          std::cout  << ".size_read_complet ==> " << req[s].size_read_complet << std::endl;
+        //  if(req[s]._fileName.length() == 0)
+        // {
+             std::cout << "create file " << std::endl;
+           // req[s].create_file(fd_socket, s);
+        // }
         // std::cout << "chunk here -------> " << req[s]._fileName << std::endl;
-	    write(req[s]._fileFd, chunk, std::strlen(chunk));
+	    write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
+         std::cout << "===============================================================================  ======================================" << std::endl;
+
      }
+
+
+
     // if recv return 0  close connectoin  /// check limite size and close client socket
     // if(size_read == 0)
     // {
@@ -117,7 +143,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     // }
 	usleep(10);
 	// std::cout << " ------------------------- chuck --------------------" << std::endl;
-    memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
+   // memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
 }
 
 /**
@@ -159,6 +185,8 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         client_socket = accept(fd_savior[i], NULL, NULL);
                         if (client_socket < 0 )
 							exitMessage(1, "accept error");
+                        // if(request_info[client_socket]._fileName.length() == 0)
+                        tmp.create_file(fd_savior[i], client_socket);
                         request_info[client_socket] = tmp; // add to map
                         FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set
                         usleep(10);
@@ -169,6 +197,8 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         // iterate through the map until index i
                        // request_info[j].config_block = conf.__Servers[i]; // change to new logic 
                         // std::cout <<"serverroute ======== ===> " << request_info[j].config_block.__Locations[0].__Route << std::endl;
+                        // crea
+                        //  request_info[j].create_file(fd_socket, s);
                         receive_basic(j, socket_list[i], fd_savior[i], request_info, conf);
                         // std::cout << " ===>============================== end ================================== " << std::endl;
                     }
@@ -177,7 +207,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                 {
                              // scope for check if you can write in client fd
                     // std::cout << request_info[j].size_read_complet << std::endl;
-                    if(request_info[j].size_read_complet < 0) // if we complet Content-Length send responce 
+                    if(request_info[j].size_read_complet == 0) // if we complet Content-Length send responce 
                     {
                         response resp;
                         // std::cout << "send req" << std::endl;
@@ -204,6 +234,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         
                         //write(j, hello, strlen(hello)); // send
                         // FD_CLR(j, &read_check); 
+                      
                         FD_CLR(j, &socket_list[i]);
                         close(j);
                         // remove(request_info[j]._fileName.c_str())

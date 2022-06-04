@@ -2,5 +2,5 @@
 
 
 
-make re && ./webserv $1
+make re && ./webserv $1 | cat -e
 

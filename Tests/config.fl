@@ -1,6 +1,6 @@
 
 server {
-	"port": 2030
+	"port": 2069
 	"host": 127.0.0.1
 	"serverNames": example.com
 	
@@ -17,7 +17,7 @@ server {
 }
 
 server {
-	"port": 2031
+	"port": 2070
 	"host": 127.0.0.1
 	"serverNames": example.com
 	

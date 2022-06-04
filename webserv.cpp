@@ -19,6 +19,7 @@ void data::create_file(int fd_socket, int client_socket)
     time222 << t;
     std::string time_;
     time222 >> time_;
+    std::cout << "CREATING A FILE FOR KADJKAJDAKLSD;ALSKD;ALKD;LA " << std::endl;
     _fileName = std::string("/tmp/webServ_" + id_c + "_" + id_s + "_" + time_ + ".txt");
     // std::cout << "writing in : " << _fileName << std::endl;
     // std::cout << " file create fot this request is " <<  _fileName << std::endl;

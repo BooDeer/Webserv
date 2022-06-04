@@ -32,7 +32,7 @@ struct data
     int status_code;
     Locations  location;
     std::string root_cgi; // path of the cgi
-    std::vector<std::string> paramter;
+    std::string paramter;
     std::string extension;
     ServerBlock config_block; // server block config
     unsigned short  port; // port fe
@@ -56,6 +56,7 @@ struct data
        //std::cout << "---------------operator =" << std::endl;
         this->id = o.id;
         this->_fileName = o._fileName;
+        std::cout << "file name ===> " << o._fileName << std::endl;
 		this->_fileFd = open(o._fileName.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
         this->client_socket = o.client_socket;
         this->server_socket = o.server_socket;

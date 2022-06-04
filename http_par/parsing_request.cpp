@@ -24,15 +24,7 @@ void first_line(std::string line, data &save) // ====> GET example.com HTTP/1.1
         tmp.erase(0, d+1); // &
         save.path.erase(d, save.path.size() - d);
     }
-    size_t pos = 0;
-    std::string token;
-    while ((pos = tmp.find(delimiter)) != std::string::npos) 
-    {
-        token = tmp.substr(0, pos);
-        save.paramter.push_back(token);
-        tmp.erase(0, pos + delimiter.length());
-    }
-    save.paramter.push_back(tmp);
+    save.paramter =  tmp;
     std::string tmp2(save.path); // case1: there is "?<...>" case2: there is no "?" at the end
     size_t pt, qstmark;
     if ((pt = tmp2.find(".")) != std::string::npos)
@@ -81,6 +73,8 @@ void parsing_header(std::stringstream &fs, data &d)
        else if (lines.find("Content-Type:") != std::string::npos) // Content-Length: 69
         {
             d.type =  lines.erase(0, strlen("Content-Type: "));
+           // std::cout << "typpeeeeeeee >>> >>>>>>   " << d.type <<  std::endl; 
+            d.type.erase(d.type.find_last_of("\r"));
         }
         else if (lines.find("Referer:") != std::string::npos) // Referer: http://127.0.0.1:2082/
         {
