@@ -31,6 +31,7 @@ struct data
     std::string referer;
     int status_code;
     Locations  location;
+    std::string root_cgi; // path of the cgi
     std::vector<std::string> paramter;
     std::string extension;
     ServerBlock config_block; // server block config
@@ -98,6 +99,7 @@ class response
     public:
         void generate_response_header(const std::string &status, data &req);
         void send_response(data &req);
+        void cgi_generate_response(data &req);
     
     response()
     {

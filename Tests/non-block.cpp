@@ -26,6 +26,7 @@ void prepare_socket(char *ip, short port, int &save)
     }
     server_info.sin_family = PF_INET; // verify is ip4 
     server_info.sin_addr.s_addr = inet_addr(ip); // convert ip(127.0.0.1) to in_addr_t  
+    std::cout << "ip ==> " << ip << "port ==> " << port << std::endl;
     server_info.sin_port =  htons(port);
     fcntl(save, F_SETFL, O_NONBLOCK);
     if(bind(save, (sockaddr *)&server_info, sizeof(server_info)) < 0)
@@ -106,7 +107,7 @@ int main(int argc, char const *argv[])
   // for(int i = 0; i < NB_SRV; i++)
   // {
     prepare_socket(ip, 2002, server_fd[0]);
-    prepare_socket(ip2, 2003, server_fd[1]);
+    prepare_socket(ip2, 2002, server_fd[1]);
     // current_sockets[NB_SRV];
 
     FD_ZERO(&current_sockets[0]);

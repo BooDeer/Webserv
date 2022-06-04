@@ -47,14 +47,14 @@ int receive_basic(int s, fd_set &current_sockets)
         if(size_read == 0)
         {
             close(s);
-            std::cout << "close and clear file" << std::endl;
+            // std::cout << "close and clear file" << std::endl;
             // open again // remove
             FD_CLR(s, &current_sockets);
         }
-            std::cout << chunk << std::endl;
+            // std::cout << chunk << std::endl;
             std::string bood(chunk);
-            if (bood.find("\r\n\r\n") != std::string::npos)
-                std::cout << "test is working" << std::endl;
+            // if (bood.find("\r\n\r\n") != std::string::npos)
+                // std::cout << "test is working" << std::endl;
                 // add if contenrt lenth 0 pars request
                 {
                          // parsing request               
@@ -83,10 +83,10 @@ int receive_basic(int s, fd_set &current_sockets)
 void start_server(int *fd_savior, fd_set *socket_list)
 {
     struct timeval tm;
-    for(int i = 0; i < 4; i++)
-    {
-        std::cout << fd_savior[i] << std::endl;
-    }
+    // for(int i = 0; i < 4; i++)
+    // {
+    //     std::cout << fd_savior[i] << std::endl;
+    // }
     tm.tv_sec = 0;
     tm.tv_usec = 10;
     // struct sockaddr_in address;

@@ -10,17 +10,17 @@
  * @param {save:number} Server's socket.
  * @return {void}.
  */
-void prepare_socket(std::map<unsigned short, std::string>& it, int &save, unsigned short port )
+void prepare_socket(std::pair<std::string, unsigned short> pair, int &save)
 {
     
     struct sockaddr_in server_info;
 
-    std::cout << "------------crearte socket----------- with port "  <<  port << std::endl;
+    std::cout << "------------crearte socket----------- with port "  <<  pair.second << std::endl;
     if ((save = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 		exitMessage(1, "socket error");
     server_info.sin_family = PF_INET;
-    server_info.sin_addr.s_addr = inet_addr(it[port].c_str());
-    server_info.sin_port =  htons(port);
+    server_info.sin_addr.s_addr = inet_addr(pair.first.c_str());
+    server_info.sin_port =  htons(pair.second);
     fcntl(save, F_SETFL, O_NONBLOCK);
     if(bind(save, (sockaddr *)&server_info, sizeof(server_info)) < 0)
 		exitMessage(1, "bind error");
@@ -35,7 +35,10 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
 
     for (; it != conf.__Servers.end(); it++)
     {
-        if ((*it).__Port == req.port && ("127.0.0.1" == req.ip_server_name || (*it).__ServerNames[0] == req.ip_server_name))
+        std::cout << "ip or server name is ===> " << req.ip_server_name << std::endl;
+        if("0.0.0.0" == req.ip_server_name)
+            req.ip_server_name = "127.0.0.1";
+        if ((*it).__Port == req.port && ( (*it).__Host == req.ip_server_name || (*it).__ServerNames[0] == req.ip_server_name))
         {
             // std::cout << "======================================================================================" << std::endl;
             // std::cout << "port from server block: " << (*it).__Port  << std::endl;
@@ -126,7 +129,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
  * @param {conf:struct} Struct of servers vector.
  * @return {none}.
  */
-void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFile &conf, std::map<unsigned short, std::string> &uniqueServers)
+void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFile &conf)
 {
     ServerBlock meTest;
 
@@ -214,10 +217,17 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
     }
 }
 
-void filterByServer(ConfigFile &conf, std::map<unsigned short, std::string> &unq)
+void filterByServer(ConfigFile &conf, std::map<std::pair<std::string, unsigned short>, std::string>&unq)
 {
-	for(int i = 0; i < conf.__Servers.size(); i++)
-		unq[conf.__Servers[i].__Port] = conf.__Servers[i].__Host;
+    
+	// for(int i = 0; i < conf.__Servers.size(); i++)
+	// 	unq[conf.__Servers[i].__Port] = conf.__Servers[i].__Host;
+    
+    for(int i = 0; i < conf.__Servers.size(); i++)
+        {
+            std::pair<std::string, unsigned short> tmp_pair(conf.__Servers[i].__Host, conf.__Servers[i].__Port);
+            unq[tmp_pair] = conf.__Servers[i].__ServerNames[0];
+        }
 }
 
 /**
@@ -230,7 +240,7 @@ void filterByServer(ConfigFile &conf, std::map<unsigned short, std::string> &unq
 void install_servers(ConfigFile &conf)
 {
 	//		   @key: Port || @value: Host.
-    std::map<unsigned short, std::string> uniqueServers;
+    std::map<std::pair<std::string, unsigned short>, std::string> uniqueServers;
 
     filterByServer(conf, uniqueServers);
     size_t server_size = uniqueServers.size();
@@ -238,11 +248,19 @@ void install_servers(ConfigFile &conf)
     int fd_savior[server_size];
 	// fd_set of each server.
     fd_set socket_list[server_size];
-    for(int i  = 0; i < server_size; i++)
-    {
-        prepare_socket(uniqueServers, fd_savior[i], conf.__Servers[i].__Port);
-        FD_ZERO(&socket_list[i]);
-        FD_SET(fd_savior[i], &socket_list[i]);
-    }
-   start_server(fd_savior, socket_list, server_size, conf, uniqueServers);
+    // for(int i  = 0; i < server_size; i++)
+    // {
+        int i = 0;
+        std::cout << "=====================+Creationg of the servers+=======================\n";
+        for(std::map<std::pair<std::string, unsigned short>, std::string>::iterator it = uniqueServers.begin(); it != uniqueServers.end(); it++)
+        {
+            std::cout << "server: " << (*it).first.first << " port: " << (*it).first.second << std::endl;
+            prepare_socket((*it).first, fd_savior[i]);
+            FD_ZERO(&socket_list[i]);
+            FD_SET(fd_savior[i], &socket_list[i]);
+            i++;
+        }
+        std::cout << "total servers : " << i << std::endl;
+    // }
+    start_server(fd_savior, socket_list, server_size, conf);
 }

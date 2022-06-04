@@ -235,6 +235,15 @@ void	log_data(ServerBlock& config)
 
 }
 
+void	checkLocation(Locations &location)
+{
+	if (location.__Route.length() && location.__Route[0]  == '.')
+	{
+		if (location.__Root.length() == 0)
+			exitMessage(1, "Error! cgi without executable path!");
+	}
+}
+
 void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& config)
 {
 	int start = 				int(ln);
@@ -278,6 +287,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 	}
 	if (tmp.size() > 1)
 		exitMessage(1, "Unknown directive line: ", ln);
+	checkLocation(location);
 	config.__Locations.push_back(location);
 }
 

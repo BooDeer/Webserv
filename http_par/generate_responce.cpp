@@ -59,7 +59,7 @@ void  auto_index(data &req) // pass class data
 			{
 				// std::cout << "file name == >" << entry->d_name << std::endl;
 				perror("stat: ");
-				std::cerr << "error in stat" << std::endl;
+				// std::cerr << "error in stat" << std::endl;
 				exit(1);
 			}
 			if(S_ISDIR(st.st_mode))
@@ -130,6 +130,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 			break ;
 		}
 	}
+	
 	while (getline(to_split, tmp, '/')) // loop to check location // location /t1/t2/
 	{
 		if (tmp.size() > 0)
@@ -152,6 +153,11 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 					// std::cout << "=======================end location =============" << std::endl;
 					break ;
 				}
+				else if (req.extension == (*it).__Route)
+				{
+					req.root_cgi = (*it).__Root; //save cgi path
+				}
+				
 			} 
 			finalString.append(tmp + "/");
 			// std::cout << " final test ==> " << finalString << std::endl;
@@ -195,12 +201,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	// std::cout << "location route ===> " << req.location.__Route << std::endl;
 	if(is_dir_and_exist(req.path.c_str()) != 0)
 	{
-		// std::cout << "======================== "<< std::endl;
-		// std::cout << req.port << std::endl;
-		// std::cout << "route: " << req.location.__Route <<  std::endl;
-		// std::cout << "is dir" << std::endl;
-		// std::cout << std::boolalpha << req.location.__DirList << std::endl;
-		// std::cout << "======================== "<< std::endl;
+		// std::cout << "======================== "<< std::endl;;l.......................0
 		//1. default file
 		//2. autoindex
 		//3. throw error
@@ -209,25 +210,19 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 		if(req.location.__DefaultFile.length() != 0)
 		{
 			// default file
-			std::string tmp_file = req.path  + req.location.__DefaultFile;
+			req.path.append(req.location.__DefaultFile);
+			if (req.path.find_last_of(".") != std::string::npos)
+				req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
 			// std::cout << "extension is ======================> :" << req.extension << std::endl;
-			ret = check_file(tmp_file);
+			ret = check_file(req.path);
 			// std::cout << "throw is >> " << ret <<std::endl;
 			if(ret == 0)
-			{
 				tr = false;
-				req.path.append(req.location.__DefaultFile);
-				if (req.path.find_last_of(".") != std::string::npos)
-					req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
-			}
 			if(ret == 404 && req.location.__DirList  == false)
 				throw "404";
 			else if(ret == 403)
 				throw "403";
-			// std::cerr << "test what is throw " << ret << std::endl;
-			// req.path.append(req.location.__DefaultFile);
-			//if (req.path.find_last_of(".") != std::string::npos)
-			//	req.extension = req.path.substr(req.path.find_last_of("."), req.path.length() - req.path.find_last_of("."));
+				
 		}
 		if (req.location.__DirList  == true && tr == true)
 		{
@@ -268,38 +263,53 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 }
 
 
+
 void response::generate_response_header(const std::string &status, data &req)
 {
+	// cgi work
 	this->status_code = status;
 	this->reason_phrase = data_base[status];
-	this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n"; // first line for response
-	this->header_resp.append("Server: webserv\r\n");
-	this->header_resp.append("Content-Length: ");
-	std::ifstream in(req.path.c_str(), std::ifstream::ate | std::ifstream::binary);
-	long long a = in.tellg();
-	std::stringstream b;
-	b << a;
-	std::string tmp;
-	b >> tmp;
-	this->lenth = a;
-	this->header_resp.append(tmp);
-	this->header_resp.append("\r\n");
-	this->header_resp.append("Content-Type: ");
-	if(Common_types.find(req.extension) != Common_types.end())
-		this->header_resp.append(Common_types[req.extension]);
+	if(req.root_cgi.length() != 0)
+	{
+		std::cout << "start cgi" << std::endl;
+		cgi_generate_response(req);
+	}
 	else
-		this->header_resp.append("application/octet-stream");
-	this->header_resp.append("\r\n");
-	this->header_resp.append("\r\n");
-	// std::cout << header_resp << std::endl;
+	{
+		std::cout << "normal file" << std::endl;
+		this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n"; // first line for response
+		this->header_resp.append("Server: webserv\r\n");
+		this->header_resp.append("Content-Length: ");
+		std::ifstream in(req.path.c_str(), std::ifstream::ate | std::ifstream::binary);
+		long long a = in.tellg();
+		std::stringstream b;
+		b << a;
+		std::string tmp;
+		b >> tmp;
+		this->lenth = a;
+		this->header_resp.append(tmp);
+		this->header_resp.append("\r\n");
+		this->header_resp.append("Content-Type: ");
+		if(Common_types.find(req.extension) != Common_types.end())
+			this->header_resp.append(Common_types[req.extension]);
+		else
+			this->header_resp.append("application/octet-stream");
+		this->header_resp.append("\r\n");
+		this->header_resp.append("Connection: Keep-Alive\r\n");
+		this->header_resp.append("\r\n");
+		std::cout << header_resp << std::endl;
+	}
 }
+
+
 
 void response::send_response(data &req)
 {
-	// std::cout << " ===============================> new path "  <<  req.path.c_str() << std::endl;
+	std::cout << " ===============================> new path "  <<  req.path.c_str() << std::endl;
 	this->fd = open(req.path.c_str(), O_RDONLY);
 	write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
 	// std::cerr << " len ==> "  << this->lenth << std::endl;
+	
 	if(this->lenth > 0)
 	{
 		char *buff = new char[this->lenth];
