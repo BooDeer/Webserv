@@ -76,6 +76,12 @@ void parsing_header(std::stringstream &fs, data &d)
            // std::cout << "typpeeeeeeee >>> >>>>>>   " << d.type <<  std::endl; 
             d.type.erase(d.type.find_last_of("\r"));
         }
+         else if (lines.find("Cookie:") != std::string::npos) // Content-Length: 69
+        {
+            d.Cookie =  lines.erase(0, strlen("Cookie: "));
+           // std::cout << "typpeeeeeeee >>> >>>>>>   " << d.type <<  std::endl; 
+            d.Cookie.erase(d.Cookie.find_last_of("\r"));
+        }
         else if (lines.find("Referer:") != std::string::npos) // Referer: http://127.0.0.1:2082/
         {
             d.referer = lines.erase(0, strlen("Referer: "));

@@ -27,6 +27,7 @@ struct data
     std::string host;
     unsigned long long lenth; // Content-Length:
     long long size_read_complet;
+    std::string Cookie;
     std::string type;
     std::string referer;
     int status_code;

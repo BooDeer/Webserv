@@ -38,7 +38,6 @@ void cgi_work(int fd_output_file, const char **args, const data &req, response &
         setenv("REQUEST_METHOD", req.method.c_str(),1);
         setenv("CONTENT_LENGTH", tmp.c_str(),1); // test
         setenv("QUERY_STRING", req.paramter.c_str(),1);
-        // setenv("CONTENT_TYPE", "multipart/form-data; boundary=----WebKitFormBoundaryrEvtmhEJEIqn43cE",1);
         if(req.type.length() != 0)
         {
             std::cout << "type ===> " << req.type.c_str() << std::endl;
@@ -48,6 +47,8 @@ void cgi_work(int fd_output_file, const char **args, const data &req, response &
             setenv("CONTENT_TYPE", const_cast<char *>(resp.Common_types[req.extension].c_str()), 1);
         else
             setenv("CONTENT_TYPE", "application/octet-stream", 1);
+        if(req.Cookie.length() != 0)
+            setenv("HTTP_COOKIE", const_cast<char *>(req.Cookie.c_str()) ,1);
         // for(int i = 0; environ[i]; i++)
         //     std::cout << "env == > " <<  environ[i] << std::endl;
         std::cout << "duped file: " << req._fileName;
