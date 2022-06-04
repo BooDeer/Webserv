@@ -180,8 +180,10 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                 if(FD_ISSET(j, &read_check))
                 {
                     data tmp;
-                    if (j == fd_savior[i])
+                    if (j == fd_savior[i] && request_info.size() < FD_SETSIZE)
                     {
+                        std::cout << "server socket: " << j << std::endl;
+                        std::cout << "map size= "  << request_info.size() << std::endl;
                         client_socket = accept(fd_savior[i], NULL, NULL);
                         if (client_socket < 0 )
 							exitMessage(1, "accept error");
@@ -191,7 +193,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set
                         usleep(10);
                     }
-                    else
+                    else if(request_info.find(j) != request_info.end())
                     {
                         // std::cout << " ----------------------------------- in else in read request -------------------------" << std::endl;
                         // iterate through the map until index i
@@ -207,7 +209,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                 {
                              // scope for check if you can write in client fd
                     // std::cout << request_info[j].size_read_complet << std::endl;
-                    if(request_info[j].size_read_complet == 0) // if we complet Content-Length send responce 
+                    if(request_info.find(j) != request_info.end() && request_info[j].size_read_complet == 0) // if we complet Content-Length send responce 
                     {
                         response resp;
                         // std::cout << "send req" << std::endl;
