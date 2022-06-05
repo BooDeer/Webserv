@@ -85,6 +85,58 @@ struct data
     
 };
 
+class response;
+
+class errors
+{
+    public:
+    //std::string error_page_fd;
+    std::string phrase;
+    std::string error_header;
+    bool you_can_genrate; // if not default page error you can genrate one
+    errors()
+    {
+        you_can_genrate =  false;
+    }
+    errors(std::string err, std::string number)
+    {
+        // this->you_can_genrate = false;
+        this->phrase = err;
+        this->error_header = number;
+
+        if(error_header[0] == '2')
+        {
+            std::cout << std::endl;
+            std::cout << std::endl;
+
+            std::cout << "error 1==> >> " << phrase[0] << std::endl;
+            std::cout << std::endl;
+            std::cout << std::endl;
+
+            // error_header =  "Successful"; // if 2xx Successful responce not genrate an error
+            this->you_can_genrate = false;
+        }
+        else 
+             this->you_can_genrate = true;
+    }
+    errors(const errors &err)
+    {
+        *this = err;
+    }
+    errors &operator=(const errors &err)
+    {
+        // this->err_number = err.err_number;
+        //this->error_page_fd = err.error_page_fd;
+        this->phrase =  err.phrase;
+        this->you_can_genrate = err.you_can_genrate;
+        return *this;
+    }
+    void generate_error(response &resp, std::map<std::string, std::string> &error);// generate reponce
+    ~errors()
+    {
+
+    }
+};
 
 class response
 {
@@ -92,10 +144,10 @@ class response
         std::string header_resp;
         std::string status_code;
         std::string reason_phrase;
-        std::map<std::string, std::string> data_base;
+        std::map<std::string, errors> data_base;
         std::map<std::string, std::string> Common_types;
         int fd; //  for file want to send
-        long long lenth;
+        unsigned long long lenth;
         std::string output_file_name;
         std::string content_type; // content type from cgi
         
@@ -104,23 +156,24 @@ class response
         void generate_response_header(const std::string &status, data &req);
         void send_response(data &req);
         void cgi_generate_response(data &req);
-    
+
     response()
     {
+        this->lenth = 0;
         // common status code
-        data_base.insert(std::pair<std::string, std::string>("400", "Bad Request"));
-        data_base.insert(std::pair<std::string, std::string>("403", "Forbidden"));
-        data_base.insert(std::pair<std::string, std::string>("404", "Not Found"));
-        data_base.insert(std::pair<std::string, std::string>("405", "Method Not Allowed"));
-        data_base.insert(std::pair<std::string, std::string>("413", "Payload Too Large"));
-        data_base.insert(std::pair<std::string, std::string>("200", "OK"));
-        data_base.insert(std::pair<std::string, std::string>("300", "Multiple Choices"));
-        data_base.insert(std::pair<std::string, std::string>("301", "Moved Permanently"));
-        data_base.insert(std::pair<std::string, std::string>("302", "Found"));
-        data_base.insert(std::pair<std::string, std::string>("303", "See Other"));
-        data_base.insert(std::pair<std::string, std::string>("304", "Not Modified"));
-        data_base.insert(std::pair<std::string, std::string>("307", "Temporary Redirect"));
-        data_base.insert(std::pair<std::string, std::string>("308", "Permanent Redirect"));
+        data_base.insert(std::pair<std::string, errors>("400", errors("Bad Request", "400")));
+        data_base.insert(std::pair<std::string, errors>("403", errors("Forbidden", "403")));
+        data_base.insert(std::pair<std::string, errors>("404", errors("Not Found", "404")));
+        data_base.insert(std::pair<std::string, errors>("405", errors("Method Not Allowed", "405")));
+        data_base.insert(std::pair<std::string, errors>("413", errors("Payload Too Large", "413")));
+        data_base.insert(std::pair<std::string, errors>("200", errors("OK", "200")));
+        data_base.insert(std::pair<std::string, errors>("300", errors("Multiple Choices", "300")));
+        data_base.insert(std::pair<std::string, errors>("301", errors("Moved Permanently", "301")));
+        data_base.insert(std::pair<std::string, errors>("302", errors("Found", "302")));
+        data_base.insert(std::pair<std::string, errors>("303", errors("See Other", "303")));
+        data_base.insert(std::pair<std::string, errors>("304", errors("Not Modified", "304")));
+        data_base.insert(std::pair<std::string, errors>("307", errors("Temporary Redirect", "307")));
+        data_base.insert(std::pair<std::string, errors>("308", errors("Permanent Redirect", "308")));
 
         // common type
         Common_types.insert(std::pair<std::string, std::string>(".aac", "audio/aac"));
@@ -203,25 +256,7 @@ class response
 
 };
 
-class errors
-{
-    public:
-    const std::string err_number;
-    std::string error_page_fd;
-    std::string phrase;
-    std::string error_header;
-    bool you_can_genrate; // if not default page error you can genrate one
-     
 
-    errors(const std::string &err): err_number(err)
-    {
-        this->you_can_genrate = false;
-        if(err_number[0] == '2')
-            error_header =  "Successful"; // if 2xx Successful responce not genrate an error
-        
-    }
-
-};
 
 
 

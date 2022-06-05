@@ -25,6 +25,45 @@ int check_file(std::string &file_name)
 	return 0;
 }
 
+void errors::generate_error(response &resp, std::map<std::string, std::string> &error)
+{
+	bool is_exist = false;
+	// check file error page
+	// genrate new one
+	// error[resp.status_code]
+	 struct stat path_stat;
+    int exist = stat(error[resp.status_code].c_str(), &path_stat);
+	if(exist == 0)
+	{
+		if(path_stat.st_mode & S_IFREG)
+				is_exist = true;
+	}
+	if(this->you_can_genrate == true) 
+	{
+		std::cout << "start generate body  error" << std::endl;	
+
+		/*
+		<html>
+			<head><title>404 Not Found</title></head>
+			<body>
+			<center><h1>404 Not Found</h1></center>
+			</body>
+		</html>
+		*/
+		std::cout << "prase ====> " << this->phrase << std::endl;
+		resp.header_resp.append("<html>\n<head><title>");
+		resp.header_resp.append(resp.status_code);
+		resp.header_resp.append(" ");
+		resp.header_resp.append(this->phrase);
+		resp.header_resp.append("</title></head>\n<body>");
+		resp.header_resp.append("<center><h1>");
+		resp.header_resp.append(resp.status_code);
+		resp.header_resp.append(" ");
+		resp.header_resp.append(this->phrase);
+		resp.header_resp.append("</center></h1>");
+		resp.header_resp.append("</body>\n</html>");
+	}
+}
 void  auto_index(data &req) // pass class data
 {
 	std::string tmp_path(req.path);
@@ -240,7 +279,7 @@ void check_url_path(data &req, std::vector<Locations> &conf) // check url ==> GE
 	else
 	{
 		/// if file
-		int fd  = open(req.path.c_str(), O_RDONLY);
+		// int fd  = open(req.path.c_str(), O_RDONLY);
 		int ret = check_file(req.path);
 		// std::cout << "return check file is ==> " << ret << std::endl;
 		
@@ -268,7 +307,10 @@ void response::generate_response_header(const std::string &status, data &req)
 {
 	// cgi work
 	this->status_code = status;
-	this->reason_phrase = data_base[status];
+	std::cout << "phrase from resp ==> " << data_base[status].phrase << std::endl;
+	this->reason_phrase = data_base[status].phrase;
+	// data_base[status].error_header  = status;
+
 	if(req.root_cgi.length() != 0)
 	{
 		std::cout << "start cgi" << std::endl;
@@ -280,16 +322,38 @@ void response::generate_response_header(const std::string &status, data &req)
 		std::cout << "normal file" << std::endl;
 		this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n"; // first line for response
 		this->header_resp.append("Server: webserv\r\n");
-		this->header_resp.append("Content-Length: ");
-		std::ifstream in(req.path.c_str(), std::ifstream::ate | std::ifstream::binary);
-		long long a = in.tellg();
-		std::stringstream b;
-		b << a;
-		std::string tmp;
-		b >> tmp;
-		this->lenth = a;
-		this->header_resp.append(tmp);
-		this->header_resp.append("\r\n");
+	//	std::cout << std::boolalpha << data_base[status].you_can_genrate << std::endl;
+		std::cout << "value of len before entering: " << this->lenth << std::endl;
+		// if(data_base[status].you_can_genrate == false)
+		// {
+		//	this->header_resp.append("Content-Length: ");
+			// std::ifstream in(req.path.c_str(), std::ifstream::ate | std::ifstream::binary);
+			// long long a = in.tellg();
+			struct stat fileStat;
+  			int exist = stat(req.path.c_str(), &fileStat);
+				std::string tmp;
+			if(exist == 0)
+			{
+				std::stringstream b;
+				unsigned long long a = fileStat.st_size;
+				b << a;
+				b >> tmp;
+				this->lenth = a;
+				this->header_resp.append("Content-Length: ");
+				this->header_resp.append(tmp);
+				this->header_resp.append("\r\n");
+				std::cout << "len from scop if --> "  << a  << " tmp " << std::endl;
+			}
+			else
+			{
+				if(req.extension.length( ) == 0)
+					req.extension = ".html";
+				this->lenth = 0;
+			}
+			
+		// }
+		std::cout << "ext -------> " << req.extension << std::endl;
+		
 		this->header_resp.append("Content-Type: ");
 		if(Common_types.find(req.extension) != Common_types.end())
 			this->header_resp.append(Common_types[req.extension]);
@@ -298,7 +362,13 @@ void response::generate_response_header(const std::string &status, data &req)
 		this->header_resp.append("\r\n");
 		this->header_resp.append("Connection: Keep-Alive\r\n");
 		this->header_resp.append("\r\n");
+		std::cout << "================================================= " << std::endl;
 		std::cout << header_resp << std::endl;
+		std::cout << "len of of of of ====> " << this->lenth << std::endl;
+
+		std::cout << "================================================= " << std::endl;
+		data_base[status].generate_error(*this, req.config_block.__DefaultErrorpg);
+		
 	}
 }
 
@@ -307,7 +377,9 @@ void response::generate_response_header(const std::string &status, data &req)
 void response::send_response(data &req)
 {
 	std::cout << " ===============================> new path "  <<  req.path.c_str() << std::endl;
+
 	this->fd = open(req.path.c_str(), O_RDONLY);
+	std::cout <<  "len of root " << req.root_cgi.length() << std::endl;
 	if(req.root_cgi.length() == 0)
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str())); // send header first
 	// std::cerr << " len ==> "  << this->lenth << std::endl;

@@ -85,7 +85,9 @@ void parse_cgi_output(response &resp, std::string &name_of_file, data &req)
     struct stat file_state;
     int exist = stat(name_of_file.c_str(), &file_state);
    // std::cout << "sum ==> " << sum  << "filesize ==> " << file_state.st_size << std::endl;
+
     resp.lenth = file_state.st_size - sum;
+
     // std::cout << "size ==> " << resp.lenth << std::endl; 
 }
 
@@ -141,7 +143,8 @@ void response::cgi_generate_response(data &req)
     struct stat file_state;
     stat(output_file_name.c_str(), &file_state);
     this->lenth = file_state.st_size;
-    
+        std::cout << std::endl;
+   
     // 1.test cgi
     // 2.parse cgi
     // 3. test upload file

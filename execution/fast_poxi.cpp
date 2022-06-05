@@ -15,7 +15,6 @@ void prepare_socket(std::pair<std::string, unsigned short> pair, int &save)
     
     struct sockaddr_in server_info;
 
-    std::cout << "------------crearte socket----------- with port "  <<  pair.second << std::endl;
     if ((save = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 		exitMessage(1, "socket error");
     server_info.sin_family = PF_INET;
@@ -27,6 +26,7 @@ void prepare_socket(std::pair<std::string, unsigned short> pair, int &save)
     if(listen(save, INT32_MAX) < 0)
 		exitMessage(1, "listen error");
 }
+
 void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, host(servernames/host), port
 {
     std::vector<ServerBlock>::iterator it;
@@ -98,22 +98,6 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
        // std::cout << "host is ==>  " << req[s].host << std::endl;
        // std::cout << "end of parsing " << std::endl;
     }
-   
-    
-    // else write if POST on file or pipe
-    // std::cout << "tmp ========================= >> " << tmp.length() << std::endl;
-    //  if(req[s].is_header ==  true && tmp.length() != 0 && req[s].method == "POST") // add delete if need
-    //  {
-    //      // check limmite size and throw error
-    //      std::cout << "tessssssssssssssssssssst" << std::endl;
-    //    // req[s].create_file(fd_socket, s);
-    //     write(req[s]._fileFd, tmp.c_str(),  tmp.length());
-    //     tmp.clear();
-    //  }
-    //  // req[s].is_header == false 
-
-
-
     if (req[s].is_header == true && req[s].method == "POST"  && (size_read  - headerLength > 0)) // if we recv chunk not in body of header
      {
          
@@ -128,22 +112,8 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         // std::cout << "chunk here -------> " << req[s]._fileName << std::endl;
 	    write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
          std::cout << "===============================================================================  ======================================" << std::endl;
-
      }
-
-
-
-    // if recv return 0  close connectoin  /// check limite size and close client socket
-    // if(size_read == 0)
-    // {
-    //     // close(s);
-    //    // req[s].remove = true; // set remove to remove data from map
-    //    // FD_CLR(s, &current_sockets);
-    //     std::cout << "close and clear file" << std::endl;
-    // }
-	usleep(10);
-	// std::cout << " ------------------------- chuck --------------------" << std::endl;
-   // memset(chunk , 0 , CHUNK_SIZE);	//clear the variable
+	// usleep(10);
 }
 
 /**
@@ -182,12 +152,9 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     data tmp;
                     if (j == fd_savior[i] && request_info.size() < FD_SETSIZE)
                     {
-                        std::cout << "server socket: " << j << std::endl;
-                        std::cout << "map size= "  << request_info.size() << std::endl;
                         client_socket = accept(fd_savior[i], NULL, NULL);
                         if (client_socket < 0 )
 							exitMessage(1, "accept error");
-                        // if(request_info[client_socket]._fileName.length() == 0)
                         tmp.create_file(fd_savior[i], client_socket);
                         request_info[client_socket] = tmp; // add to map
                         FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set
@@ -195,24 +162,14 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     }
                     else if(request_info.find(j) != request_info.end())
                     {
-                        // std::cout << " ----------------------------------- in else in read request -------------------------" << std::endl;
-                        // iterate through the map until index i
-                       // request_info[j].config_block = conf.__Servers[i]; // change to new logic 
-                        // std::cout <<"serverroute ======== ===> " << request_info[j].config_block.__Locations[0].__Route << std::endl;
-                        // crea
-                        //  request_info[j].create_file(fd_socket, s);
                         receive_basic(j, socket_list[i], fd_savior[i], request_info, conf);
-                        // std::cout << " ===>============================== end ================================== " << std::endl;
                     }
                 }
                 if(FD_ISSET(j, &write_check))
                 {
-                             // scope for check if you can write in client fd
-                    // std::cout << request_info[j].size_read_complet << std::endl;
                     if(request_info.find(j) != request_info.end() && request_info[j].size_read_complet == 0) // if we complet Content-Length send responce 
                     {
                         response resp;
-                        // std::cout << "send req" << std::endl;
                         try
                         {
                             check_url_path(request_info[j], request_info[j].config_block.__Locations); // check first line error
@@ -252,15 +209,12 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
 
 void filterByServer(ConfigFile &conf, std::map<std::pair<std::string, unsigned short>, std::string>&unq)
 {
-    
-	// for(int i = 0; i < conf.__Servers.size(); i++)
-	// 	unq[conf.__Servers[i].__Port] = conf.__Servers[i].__Host;
-    
+
     for(int i = 0; i < conf.__Servers.size(); i++)
-        {
-            std::pair<std::string, unsigned short> tmp_pair(conf.__Servers[i].__Host, conf.__Servers[i].__Port);
-            unq[tmp_pair] = conf.__Servers[i].__ServerNames[0];
-        }
+    {
+        std::pair<std::string, unsigned short> tmp_pair(conf.__Servers[i].__Host, conf.__Servers[i].__Port);
+        unq[tmp_pair] = conf.__Servers[i].__ServerNames[0];
+    }
 }
 
 /**
@@ -281,19 +235,13 @@ void install_servers(ConfigFile &conf)
     int fd_savior[server_size];
 	// fd_set of each server.
     fd_set socket_list[server_size];
-    // for(int i  = 0; i < server_size; i++)
-    // {
-        int i = 0;
-        std::cout << "=====================+Creationg of the servers+=======================\n";
-        for(std::map<std::pair<std::string, unsigned short>, std::string>::iterator it = uniqueServers.begin(); it != uniqueServers.end(); it++)
-        {
-            std::cout << "server: " << (*it).first.first << " port: " << (*it).first.second << std::endl;
-            prepare_socket((*it).first, fd_savior[i]);
-            FD_ZERO(&socket_list[i]);
-            FD_SET(fd_savior[i], &socket_list[i]);
-            i++;
-        }
-        std::cout << "total servers : " << i << std::endl;
-    // }
+    int i = 0;
+    for(std::map<std::pair<std::string, unsigned short>, std::string>::iterator it = uniqueServers.begin(); it != uniqueServers.end(); it++)
+    {
+        prepare_socket((*it).first, fd_savior[i]);
+        FD_ZERO(&socket_list[i]);
+        FD_SET(fd_savior[i], &socket_list[i]);
+        i++;
+    }
     start_server(fd_savior, socket_list, server_size, conf);
 }
