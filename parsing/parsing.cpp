@@ -6,7 +6,7 @@
 /*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/06/02 22:02:32 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/06/05 21:39:17 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include "parsing.hpp"
 #include <cstdlib>
 #include <map>
+#include <cctype>
+
 #define LOG(X)	std::cout << X << std::endl
 
 void	ft_split(std::string const& src, const char delimiter, std::vector<std::string> &dst)
@@ -85,11 +87,13 @@ void	checkHost(std::vector<std::string> &line, ServerBlock &config, int ln)
 void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int ln, bool dir=false)
 {
 	std::vector<std::string>::iterator it;
+	int i = 1;
 	if (line.size() < 2)
 		exitMessage(1, "Error! too few arguments in line: ", ln);
 	it = line.begin();
 	it++;
 	for (; it != line.end(); ++it)
+	{
 		if(dir == true)
 		{
 			if (line.size() > 2)
@@ -97,7 +101,19 @@ void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int l
 			config.__ServerNames.push_back(*it);
 		}
 		else
-			config.__DefaultErrorpg.push_back(*it);
+		{
+			if (!(line.size() % 2))
+				exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
+			if (i % 2)
+			{
+				if ((*it).length() != 3 || (!std::isdigit((*it)[0]) || !std::isdigit((*it)[1]) || !std::isdigit((*it)[2])))
+					exitMessage(1, "Error! Arguments should be between 100-999");
+				config.__DefaultErrorpg[*it] = *(it + 1);
+			}
+			i++;
+		}
+	}
+			// config.__DefaultErrorpg.push_back(*it);
 	//TODO: In the case of errorPages (dir == false) check each pair(status code)
 	//TODO: whether it contains digits only or not.
 }
@@ -196,9 +212,9 @@ void	log_data(ServerBlock& config)
 		std::cout << *it << " ";
 	std::cout << std::endl;
 	std::cout << "ErrorPages: ";
-	it = config.__DefaultErrorpg.begin();
-	for(; it != config.__DefaultErrorpg.end(); it++)
-		std::cout << *it << " ";
+	// it = config.__DefaultErrorpg.begin();
+	// for(; it != config.__DefaultErrorpg.end(); it++)
+		// std::cout << *it << " ";
 	std::cout << std::endl;
 	LOG("LimitSize: " << config.__ClientLimit);
 	std::cout << "============================\nLocation:" << std::endl;

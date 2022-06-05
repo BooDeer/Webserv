@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 class Locations
 {
@@ -29,7 +30,7 @@ class ServerBlock //! Name to be changed later
 		//* I guess server_names mean aliases to that host. (similar to DNS)
 		std::vector<std::string>				__ServerNames;
 		//? Should this be a vector of strings or (?) . . .
-		std::vector<std::string>				__DefaultErrorpg;
+		std::map<std::string, std::string>				__DefaultErrorpg;
 		unsigned long long 						__ClientLimit; // Limit client body size.
 		bool									__DefaultServer; // The default server. (Mainly the first server)
 		std::vector<Locations>					__Locations;	//
