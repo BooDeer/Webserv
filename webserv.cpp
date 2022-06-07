@@ -33,7 +33,6 @@ int main(int ac, char **av)
 	else
 		parse((char*)"./Tests/config.fl", config);
 // here ?
-	return (0);
 	install_servers(config); // include config file setting
 	// system("leaks webserv");
 }

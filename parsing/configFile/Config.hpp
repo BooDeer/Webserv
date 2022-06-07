@@ -9,7 +9,7 @@ class Locations
 	public:
 		std::string					__Route; // location/extension.
 		std::vector<std::string>	__AllowedMethods;
-		std::vector<std::string>	__Redirection;
+		std::string					__Redirection[2];
 		std::string					__Root;
 		bool						__DirList;
 		std::string					__DefaultFile;

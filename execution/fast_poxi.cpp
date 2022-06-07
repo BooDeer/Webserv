@@ -180,12 +180,13 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                            // write(j, hello, strlen(hello)); // send
                             
                         }
-                        catch(char const* error)
+                        catch(char const* error)  
                         {
                             // std::cout << "error" << std::endl;
                             // genrate_body_for_errors(error);
                             // send data
                             //    resp.generate_response_header("200", request_info[j]);
+                            std::cout << "status code return is " << error << std::endl;
                             resp.generate_response_header(error, request_info[j]);
                             resp.send_response(request_info[j]);
                             std::cerr << error << '\n';

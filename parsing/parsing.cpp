@@ -107,7 +107,7 @@ void	checkServerNames(std::vector<std::string> &line, ServerBlock &config, int l
 			if (i % 2)
 			{
 				if ((*it).length() != 3 || (!std::isdigit((*it)[0]) || !std::isdigit((*it)[1]) || !std::isdigit((*it)[2])))
-					exitMessage(1, "Error! Arguments should be between 100-999");
+					exitMessage(1, "Error! Arguments should be between 100-999 line: ", ln);
 				config.__DefaultErrorpg[*it] = *(it + 1);
 			}
 			i++;
@@ -138,12 +138,20 @@ void	redirections(std::vector<std::string>& line, Locations& location, int ln)
 {
 	std::vector<std::string>::iterator it;
 	
-	if (line.size() < 2)
-		exitMessage(1, "Error! too few arguments in line: ", ln);
+	// if (line.size() < 2)
+	// 	exitMessage(1, "Error! too few arguments in line: ", ln);
+	if (line.size() != 3)
+		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
 	it = line.begin();
 	it++;
-	for (; it != line.end(); ++it)
-		location.__Redirection.push_back(*it);
+	for (int i = 0; it != line.end(); ++it)
+	{
+		if (!i)
+			if ((*it).length() != 3 || (!std::isdigit((*it)[0]) || !std::isdigit((*it)[1]) || !std::isdigit((*it)[2])))
+				exitMessage(1, "Error! Arguments should be between 100-999 line: ", ln);
+		location.__Redirection[i] = *it;
+		i++;
+	}
 }
 
 void	root(std::vector<std::string> &line, Locations &location, int ln)
@@ -184,54 +192,54 @@ void	route(std::vector<std::string>& line, Locations& location, int ln)
 		// 	fillVector(tmp, NULL, location, ln);
 /*============================================================================*/
 
-void	log_data(ServerBlock& config)
-{
-	std::vector<std::string>::iterator	it;
-	LOG("================= Data log =================");
-	// LOG("Port 		=====> " << config.__Port);
-	// LOG("Host 		=====> " << config.__Host);
-	// LOG("ServerNames 	=====>");
-	// it = config.__ServerNames.begin();
-	// for(; it != config.__ServerNames.end(); it++)
-	// 	LOG("			" << *it);
-	// LOG("ErrorPages 	=====>");
-	// it = config.__DefaultErrorpg.begin();
-	// for(; it != config.__DefaultErrorpg.end(); it++)
-	// 	LOG("			" << *it);
-	// LOG("LimitSize	=====> " << config.__ClientLimit);
-	// LOG("Location: ");
-	// LOG("	methods: ====>");
-	// it = config.__Locations[0].__AllowedMethods.begin();
-	// for (; it !=config.__Locations[0].__AllowedMethods.end(); it++)
-	// 	LOG("			" << *it);
-	LOG("Port: " << config.__Port);
-	LOG("Host: " << config.__Host);
-	std::cout << "ServerNames: ";
-	it = config.__ServerNames.begin();
-	for(; it != config.__ServerNames.end(); it++)
-		std::cout << *it << " ";
-	std::cout << std::endl;
-	std::cout << "ErrorPages: ";
-	// it = config.__DefaultErrorpg.begin();
-	// for(; it != config.__DefaultErrorpg.end(); it++)
-		// std::cout << *it << " ";
-	std::cout << std::endl;
-	LOG("LimitSize: " << config.__ClientLimit);
-	std::cout << "============================\nLocation:" << std::endl;
-	std::cout << "Route: " << config.__Locations[0].__Route << std::endl;
-	std::cout << "AllowedMethods: ";
-	it = config.__Locations[0].__AllowedMethods.begin();
-	for(; it != config.__Locations[0].__AllowedMethods.end(); it++)
-		std::cout << *it << " ";
-	std::cout << std::endl;
-	std::cout << "Redirections: ";
-	it = config.__Locations[0].__Redirection.begin();
-	for(; it != config.__Locations[0].__Redirection.end(); it++)
-		std::cout << *it << " ";
-	std::cout << std::endl;
-	LOG("Root: " << config.__Locations[0].__Root);
-	LOG("DirList: " << std::boolalpha << config.__Locations[0].__DirList);
-	LOG("DefaultFile : " << config.__Locations[0].__DefaultFile);
+// void	log_data(ServerBlock& config)
+// {
+// 	std::vector<std::string>::iterator	it;
+// 	LOG("================= Data log =================");
+// 	// LOG("Port 		=====> " << config.__Port);
+// 	// LOG("Host 		=====> " << config.__Host);
+// 	// LOG("ServerNames 	=====>");
+// 	// it = config.__ServerNames.begin();
+// 	// for(; it != config.__ServerNames.end(); it++)
+// 	// 	LOG("			" << *it);
+// 	// LOG("ErrorPages 	=====>");
+// 	// it = config.__DefaultErrorpg.begin();
+// 	// for(; it != config.__DefaultErrorpg.end(); it++)
+// 	// 	LOG("			" << *it);
+// 	// LOG("LimitSize	=====> " << config.__ClientLimit);
+// 	// LOG("Location: ");
+// 	// LOG("	methods: ====>");
+// 	// it = config.__Locations[0].__AllowedMethods.begin();
+// 	// for (; it !=config.__Locations[0].__AllowedMethods.end(); it++)
+// 	// 	LOG("			" << *it);
+// 	LOG("Port: " << config.__Port);
+// 	LOG("Host: " << config.__Host);
+// 	std::cout << "ServerNames: ";
+// 	it = config.__ServerNames.begin();
+// 	for(; it != config.__ServerNames.end(); it++)
+// 		std::cout << *it << " ";
+// 	std::cout << std::endl;
+// 	std::cout << "ErrorPages: ";
+// 	// it = config.__DefaultErrorpg.begin();
+// 	// for(; it != config.__DefaultErrorpg.end(); it++)
+// 		// std::cout << *it << " ";
+// 	std::cout << std::endl;
+// 	LOG("LimitSize: " << config.__ClientLimit);
+// 	std::cout << "============================\nLocation:" << std::endl;
+// 	std::cout << "Route: " << config.__Locations[0].__Route << std::endl;
+// 	std::cout << "AllowedMethods: ";
+// 	it = config.__Locations[0].__AllowedMethods.begin();
+// 	for(; it != config.__Locations[0].__AllowedMethods.end(); it++)
+// 		std::cout << *it << " ";
+// 	std::cout << std::endl;
+// 	std::cout << "Redirections: ";
+// 	// it = config.__Locations[0].__Redirection.begin();
+// 	// for(; it != config.__Locations[0].__Redirection.end(); it++)
+// 	// 	std::cout << *it << " ";
+// 	std::cout << std::endl;
+// 	LOG("Root: " << config.__Locations[0].__Root);
+// 	LOG("DirList: " << std::boolalpha << config.__Locations[0].__DirList);
+// 	LOG("DefaultFile : " << config.__Locations[0].__DefaultFile);
 
 
 
@@ -245,11 +253,11 @@ void	log_data(ServerBlock& config)
 
 
 	
-	LOG("============================");
+// 	LOG("============================");
 	
-	LOG("============================================");
+// 	LOG("============================================");
 
-}
+// }
 
 void	checkLocation(Locations &location)
 {

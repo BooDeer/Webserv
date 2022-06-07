@@ -156,6 +156,7 @@ class response
         void generate_response_header(const std::string &status, data &req);
         void send_response(data &req);
         void cgi_generate_response(data &req);
+        void redirection_header_generate(data &req);
 
     response()
     {
@@ -174,6 +175,10 @@ class response
         data_base.insert(std::pair<std::string, errors>("304", errors("Not Modified", "304")));
         data_base.insert(std::pair<std::string, errors>("307", errors("Temporary Redirect", "307")));
         data_base.insert(std::pair<std::string, errors>("308", errors("Permanent Redirect", "308")));
+        // 5xx
+        data_base.insert(std::pair<std::string, errors>("500", errors("Internal Server Error", "500")));
+
+
 
         // common type
         Common_types.insert(std::pair<std::string, std::string>(".aac", "audio/aac"));

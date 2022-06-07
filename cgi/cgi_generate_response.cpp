@@ -96,12 +96,19 @@ void response::cgi_generate_response(data &req)
     struct stat fileStat;
 
     //  struct stat fileStat;
-
     int exist = stat(req.root_cgi.c_str(), &fileStat);
-    if(exist < 0)
+    std::cout << "======================================== cgi status ==========================" << std::endl;
+    std::cout << "cgi exist ==> " << exist << std::endl;
+    if(exist < 0 || !(fileStat.st_mode & S_IXUSR))
+    {
+        std::cout << "exit cgi problem" << std::endl;
         this->status_code = "500";
-    if (!(fileStat.st_mode & S_IXUSR))
-        this->status_code = "500";
+        this->reason_phrase = this->data_base[status_code].phrase;
+        req.root_cgi.clear();
+        this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n\r\n";
+        return ;
+    }
+    std::cout << "======================================== end cgi ==========================" << std::endl;
     std::string name = generate_name_of_file("cgi_output");
     const char *arg[3] = {const_cast<char *>(req.root_cgi.c_str()), const_cast<char *>(req.path.c_str()), NULL};
     int output = open(name.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0600);
@@ -118,6 +125,7 @@ void response::cgi_generate_response(data &req)
     }
     // //generate_name_of_file_of_the_named_file_of_that_one_named_file();
     this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n"; // first line for response
+    std::cout << "first line in header >>>>>> " << header_resp << std::endl;
     if(status_code[0] == '2')
     {
         this->output_file_name = generate_name_of_file("file_send");
