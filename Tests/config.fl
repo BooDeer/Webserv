@@ -25,7 +25,7 @@ server {
 #"limitSize": 90
 "location": {
 	"route": /
-	"redirection": 666 https://github.com/
+	"redirection": 200 https://github.com/
 #	"root":
 	"autoindex": on
 	}

@@ -305,10 +305,9 @@ void response::redirection_header_generate(data &req)
 	std::cout << "status =================== >>>>>>>>>>>>>>>>>>>>>> " << this->status_code << std::endl;
 	std::map<std::string, errors>::iterator it = data_base.find(this->status_code);
 	
-	if(it != data_base.end())
+	if(it != data_base.end() && req.location.__Redirection[0][0] == '3')
 	{
 			std::cout << " ana evil hna -------------------------------------------" << std::endl;
-
 		this->reason_phrase = data_base[this->status_code].phrase;
 		this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n"; // first line for response
 		this->header_resp.append("Server: webserv\r\n");
@@ -320,7 +319,7 @@ void response::redirection_header_generate(data &req)
 	{
 			std::cout << " ana hna -------------------------------------------" << std::endl;
 		 this->reason_phrase.clear();
-		this->header_resp = "HTTP/1.1 " + status_code + "\r\n"; // first line for response
+		this->header_resp = "HTTP/1.1 " + status_code + " " + this->reason_phrase +"\r\n"; // first line for response
 		this->header_resp.append("Server: webserv\r\n");
 		this->header_resp.append("Content-Type: application/octet-stream");
 		this->header_resp.append("\r\n\r\n");
@@ -334,16 +333,16 @@ void response::generate_response_header(const std::string &status, data &req)
 {
 	// cgi work
 	this->status_code = status;
-	std::cout << "phrase from resp ==> " << data_base[this->status_code].phrase << std::endl;
 	// data_base[status].error_header  = status;
 	std::cout << "red ================================ > " << req.location.__Redirection[0] << std::endl;
 	std::cout << "red ================================ > " << req.location.__Redirection[1] << std::endl;
-
 	if(req.location.__Redirection[0].length() != 0)
 	{
 		redirection_header_generate(req);
 		return;
 	}
+
+	std::cout << "phrase from resp ==> " << data_base[this->status_code].phrase << std::endl;
 	this->reason_phrase = data_base[this->status_code].phrase;
 	if (req.root_cgi.length() != 0)
 	{
