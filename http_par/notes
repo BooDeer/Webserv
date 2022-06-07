@@ -1,9 +1,0 @@
-every line in request end \r\n
-end of header is \r\n\r\n
-first line have method and file_name and http_v
-GET dont care about body
-POST save body
-3  methods we support GET and POST and DELETE
-
-
-//  test 

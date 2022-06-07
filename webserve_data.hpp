@@ -54,10 +54,8 @@ struct data
     }
     data& operator=(data &o)
     {
-       //std::cout << "---------------operator =" << std::endl;
         this->id = o.id;
         this->_fileName = o._fileName;
-        std::cout << "file name ===> " << o._fileName << std::endl;
 		this->_fileFd = open(o._fileName.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
         this->client_socket = o.client_socket;
         this->server_socket = o.server_socket;
@@ -100,20 +98,11 @@ class errors
     }
     errors(std::string err, std::string number)
     {
-        // this->you_can_genrate = false;
         this->phrase = err;
         this->error_header = number;
 
         if(error_header[0] == '2')
         {
-            std::cout << std::endl;
-            std::cout << std::endl;
-
-            std::cout << "error 1==> >> " << phrase[0] << std::endl;
-            std::cout << std::endl;
-            std::cout << std::endl;
-
-            // error_header =  "Successful"; // if 2xx Successful responce not genrate an error
             this->you_can_genrate = false;
         }
         else 

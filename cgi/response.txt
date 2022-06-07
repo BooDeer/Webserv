@@ -1,4 +1,0 @@
-X-Powered-By: PHP/8.1.6
-Content-type: text/html; charset=UTF-8
-
-My username is NULL

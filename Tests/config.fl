@@ -24,8 +24,8 @@ server {
 #"errorPages": 401 pathexample
 #"limitSize": 90
 "location": {
-	"route": /
-	"redirection": 200 https://github.com/
+	"route": /test
+	"redirection": 302 https://github.com/
 #	"root":
 	"autoindex": on
 	}

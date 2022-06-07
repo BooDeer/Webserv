@@ -22,18 +22,17 @@ void data::create_file(int fd_socket, int client_socket)
 
 int main(int ac, char **av)
 {
-	ConfigFile		config; // <=== All the parsing data. (AKA the server blocks)
-	if (ac != 2 && ac != 1) //TODO:Should use the default config file if no config file has been given.
+	ConfigFile		config;
+
+	if (ac != 2 && ac != 1)
 	{
 		std::cerr << "usage: ./webserv " << CYAN << "[Configuration file]" << std::endl;
 		return (1);
 	}
 	if (ac == 2)
-		parse(av[1], config); // parse data  from config file
+		parse(av[1], config);
 	else
 		parse((char*)"./Tests/config.fl", config);
-// here ?
-	install_servers(config); // include config file setting
-	// system("leaks webserv");
+	install_servers(config);
 }
 

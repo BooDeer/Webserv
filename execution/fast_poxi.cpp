@@ -35,83 +35,53 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
 
     for (; it != conf.__Servers.end(); it++)
     {
-        std::cout << "ip or server name is ===> " << req.ip_server_name << std::endl;
         if("0.0.0.0" == req.ip_server_name)
             req.ip_server_name = "127.0.0.1";
         if ((*it).__Port == req.port && ( (*it).__Host == req.ip_server_name || (*it).__ServerNames[0] == req.ip_server_name))
         {
-            // std::cout << "======================================================================================" << std::endl;
-            // std::cout << "port from server block: " << (*it).__Port  << std::endl;
-            // std::cout << "host from server block: " << (*it).__Host << std::endl;
-            // std::cout << "======================================================================================" << std::endl;
             req.config_block = *it;
-            // req.location = (*it).__Locations;
-            // std::cout << "route of the above: " << req.config_block.__Locations[0].__Route << std::endl;
         }
     }
 }
 
 void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req, ConfigFile& conf)// s ==> client socket
 {
+    char chunk[CHUNK_SIZE];
+	int size_read;
+    std::string tmp;
+
     req[s].client_socket = s;
     req[s].server_socket = fd_socket;
-    char chunk[CHUNK_SIZE];
     memset(chunk ,0 , CHUNK_SIZE);
-    int size_read = recv(s , chunk , CHUNK_SIZE - 1, 0);
-    std::cout << chunk << std::endl;
+    size_read = recv(s , chunk , CHUNK_SIZE - 1, 0);
     if(size_read < 0 )
-    {
-        std::cout << "error in recv :(" << std::endl;
         exit(EXIT_FAILURE);
-    }
-    // std::cout << "size read = " << size_read << "byte" << std::endl;
-    std::cout  << "lenth ==> " << req[s].lenth  << "size _read === " << size_read  << std::endl;
-    
 
-    // parse here
-    // CHECK IF POST
     std::stringstream check(chunk);
-    std::string tmp;
     int headerLength = 0;
-    // std::cout << "socket number " << s << std::endl;
     if(req[s].is_header ==  false) // parsing the header.
     {
-        std::getline(check, tmp); // get first line in header
-        first_line(tmp, req[s]); // just parse first line
-        parsing_header(check, req[s]); // paring all headers
+        std::getline(check, tmp);
+        first_line(tmp, req[s]);
+        parsing_header(check, req[s]);
         findServerBlock(req[s], conf);
-        // found good server
-        // std::cout << "name of file get here ->  " <<  req[s]._fileName  << "  check limit == >  " << req[s].lenth  << " check server block  " << req[s].config_block.__ClientLimit << std::endl;
+
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
             if(req[s].lenth > req[s].config_block.__ClientLimit)
                 throw "413";
         }
-
         tmp = std::string(chunk);
         headerLength = tmp.find("\r\n\r\n") + 4;
         tmp.erase(0, tmp.find("\r\n\r\n") + 4);
         req[s].size_read_complet = req[s].lenth;
-        // std::cout << "body ====> " << "|" << tmp  << "|" << std::endl;
         req[s].is_header = true;
-        // here
-       // std::cout << "host is ==>  " << req[s].host << std::endl;
-       // std::cout << "end of parsing " << std::endl;
     }
     if (req[s].is_header == true && req[s].method == "POST"  && (size_read  - headerLength > 0)) // if we recv chunk not in body of header
      {
          
-         std::cout << "=============================================================================== ana hnaa ======================================" << std::endl;
           req[s].size_read_complet  -= size_read - headerLength;
-          std::cout  << ".size_read_complet ==> " << req[s].size_read_complet << std::endl;
-        //  if(req[s]._fileName.length() == 0)
-        // {
-             std::cout << "create file " << std::endl;
-           // req[s].create_file(fd_socket, s);
-        // }
-        // std::cout << "chunk here -------> " << req[s]._fileName << std::endl;
 	    write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
-         std::cout << "===============================================================================  ======================================" << std::endl;
      }
 	// usleep(10);
 }
@@ -128,7 +98,6 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
 void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFile &conf)
 {
     ServerBlock meTest;
-
     struct timeval tm;
     fd_set read_check;
     fd_set  write_check;
@@ -157,7 +126,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
 							exitMessage(1, "accept error");
                         tmp.create_file(fd_savior[i], client_socket);
                         request_info[client_socket] = tmp; // add to map
-                        FD_SET(client_socket, &socket_list[i]); // set client socket(return of accept) to set
+                        FD_SET(client_socket, &socket_list[i]);
                         usleep(10);
                     }
                     else if(request_info.find(j) != request_info.end())
@@ -172,33 +141,20 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         response resp;
                         try
                         {
-                            check_url_path(request_info[j], request_info[j].config_block.__Locations); // check first line error
-                            // genrate body response and send it
+                            check_url_path(request_info[j], request_info[j].config_block.__Locations);
+                            // generate body response and send it
                             resp.generate_response_header("200", request_info[j]);
-                            // resp.generate_response_header();
                             resp.send_response(request_info[j]);
-                           // write(j, hello, strlen(hello)); // send
                             
                         }
                         catch(char const* error)  
                         {
-                            // std::cout << "error" << std::endl;
-                            // genrate_body_for_errors(error);
-                            // send data
-                            //    resp.generate_response_header("200", request_info[j]);
-                            std::cout << "status code return is " << error << std::endl;
                             resp.generate_response_header(error, request_info[j]);
                             resp.send_response(request_info[j]);
-                            std::cerr << error << '\n';
                         }
-                        
-                        //write(j, hello, strlen(hello)); // send
-                        // FD_CLR(j, &read_check); 
-                      
                         FD_CLR(j, &socket_list[i]);
                         close(j);
-                        // remove(request_info[j]._fileName.c_str())
-                        request_info.erase(j); // erase socket data parsing from map after send response
+                        request_info.erase(j);
                     }
                 }
             }
