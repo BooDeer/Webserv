@@ -102,7 +102,7 @@ void response::cgi_generate_response(data &req)
         cgi_work(output, arg, req, *this);
         parse_cgi_output(*this, name, req);
     }
-    catch(char *err)
+    catch(const char *err)
     {
         status_code = err;
     }

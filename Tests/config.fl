@@ -24,7 +24,7 @@ server {
 	"location": {
 	"route": /
 #	"redirection": 302 https://github.com/
-	"root": .
+#	"root": .
 	"default": index_default.html
 	"autoindex": on
 	}

@@ -5,7 +5,10 @@
 #include <fstream>
 #include <iomanip>
 #include <ctime>
-
+#define _XOPEN_SOURCE 500
+#include <stdio.h>
+#include <ftw.h>
+#include <unistd.h>
 int is_dir_and_exist(const char *path)
 {
 	struct stat path_stat;
@@ -120,7 +123,48 @@ void auto_index(data &req)
 	MyFile.close();
 	closedir(dir);
 }
+int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
+    int rv = remove(fpath);
 
+    if (rv) // remove this perror (errno not allowed)
+        perror(fpath);
+
+    return rv;
+}
+
+int rmrf(const char *path)
+{
+    return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
+}
+void delete_handling(data &req)
+{
+    // 1. file is exist
+    // 2. check perms
+    // 3. is directory (delete using tree)
+    struct stat fileStat;
+    std::cout << "path u clear   " << req.path << std::endl;
+    int exist = stat(req.path.c_str(), &fileStat);
+    if(exist == 0)
+    {
+        if(!(S_ISDIR(fileStat.st_mode)) && (fileStat.st_mode & S_IRUSR)) //
+        {
+            remove(req.path.c_str());
+            throw "200";
+        }
+        else if((!(fileStat.st_mode & S_IRUSR)))
+            throw "403"; // if not have permassion
+        else if(S_ISDIR(fileStat.st_mode) && (fileStat.st_mode & S_IRUSR)) // 
+        {
+            rmrf(req.path.c_str());
+            throw "200";
+        }
+    }
+    else
+        throw "404"; // if file not found
+
+
+}
 void check_url_path(data &req, std::vector<Locations> &conf)
 {
 	bool is = false;
@@ -153,7 +197,11 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 	else
 		req.path.replace(0, req.location.__Route.length() - 1, req.location.__Root);
 	std::cout << "path == > " <<  req.path << std::endl;
-
+	 if(req.method == "DELETE")
+     {
+         std::cout << "start delete" << std::endl;
+        delete_handling(req);
+    }
 	if (is_dir_and_exist(req.path.c_str()) != 0)
 	{
 		if(req.path[req.path.length() - 1] != '/')
