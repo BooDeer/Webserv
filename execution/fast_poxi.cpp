@@ -164,6 +164,8 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         }
                         FD_CLR(j, &socket_list[i]);
                         close(j);
+                        close(request_info[j]._fileFd);
+                        remove(request_info[j]._fileName.c_str());
                         request_info.erase(j);
                     }
                 }

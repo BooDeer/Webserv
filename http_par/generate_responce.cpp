@@ -125,12 +125,14 @@ void auto_index(data &req)
 }
 int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
-    int rv = remove(fpath);
+	struct stat fileStat;
+	stat(fpath, &fileStat);
 
-    if (rv) // remove this perror (errno not allowed)
-        perror(fpath);
-
-    return rv;
+	if(fileStat.st_mode & S_IWUSR)
+		remove(fpath);
+	else
+		throw "403";
+    return 0;
 }
 
 int rmrf(const char *path)
@@ -147,14 +149,14 @@ void delete_handling(data &req)
     int exist = stat(req.path.c_str(), &fileStat);
     if(exist == 0)
     {
-        if(!(S_ISDIR(fileStat.st_mode)) && (fileStat.st_mode & S_IRUSR)) //
+        if(!(S_ISDIR(fileStat.st_mode)) && (fileStat.st_mode & S_IWUSR)) //
         {
             remove(req.path.c_str());
             throw "200";
         }
         else if((!(fileStat.st_mode & S_IRUSR)))
             throw "403"; // if not have permassion
-        else if(S_ISDIR(fileStat.st_mode) && (fileStat.st_mode & S_IRUSR)) // 
+        else if(S_ISDIR(fileStat.st_mode) && (fileStat.st_mode & S_IWUSR)) // 
         {
             rmrf(req.path.c_str());
             throw "200";
@@ -338,6 +340,7 @@ void response::send_response(data &req)
 	if(req.location.__Redirection[0].length() != 0)
 	{
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
+		// signal(13, SIG_IGN);
 		return ;
 	}
 	this->fd = open(req.path.c_str(), O_RDONLY);
