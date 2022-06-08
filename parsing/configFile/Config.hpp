@@ -14,6 +14,10 @@ class Locations
 		bool						__DirList;
 		std::string					__DefaultFile;
 		//? ◦ Execute CGI based on certain file extension (for example .php).
+		Locations()
+		{
+			this->__Route = "./default/";
+		}
 	
 };
 

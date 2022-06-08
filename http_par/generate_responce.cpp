@@ -126,7 +126,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 	bool is = false;
 	std::istringstream to_split(req.path);
 	std::string tmp;
-	std::string finalString = "/";
+	std::string finalString ;
 
 	std::vector<Locations>::iterator itB = conf.begin();
 	for (; itB != conf.end(); itB++)
@@ -137,59 +137,41 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			break;
 		}
 	}
-
-	while (getline(to_split, tmp, '/'))
-	{
-		if (tmp.size() > 0)
-		{
-			std::vector<Locations>::iterator it = conf.begin();
-
-			for (; it != conf.end(); it++)
-			{
-				if ((finalString + tmp) == (*it).__Route)
-				{
-					req.location = (*it);
-					break;
-				}
-				else if (req.extension == (*it).__Route)
-				{
-					req.root_cgi = (*it).__Root;
-				}
-			}
-			finalString.append(tmp + "/");
-		}
-	}
-	
 	if (req.location.__Redirection[0].length() != 0)
 		throw req.location.__Redirection[0].c_str();
 
-	if (finalString.length() > 0)
-	{
-		finalString.erase(finalString.length() - 1, 1);
-		finalString.erase(0, 1);
-	}
-	req.path.clear();
-	req.path = finalString;
 	if (req.location.__Root.length() == 0)
 	{
 		req.location.__Root = "./default/";
-		int len;
-		if (req.location.__Route.length() > 1)
-		{
-
-			len = req.location.__Route.length() - 1;
-		}
-		else
-			len = 0;
-		req.path.replace(0, len, req.location.__Root);
+		// if (req.location.__Route.length() > 1)
+		// {
+		std::cout << "route is ====> " << req.location.__Route << std::endl;
+		req.path.replace(0, 0, req.location.__Root);
+		std::cout << "after replace ====> " << req.location.__Route << std::endl;
+		std::cout <<  "path befor replace  ==> "  << req.path <<  std::endl; 
 	}
 	else
 		req.path.replace(0, req.location.__Route.length() - 1, req.location.__Root);
+	std::cout << "path == > " <<  req.path << std::endl;
 
 	if (is_dir_and_exist(req.path.c_str()) != 0)
 	{
+		if(req.path[req.path.length() - 1] != '/')
+		{
+			std::stringstream a;
+			a << req.port;
+			std::string tmp_port;
+			a >> tmp_port;
+
+			req.location.__Redirection[0] = "301";
+			std::cout << "lol ==> " << req.path << std::endl;
+			req.location.__Redirection[1] = req.path.erase(0, req.location.__Root.length() - 1) + "/";
+			throw "301";
+		}
+		std::cout << "test  path ===> " << req.path  << std::endl;
 		bool tr = true;
 		int ret = 0;
+		std::cout << "default ============= " << req.location.__DefaultFile  << std::endl;
 		if (req.location.__DefaultFile.length() != 0)
 		{
 			req.path.append(req.location.__DefaultFile);
@@ -272,7 +254,7 @@ void response::generate_response_header(const std::string &status, data &req)
 		struct stat fileStat;
 		int exist = stat(req.path.c_str(), &fileStat);
 		std::string tmp;
-		if (exist == 0)
+		if (exist == 0 && !S_ISDIR(fileStat.st_mode))
 		{
 			std::stringstream b;
 			unsigned long long a = fileStat.st_size;
@@ -304,6 +286,7 @@ void response::generate_response_header(const std::string &status, data &req)
 
 void response::send_response(data &req)
 {
+	std::cout << header_resp << std::endl;
 	if(req.location.__Redirection[0].length() != 0)
 	{
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));

@@ -2,18 +2,10 @@
 server {
 	"port": 2069
 	"host": 127.0.0.1
-	"serverNames": example.com
-	
-#"errorPages": 401 pathexample
-#"limitSize": 90
-"location": {
-	"route":	/
-#	"root":
-#	"default": index_default.html
-	"autoindex": on
-	
-	}
 
+	"location": {
+		"route": /
+	}
 }
 
 server {
@@ -25,10 +17,18 @@ server {
 #"limitSize": 90
 "location": {
 	"route": /test
-	"redirection": 302 https://github.com/
-#	"root":
+#	"redirection": 302 https://github.com/
+#	"root": test2
 	"autoindex": on
 	}
+	"location": {
+	"route": /
+#	"redirection": 302 https://github.com/
+	"root": .
+	"default": index_default.html
+	"autoindex": on
+	}
+
 	"location": {
 		
 		"route": .php

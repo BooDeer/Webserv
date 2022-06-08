@@ -21,6 +21,11 @@ void prepare_socket(std::pair<std::string, unsigned short> pair, int &save)
     server_info.sin_addr.s_addr = inet_addr(pair.first.c_str());
     server_info.sin_port =  htons(pair.second);
     fcntl(save, F_SETFL, O_NONBLOCK);
+    int optval = 1;
+    if ((setsockopt(save, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int))) == -1)
+    {
+        throw ("In set socket options : error");
+    }
     if(bind(save, (sockaddr *)&server_info, sizeof(server_info)) < 0)
 		exitMessage(1, "bind error");
     if(listen(save, INT32_MAX) < 0)
@@ -83,6 +88,10 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
           req[s].size_read_complet  -= size_read - headerLength;
 	    write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
      }
+    else
+    {
+        
+    }
 	// usleep(10);
 }
 
@@ -149,6 +158,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         }
                         catch(char const* error)  
                         {
+                            std::cout << "err " << error << std::endl;
                             resp.generate_response_header(error, request_info[j]);
                             resp.send_response(request_info[j]);
                         }
@@ -170,7 +180,8 @@ void filterByServer(ConfigFile &conf, std::map<std::pair<std::string, unsigned s
     for(int i = 0; i < conf.__Servers.size(); i++)
     {
         std::pair<std::string, unsigned short> tmp_pair(conf.__Servers[i].__Host, conf.__Servers[i].__Port);
-        unq[tmp_pair] = conf.__Servers[i].__ServerNames[0];
+        if (conf.__Servers[i].__ServerNames.size())
+            unq[tmp_pair] = conf.__Servers[i].__ServerNames[0];
     }
 }
 
