@@ -1,6 +1,9 @@
 #include "execution.hpp"
 #include "../webserv.hpp"
-
+#define _XOPEN_SOURCE 500
+#include <stdio.h>
+#include <ftw.h>
+#include <unistd.h>
 #define CHUNK_SIZE 65536
 
 /**
@@ -49,6 +52,48 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
     }
 }
 
+
+int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
+    int rv = remove(fpath);
+
+    if (rv) // remove this perror (errno not allowed)
+        perror(fpath);
+
+    return rv;
+}
+
+int rmrf(const char *path)
+{
+    return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
+}
+void delete_handling(data &req)
+{
+    // 1. file is exist
+    // 2. check perms
+    // 3. is directory (delete using tree)
+    
+    struct stat fileStat;
+    int exist = stat(req.path.c_str(), &fileStat);
+    if(exist == 0)
+    {
+        if(!S_ISDIR(fileStat.st_mode) && (fileStat.st_mode & S_IRUSR))
+        {
+            remove(req.path.c_str());
+        }
+        else if((!fileStat.st_mode & S_IRUSR))
+            throw "403";
+        else if(S_ISDIR(fileStat.st_mode) && (fileStat.st_mode & S_IRUSR))
+        {
+            rmrf(req.path.c_str());
+        }
+    }
+    else
+        throw "404";
+
+
+}
+
 void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req, ConfigFile& conf)// s ==> client socket
 {
     char chunk[CHUNK_SIZE];
@@ -82,16 +127,18 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         req[s].size_read_complet = req[s].lenth;
         req[s].is_header = true;
     }
+    if(req[s].method == "DELETE")
+     {
+        delete_handling(req[s]);
+        return ;
+    }
     if (req[s].is_header == true && req[s].method == "POST"  && (size_read  - headerLength > 0)) // if we recv chunk not in body of header
      {
          
           req[s].size_read_complet  -= size_read - headerLength;
 	    write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
      }
-    else
-    {
-        
-    }
+   
 	// usleep(10);
 }
 
