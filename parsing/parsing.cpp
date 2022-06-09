@@ -6,7 +6,7 @@
 /*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/06/07 05:30:58 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/06/09 01:51:00 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,11 @@ void	allowedMethods(std::vector<std::string>& line, Locations& location, int ln)
 	it = line.begin();
 	it++;
 	for (; it != line.end(); ++it)
+	{
+		if (*it != "POST" && *it != "DELETE" && *it != "GET")
+			exitMessage(1, "Error! Unknown HTTP method in line: ", ln);
 		location.__AllowedMethods.push_back(*it);
+	}
 }
 
 /* Vector content: [301][redirectionURL] */
