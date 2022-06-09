@@ -14,7 +14,7 @@
 struct data
 {
     public:
-    int id; // id for request
+    // int id; // id for request
    // std::ofstream fd_file; // file stream
 	int	_fileFd;
     bool is_header; // check is header
@@ -43,7 +43,7 @@ struct data
     data()
     {
         // set all default
-        this->id  = 0;
+        // this->id  = 0;
         this->client_socket = 0;
         this->server_socket = 0;
         this->status_code = 0;
@@ -54,7 +54,7 @@ struct data
     }
     data& operator=(data &o)
     {
-        this->id = o.id;
+        // this->id = o.id;
         this->_fileName = o._fileName;
 		this->_fileFd = open(o._fileName.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
         this->client_socket = o.client_socket;
@@ -72,13 +72,10 @@ struct data
     void create_file(int fd_socket, int client_socket); // create file 
     ~data()
     {
-         this->id  = 0;
         this->client_socket = 0;
         this->server_socket = 0;
         this->status_code = 0;
         is_header = false;
-        //remove = false;
-      //  close(_fileFd);
     }
     
 };

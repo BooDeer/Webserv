@@ -169,10 +169,10 @@ void delete_handling(data &req)
 }
 void check_url_path(data &req, std::vector<Locations> &conf)
 {
-	bool is = false;
+	// bool is = false;
 	std::istringstream to_split(req.path);
 	std::string tmp;
-	std::string finalString ;
+	std::string finalString;
 
 	std::vector<Locations>::iterator itB = conf.begin();
 	for (; itB != conf.end(); itB++)
@@ -183,12 +183,33 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			break;
 		}
 	}
+	while (getline(to_split, tmp, '/'))
+	{
+		if (tmp.size() > 0)
+		{
+			std::vector<Locations>::iterator it = conf.begin();
+			for (; it != conf.end(); it++)
+			{
+				if ((finalString + tmp) == (*it).__Route)
+				{
+					req.location = (*it);
+					break;
+				}
+				else if (req.extension == (*it).__Route)
+				{
+					req.root_cgi = (*it).__Root;
+				}
+			}
+			finalString.append(tmp + "/");
+		}
+	}
+	//std::cout << "route=== " << req.location.__Route << "root" << req.location.__Root << std::endl;
 	if (req.location.__Redirection[0].length() != 0)
 		throw req.location.__Redirection[0].c_str();
 
 	if (req.location.__Root.length() == 0)
 	{
-		req.location.__Root = "./default/";
+		req.location.__Root = "./default";
 		// if (req.location.__Route.length() > 1)
 		// {
 		std::cout << "route is ====> " << req.location.__Route << std::endl;
@@ -212,10 +233,10 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			a << req.port;
 			std::string tmp_port;
 			a >> tmp_port;
-
 			req.location.__Redirection[0] = "301";
 			std::cout << "lol ==> " << req.path << std::endl;
-			req.location.__Redirection[1] = req.path.erase(0, req.location.__Root.length() - 1) + "/";
+			req.location.__Redirection[1] = req.path.erase(0, req.location.__Root.length()) + "/";
+			std::cout << "redoraction " << req.location.__Redirection[1] << std::endl;
 			throw "301";
 		}
 		std::cout << "test  path ===> " << req.path  << std::endl;
@@ -340,19 +361,20 @@ void response::send_response(data &req)
 	if(req.location.__Redirection[0].length() != 0)
 	{
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-		// signal(13, SIG_IGN);
+
 		return ;
 	}
-	this->fd = open(req.path.c_str(), O_RDONLY);
-	if (req.root_cgi.length() == 0)
+	else if (req.root_cgi.length() == 0)
 	{
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 	}
 	if (this->lenth > 0)
 	{
+		this->fd = open(req.path.c_str(), O_RDONLY);
 		char *buff = new char[this->lenth];
 		read(this->fd, buff, this->lenth);
 		write(req.client_socket, buff, this->lenth);
+		close(this->fd);
 		delete[] buff;
 	}
 }

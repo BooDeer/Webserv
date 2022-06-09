@@ -23,7 +23,7 @@ void data::create_file(int fd_socket, int client_socket)
 int main(int ac, char **av)
 {
 	ConfigFile		config;
-
+    signal(13, SIG_IGN);
 	if (ac != 2 && ac != 1)
 	{
 		std::cerr << "usage: ./webserv " << CYAN << "[Configuration file]" << std::endl;

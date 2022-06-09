@@ -60,7 +60,7 @@ void cgi_work(int fd_output_file, const char **args, const data &req, response &
         close(fd_output_file);
     }
 }
-void parse_cgi_output(response &resp, std::string &name_of_file, data &req)
+void parse_cgi_output(response &resp, std::string &name_of_file)
 {
     std::fstream fs(name_of_file);
 
@@ -77,7 +77,7 @@ void parse_cgi_output(response &resp, std::string &name_of_file, data &req)
     }
 
     struct stat file_state;
-    int exist = stat(name_of_file.c_str(), &file_state);
+    stat(name_of_file.c_str(), &file_state);
     resp.lenth = file_state.st_size - sum;
 }
 
@@ -100,7 +100,7 @@ void response::cgi_generate_response(data &req)
     try
     {
         cgi_work(output, arg, req, *this);
-        parse_cgi_output(*this, name, req);
+        parse_cgi_output(*this, name);
     }
     catch(const char *err)
     {

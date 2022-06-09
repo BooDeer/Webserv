@@ -24,7 +24,8 @@ void prepare_socket(std::pair<std::string, unsigned short> pair, int &save)
     int optval = 1;
     if ((setsockopt(save, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int))) == -1)
     {
-        throw ("In set socket options : error");
+        exit(1);
+        // return ;
     }
     if(bind(save, (sockaddr *)&server_info, sizeof(server_info)) < 0)
 		exitMessage(1, "bind error");
@@ -73,7 +74,7 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         first_line(tmp, req[s]);
         parsing_header(check, req[s]);
         findServerBlock(req[s], conf);
-
+        // if(req[s].config_block.__Locations)
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
             if(req[s].lenth > req[s].config_block.__ClientLimit)
@@ -87,10 +88,10 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     }
     if (req[s].is_header == true && req[s].method == "POST"  && (size_read  - headerLength > 0)) // if we recv chunk not in body of header
      {
-         
-          req[s].size_read_complet  -= size_read - headerLength;
+        req[s].size_read_complet  -= size_read - headerLength;
 	    write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
      }
+    
    
 	// usleep(10);
 }
@@ -117,7 +118,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
     tm.tv_usec = 10;
     while(1)
     {
-        for(int i = 0; i <  servers; i++)
+        for(size_t i = 0; i <  servers; i++)
         {
             read_check = socket_list[i];
             write_check =  read_check;

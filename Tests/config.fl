@@ -1,22 +1,9 @@
-
 server {
-	"port": 2069
-	"host": 127.0.0.1
-
-	"location": {
-		"route": /
-	}
-}
-
-server {
-	"port": 2070
+	"port": 2071
 	"host": 127.0.0.1
 	"serverNames": example.com
-	
-#"errorPages": 401 pathexample
-#"limitSize": 90
 "location": {
-	"route": /test
+	"route": test
 #	"redirection": 302 https://github.com/
 #	"root": test2
 	"autoindex": on
@@ -26,7 +13,7 @@ server {
 #	"redirection": 302 https://github.com/
 #	"root": .
 	"default": index_default.html
-	"autoindex": on
+#   "autoindex": on
 	}
 
 	"location": {
@@ -41,6 +28,3 @@ server {
 		
 #	}
 }
-
-
-
