@@ -14,7 +14,6 @@ void prepare_socket(std::pair<std::string, unsigned short> pair, int &save)
 {
     
     struct sockaddr_in server_info;
-
     if ((save = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 		exitMessage(1, "socket error");
     server_info.sin_family = PF_INET;
@@ -43,7 +42,7 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
     {
         if("0.0.0.0" == req.ip_server_name)
             req.ip_server_name = "127.0.0.1";
-        if ((*it).__Port == req.port && ( (*it).__Host == req.ip_server_name || (*it).__ServerNames[0] == req.ip_server_name))
+        if ((*it).__Port == req.port && ( (*it).__Host == req.ip_server_name || ((*it).__ServerNames.size() && (*it).__ServerNames[0] == req.ip_server_name)))
         {
             req.config_block = *it;
             found = true;
@@ -120,10 +119,13 @@ void check_metod(data &d)
             throw "400";
     }
     // GET POST DELETE
-    if(d.method != "GET" && d.method != "POST" && d.method != "DELETE")
+    if(d.method.length() != 0)
     {
-        std::cout << "fucl ==> " << d.method << std::endl;
-         throw "405";
+        if(d.method != "GET" && d.method != "POST" && d.method != "DELETE")
+        {
+            std::cout << "fucl ==> " << d.method << std::endl;
+            throw "405";
+        }
     }
 }
 
@@ -217,6 +219,8 @@ void filterByServer(ConfigFile &conf, std::map<std::pair<std::string, unsigned s
         std::pair<std::string, unsigned short> tmp_pair(conf.__Servers[i].__Host, conf.__Servers[i].__Port);
         if (conf.__Servers[i].__ServerNames.size())
             unq[tmp_pair] = conf.__Servers[i].__ServerNames[0];
+        else
+            unq[tmp_pair];
     }
 }
 
@@ -241,6 +245,7 @@ void install_servers(ConfigFile &conf)
     int i = 0;
     for(std::map<std::pair<std::string, unsigned short>, std::string>::iterator it = uniqueServers.begin(); it != uniqueServers.end(); it++)
     {
+        //std::cout << "host =======> " << (*it).first.first << " port: " << (*it).first.second << std::endl;
         prepare_socket((*it).first, fd_savior[i]);
         FD_ZERO(&socket_list[i]);
         FD_SET(fd_savior[i], &socket_list[i]);

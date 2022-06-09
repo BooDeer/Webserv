@@ -17,7 +17,7 @@ class Locations
 		Locations()
 		{
 			this->__Route = "./default/";
-		}
+		} // permissiosn a zebi pls :D
 	
 };
 

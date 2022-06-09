@@ -1,32 +1,6 @@
 server {
 	"port": 2071
 	"host": 127.0.0.1
-	"serverNames": example.com
-"location": {
-	"route": test
-#	"redirection": 302 https://github.com/
-#	"root": test2
-	"autoindex": on
-#		"methods": POST GET
-	}
-	"location": {
-	"route": /
-#	"redirection": 302 https://github.com/
-#	"root": .
-	"default": index_default.html
-#   "autoindex": on
-#	"methods": GET
-	}
 
-	"location": {
-		
-		"route": .php
-		"root": /goinfre/ssamadi/.brew/bin/php-cgi
-	}
-#		"location": {
-		
-#		"route": .test
-#		"root": _path_cgi
-		
-#	}
+
 }
