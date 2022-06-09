@@ -1,6 +1,24 @@
 server {
 	"port": 2071
 	"host": 127.0.0.1
-
+	
+	"location": {
+		"route": /
+		"root": /tmp/www
+	}
 
 }
+
+server {
+	"port": 2072
+	"host": 127.0.0.1
+	
+	"location": {
+		"route": /
+	}
+	"location": {
+		"route_cgi": .php
+		"root_cgi": /goinfre/ssamadi/.brew/bin/php-cgi
+	}
+}
+

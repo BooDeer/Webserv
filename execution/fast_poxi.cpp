@@ -42,6 +42,8 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
     {
         if("0.0.0.0" == req.ip_server_name)
             req.ip_server_name = "127.0.0.1";
+            // std::cout << "port from comfig ==> " << (*it).__Port << " hoost from config " << (*it).__Host << " server name from config " << (*it).__ServerNames[0] << std::endl;
+            // std::cout << "conction " << req.port << " req.ip_server_name " << req.ip_server_name << std::endl;
         if ((*it).__Port == req.port && ( (*it).__Host == req.ip_server_name || ((*it).__ServerNames.size() && (*it).__ServerNames[0] == req.ip_server_name)))
         {
             req.config_block = *it;
@@ -201,6 +203,8 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         close(j);
                         close(request_info[j]._fileFd);
                         remove(request_info[j]._fileName.c_str());
+                        //remove(resp.output_file_name.c_str());
+
                         request_info.erase(j);
                     }
                 }

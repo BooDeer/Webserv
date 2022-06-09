@@ -176,18 +176,24 @@ void	route(std::vector<std::string>& line, Locations& location, int ln)
 	location.__Route = line[1];
 }
 
-// void	route_cgi(std::vector<std::string>& line, Locations& location, int ln)
-// {
-// 	if (line.size() != 2)
-// 		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
-// 	location.__Route = line[1];
-// }
+void	root_cgi(std::vector<std::string>& line, Locations& location, int ln)
+{
+	if (line.size() != 2)
+		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
+	location.__RootCGI = line[1];
+}
+void	route_cgi(std::vector<std::string>& line, Locations& location, int ln)
+{
+	if (line.size() != 2)
+		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
+	location.__RouteCGI = line[1];
+}
 
 void	checkLocation(Locations &location)
 {
-	if (location.__Route.length() && location.__Route[0]  == '.' && location.__Route != "./default/")
+	if (location.__RouteCGI.length())
 	{
-		if (location.__Root.length() == 0)
+		if (location.__RootCGI.length() == 0)
 			exitMessage(1, "Error! cgi without executable path!");
 	}
 }
@@ -217,8 +223,10 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 		ft_split(line, ' ', tmp);
 		if (tmp.size() > 0 && tmp[0] == "\"route\":")
 			route(tmp, location, ln);
-		// else if (tmp.size() > 0 && tmp[0] == "\"route_cgi\":")
-		// 	route_cgi(tmp, location, ln);
+		else if (tmp.size() > 0 && tmp[0] == "\"root_cgi\":")
+			root_cgi(tmp, location, ln);
+		else if (tmp.size() > 0 && tmp[0] == "\"route_cgi\":")
+			route_cgi(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"methods\":")
 			allowedMethods(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"redirection\":")

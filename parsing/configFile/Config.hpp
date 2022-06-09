@@ -8,9 +8,11 @@ class Locations
 {
 	public:
 		std::string					__Route; // location/extension.
+		std::string					__RouteCGI; // location/extension.
 		std::vector<std::string>	__AllowedMethods;
 		std::string					__Redirection[2];
 		std::string					__Root;
+		std::string					__RootCGI;
 		bool						__DirList;
 		std::string					__DefaultFile;
 		//? ◦ Execute CGI based on certain file extension (for example .php).

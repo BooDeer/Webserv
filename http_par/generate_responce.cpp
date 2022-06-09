@@ -195,14 +195,15 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 					req.location = (*it);
 					break;
 				}
-				else if (req.extension == (*it).__Route)
+				else if (req.extension == (*it).__RouteCGI)
 				{
-					req.root_cgi = (*it).__Root;
+					req.root_cgi = (*it).__RootCGI;
 				}
 			}
 			finalString.append(tmp + "/");
 		}
 	}
+	std::cout << "Current used location is: " << req.location.__Root << std::endl;
 	if(req.location.__AllowedMethods.size() != 0)
 	{
 		bool accpetd =  false;
@@ -384,6 +385,11 @@ void response::send_response(data &req)
 	if (this->lenth > 0)
 	{
 		this->fd = open(req.path.c_str(), O_RDONLY);
+		if(fd < 0)
+		{
+			std::cout << "error in fd " << std::endl;
+			return;
+		}
 		char *buff = new char[this->lenth];
 		read(this->fd, buff, this->lenth);
 		write(req.client_socket, buff, this->lenth);
