@@ -38,7 +38,7 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
     std::vector<ServerBlock>::iterator it;
 
     it = conf.__Servers.begin();
-
+    bool found = false;
     for (; it != conf.__Servers.end(); it++)
     {
         if("0.0.0.0" == req.ip_server_name)
@@ -46,8 +46,23 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
         if ((*it).__Port == req.port && ( (*it).__Host == req.ip_server_name || (*it).__ServerNames[0] == req.ip_server_name))
         {
             req.config_block = *it;
+            found = true;
         }
     }
+    if (!found)
+    {
+        it = conf.__Servers.begin();
+        for (; it != conf.__Servers.end(); it++)
+        {
+            if ((*it).__Port == req.port)
+            {
+                req.config_block = *it;
+                //std::cout <<  "ddd -----> " << req.config_block.__Locations[1].__DefaultFile[0] <<  std::endl;
+                break ;
+            }
+        }
+    }
+        // req.config_block = *(conf.__Servers.begin());
 }
 
 
@@ -94,6 +109,22 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     
    
 	// usleep(10);
+}
+
+void check_metod(data &d)
+{
+     const char *save = d.method.c_str();
+    for(size_t i = 0; save[i] != '\0'; i++)
+    {
+        if(islower(save[i]))
+            throw "400";
+    }
+    // GET POST DELETE
+    if(d.method != "GET" && d.method != "POST" && d.method != "DELETE")
+    {
+        std::cout << "fucl ==> " << d.method << std::endl;
+         throw "405";
+    }
 }
 
 /**
@@ -151,6 +182,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         response resp;
                         try
                         {
+                            check_metod(request_info[j]); // check method 
                             check_url_path(request_info[j], request_info[j].config_block.__Locations);
                             // generate body response and send it
                             resp.generate_response_header("200", request_info[j]);

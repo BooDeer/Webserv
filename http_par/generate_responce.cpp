@@ -203,6 +203,18 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			finalString.append(tmp + "/");
 		}
 	}
+	if(req.location.__AllowedMethods.size() != 0)
+	{
+		bool accpetd =  false;
+		std::vector<std::string>::iterator it  = req.location.__AllowedMethods.begin();
+		for(; it != req.location.__AllowedMethods.end(); it++)
+		{
+			if(*it == req.method)
+				accpetd = true;
+		}
+		if(accpetd == false)
+			throw "405";
+	}
 	//std::cout << "route=== " << req.location.__Route << "root" << req.location.__Root << std::endl;
 	if (req.location.__Redirection[0].length() != 0)
 		throw req.location.__Redirection[0].c_str();
@@ -263,6 +275,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 		}
 		if (req.location.__DirList == false && req.location.__DefaultFile.length() == 0)
 			throw "403";
+
 	}
 	else
 	{

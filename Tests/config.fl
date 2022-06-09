@@ -7,6 +7,7 @@ server {
 #	"redirection": 302 https://github.com/
 #	"root": test2
 	"autoindex": on
+#		"methods": POST GET
 	}
 	"location": {
 	"route": /
@@ -14,6 +15,7 @@ server {
 #	"root": .
 	"default": index_default.html
 #   "autoindex": on
+#	"methods": GET
 	}
 
 	"location": {
