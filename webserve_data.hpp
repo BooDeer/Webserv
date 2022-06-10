@@ -140,7 +140,7 @@ class response
 
     public:
         void generate_response_header(const std::string &status, data &req);
-        void send_response(data &req);
+        void send_response(data &req, const std::string &status);
         void cgi_generate_response(data &req);
         void redirection_header_generate(data &req);
 

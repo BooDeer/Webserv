@@ -190,14 +190,14 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                             check_url_path(request_info[j], request_info[j].config_block.__Locations);
                             // generate body response and send it
                             resp.generate_response_header("200", request_info[j]);
-                            resp.send_response(request_info[j]);
+                            resp.send_response(request_info[j], "200");
                             
                         }
                         catch(char const* error)  
                         {
                             std::cout << "err " << error << std::endl;
                             resp.generate_response_header(error, request_info[j]);
-                            resp.send_response(request_info[j]);
+                            resp.send_response(request_info[j], error);
                         }
                         FD_CLR(j, &socket_list[i]);
                         close(j);

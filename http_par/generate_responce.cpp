@@ -376,7 +376,7 @@ void response::generate_response_header(const std::string &status, data &req)
 	data_base[this->status_code].generate_error(*this, req.config_block.__DefaultErrorpg);
 }
 
-void response::send_response(data &req)
+void response::send_response(data &req, const std::string &status)
 {
 	std::cout << header_resp << std::endl;
 	if(req.location.__Redirection[0].length() != 0)
@@ -385,8 +385,14 @@ void response::send_response(data &req)
 
 		return ;
 	}
-	else if (req.root_cgi.length() == 0)
+	if (req.root_cgi.length() == 0)
 	{
+		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
+	}
+	if( header_resp.length() != 0 && status[0] == '4')
+	{
+		std::cout << "aba ana hna " << std::endl;
+		std::cout << "req.path ==> " << req.path << std::endl;
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 	}
 	if (this->lenth > 0)
@@ -401,6 +407,7 @@ void response::send_response(data &req)
 		read(this->fd, buff, this->lenth);
 		write(req.client_socket, buff, this->lenth);
 		close(this->fd);
+		remove(req.path.c_str());
 		delete[] buff;
 	}
 }
