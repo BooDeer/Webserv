@@ -3,10 +3,10 @@ server {
 	"host": 127.0.0.1
 	
 	"location": {
-		"route": /
-		"root": /tmp/www/
+		"route": home
+#		"root": /tmp/www/
+	"default": empty_file.txt
 	}
-
 }
 
 server {
@@ -15,6 +15,7 @@ server {
 	
 	"location": {
 		"route": /
+		"default": empty_file.txt
 	}
 	"location": {
 		"route_cgi": .php

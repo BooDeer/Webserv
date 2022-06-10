@@ -389,7 +389,7 @@ void response::send_response(data &req, const std::string &status)
 	{
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 	}
-	if( header_resp.length() != 0 && status[0] == '4')
+	else if( header_resp.length() != 0 && status[0] == '4')
 	{
 		std::cout << "aba ana hna " << std::endl;
 		std::cout << "req.path ==> " << req.path << std::endl;
@@ -407,7 +407,6 @@ void response::send_response(data &req, const std::string &status)
 		read(this->fd, buff, this->lenth);
 		write(req.client_socket, buff, this->lenth);
 		close(this->fd);
-		remove(req.path.c_str());
 		delete[] buff;
 	}
 }

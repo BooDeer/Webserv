@@ -167,6 +167,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     if (j == fd_savior[i] && request_info.size() < FD_SETSIZE)
                     {
                         client_socket = accept(fd_savior[i], NULL, NULL);
+                        //fcntl(client_socket, F_SETFL, O_NONBLOCK);
                         if (client_socket < 0 )
 							exitMessage(1, "accept error");
                         tmp.create_file(fd_savior[i], client_socket);
