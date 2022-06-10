@@ -11,20 +11,6 @@
   #include <sys/time.h>
 
 
-struct bod {
-  // std::string name;
-  std::fstream test;
-  bod()
-  {
-    std::cout << "Reacehd here" << std::endl;
-  }
-  // int  a;
-  void create_file()
-  {
-    test.open("brah.txt",  std::fstream::out);
-
-  }
-};
 
 
 
@@ -32,10 +18,6 @@ struct bod {
 int main()
 {
 
-
-
-
-
-  int i = rmrf("./boodTestfile101");
-  std::cout << "i =  " <<  i << std::endl;
+  std::string tmp = "abcd";
+  std::cout << tmp.erase(0,tmp.length());
 }

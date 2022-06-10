@@ -231,7 +231,8 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 		std::cout <<  "path befor replace  ==> "  << req.path <<  std::endl; 
 	}
 	else
-		req.path.replace(0, req.location.__Route.length() - 1, req.location.__Root);
+		req.path.replace(0, req.path.find(req.location.__Route) + req.location.__Route.length(), req.location.__Root);
+		// req.path.replace(0, req.location.__Route.length(), req.location.__Root);
 	std::cout << "path == > " <<  req.path << std::endl;
 	 if(req.method == "DELETE")
      {
@@ -324,9 +325,14 @@ void response::generate_response_header(const std::string &status, data &req)
 		redirection_header_generate(req);
 		return;
 	}
-
 	this->reason_phrase = data_base[this->status_code].phrase;
-	if (req.root_cgi.length() != 0)
+	if(status[0] == '4' || status[0] == '5')
+	{
+		if(req.config_block.__DefaultErrorpg.size() == 0)
+			req.extension = ".html";
+		goto goto_create_response_header;
+	}
+	else if (req.root_cgi.length() != 0 )
 	{
 		cgi_generate_response(req);
 		req.path = output_file_name;
@@ -334,6 +340,7 @@ void response::generate_response_header(const std::string &status, data &req)
 	}
 	else
 	{
+		goto_create_response_header:
 		this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n";
 		this->header_resp.append("Server: webserv\r\n");
 		struct stat fileStat;

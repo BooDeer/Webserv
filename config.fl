@@ -4,8 +4,16 @@ server {
 	
 	"location": {
 		"route": /
-		"root": /tmp/www/
+#		"root": /t
+		"default": index_default.html
 	}
+
+	"location": {
+	"route": home/lol
+#	"autoindex": on
+	"root": /Users/ssamadi/Desktop/Webserv/default/files/
+	"default": f1.txt
+}
 
 }
 
@@ -15,9 +23,10 @@ server {
 	
 	"location": {
 		"route": /
+#		"root": /tmp/www/html
 	}
 	"location": {
-		"route_cgi": .php
+		"route_cgi": .php 
 		"root_cgi": /goinfre/ssamadi/.brew/bin/php-cgi
 	}
 }
