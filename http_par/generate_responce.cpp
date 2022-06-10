@@ -222,7 +222,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 
 	if (req.location.__Root.length() == 0)
 	{
-		req.location.__Root = "./default";
+		req.location.__Root = "./default/";
 		// if (req.location.__Route.length() > 1)
 		// {
 		std::cout << "route is ====> " << req.location.__Route << std::endl;
@@ -389,14 +389,15 @@ void response::send_response(data &req, const std::string &status)
 	{
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 	}
-	else if( header_resp.length() != 0 && status[0] == '4')
-	{
-		std::cout << "aba ana hna " << std::endl;
-		std::cout << "req.path ==> " << req.path << std::endl;
-		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-	}
 	if (this->lenth > 0)
 	{
+		if(this->lenth > 2147483647)
+		{
+			header_resp.clear();
+			header_resp = "HTTP/1.1 507 Insufficient Storage\r\nContent-Type: text/plain\r\n\r\nWow, that's a big file. Can you store it somewhere else? We're pretty cramped here.";
+			write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
+			return;
+		}
 		this->fd = open(req.path.c_str(), O_RDONLY);
 		if(fd < 0)
 		{

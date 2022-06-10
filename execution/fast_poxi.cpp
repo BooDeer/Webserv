@@ -167,7 +167,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     if (j == fd_savior[i] && request_info.size() < FD_SETSIZE)
                     {
                         client_socket = accept(fd_savior[i], NULL, NULL);
-                        //fcntl(client_socket, F_SETFL, O_NONBLOCK);
+                       // fcntl(client_socket, F_SETFL, O_NONBLOCK);
                         if (client_socket < 0 )
 							exitMessage(1, "accept error");
                         tmp.create_file(fd_savior[i], client_socket);
@@ -196,6 +196,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         }
                         catch(char const* error)  
                         {
+                            request_info[j].root_cgi.clear(); // for error in .php
                             std::cout << "err " << error << std::endl;
                             resp.generate_response_header(error, request_info[j]);
                             resp.send_response(request_info[j], error);

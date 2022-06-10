@@ -163,6 +163,7 @@ class response
         data_base.insert(std::pair<std::string, errors>("308", errors("Permanent Redirect", "308")));
         // 5xx
         data_base.insert(std::pair<std::string, errors>("500", errors("Internal Server Error", "500")));
+        data_base.insert(std::pair<std::string, errors>("507", errors("Insufficient Storage", "507")));
 
 
 
