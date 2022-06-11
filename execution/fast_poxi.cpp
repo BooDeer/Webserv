@@ -22,17 +22,14 @@ void prepare_socket(std::pair<std::string, unsigned short> pair, int &save)
     fcntl(save, F_SETFL, O_NONBLOCK);
     int optval = 1;
     if ((setsockopt(save, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int))) == -1)
-    {
         exit(1);
-        // return ;
-    }
     if(bind(save, (sockaddr *)&server_info, sizeof(server_info)) < 0)
 		exitMessage(1, "bind error");
     if(listen(save, INT32_MAX) < 0)
 		exitMessage(1, "listen error");
 }
 
-void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, host(servernames/host), port
+void findServerBlock(data& req, ConfigFile& conf)
 {
     std::vector<ServerBlock>::iterator it;
 
@@ -42,8 +39,6 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
     {
         if("0.0.0.0" == req.ip_server_name)
             req.ip_server_name = "127.0.0.1";
-            // std::cout << "port from comfig ==> " << (*it).__Port << " hoost from config " << (*it).__Host << " server name from config " << (*it).__ServerNames[0] << std::endl;
-            // std::cout << "conction " << req.port << " req.ip_server_name " << req.ip_server_name << std::endl;
         if ((*it).__Port == req.port && ( (*it).__Host == req.ip_server_name || ((*it).__ServerNames.size() && (*it).__ServerNames[0] == req.ip_server_name)))
         {
             req.config_block = *it;
@@ -58,12 +53,10 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
             if ((*it).__Port == req.port)
             {
                 req.config_block = *it;
-                //std::cout <<  "ddd -----> " << req.config_block.__Locations[1].__DefaultFile[0] <<  std::endl;
                 break ;
             }
         }
     }
-        // req.config_block = *(conf.__Servers.begin());
 }
 
 
@@ -93,19 +86,14 @@ void receive_basic(int s, int fd_socket,  std::map<int , data> &req, ConfigFile&
 
     std::stringstream check(chunk);
     int headerLength = 0;
-   // std::cout << "is header " << std::boolalpha << req[s].is_header << chunk <<  std::endl;
     if(req[s].is_header ==  false) // parsing the header.
     {
         std::getline(check, tmp);
-       // std::cout << "firs line ===>  " << tmp << std::endl;
          first_line(tmp, req[s]);
         parsing_header(check, req[s]);
         findServerBlock(req[s], conf);
-        // if(req[s].config_block.__Locations)
-        std::cout << "limite 9bel" << req[s].config_block.__ClientLimit << std::endl;
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
-            std::cout << "limit " << req[s].config_block.__ClientLimit << "lenth ==> " <<req[s].lenth  << std::endl;
             if(req[s].lenth > req[s].config_block.__ClientLimit)
                 req[s].status_code = "413";
             return;
@@ -125,9 +113,6 @@ void receive_basic(int s, int fd_socket,  std::map<int , data> &req, ConfigFile&
         else if(ret == -1)
             req[s].status_code = "500";
      }
-    
-   
-	// usleep(10);
 }
 
 void check_metod(data &d)
@@ -147,7 +132,6 @@ void check_metod(data &d)
     {
         if(d.method != "GET" && d.method != "POST" && d.method != "DELETE")
         {
-            std::cout << "fucl ==> " << d.method << std::endl;
             {
                 if(d.config_block.__DefaultErrorpg.size() == 0)
 					d.extension = ".html"; 
@@ -205,7 +189,6 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     }
                     else if(request_info.find(j) != request_info.end())
                     {
-                      //  std::cout << "start pars      " <<  std::endl;
                         receive_basic(j, fd_savior[i], request_info, conf);
                         write_check =  read_check; // 
                     }
@@ -231,7 +214,6 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                             catch(char const* error)  
                             {
                                 request_info[j].root_cgi.clear(); // for error in .php
-                                std::cout << "err " << error << std::endl;
                                 if(request_info[j].config_block.__DefaultErrorpg.size() == 0)
                                     request_info[j].extension = ".html"; 
                                 resp.generate_response_header(error, request_info[j]);
@@ -288,7 +270,6 @@ void install_servers(ConfigFile &conf)
     int i = 0;
     for(std::map<std::pair<std::string, unsigned short>, std::string>::iterator it = uniqueServers.begin(); it != uniqueServers.end(); it++)
     {
-        //std::cout << "host =======> " << (*it).first.first << " port: " << (*it).first.second << std::endl;
         prepare_socket((*it).first, fd_savior[i]);
         FD_ZERO(&socket_list[i]);
         FD_SET(fd_savior[i], &socket_list[i]);

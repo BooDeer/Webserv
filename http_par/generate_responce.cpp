@@ -5,10 +5,10 @@
 #include <fstream>
 #include <iomanip>
 #include <ctime>
-#define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <ftw.h>
 #include <unistd.h>
+
 int is_dir_and_exist(const char *path)
 {
 	struct stat path_stat;
@@ -34,12 +34,7 @@ void errors::generate_error(response &resp, std::map<std::string, std::string> &
 {
 	bool is_exist = false;
 	struct stat path_stat;
-	std::cout << "=========================================================" << std::endl;
-	std::cout << "Size of error map: " << error.size() << std::endl;
-	// std::cout << " error " <<  resp.status_code << std::endl;
-	// std::cout << "file error " << error[resp.status_code] << std::endl;
   	int exist = stat(error[resp.status_code].c_str(), &path_stat);
-	std::cout << "exit ==> " << exist <<  "file name " << error[resp.status_code] << std::endl;
 	if (exist == 0)
 	{
 		if (path_stat.st_mode & S_IRUSR)
@@ -79,8 +74,6 @@ void auto_index(data &req)
 	DIR *dir;
 
 	dir = opendir(req.path.c_str());
-	// if (dir == NULL)
-	// 	throw "403";
 
 	struct dirent *entry;
 
@@ -152,11 +145,7 @@ int rmrf(const char *path)
 }
 void delete_handling(data &req)
 {
-    // 1. file is exist
-    // 2. check perms
-    // 3. is directory (delete using tree)
     struct stat fileStat;
-    std::cout << "path u clear   " << req.path << std::endl;
     int exist = stat(req.path.c_str(), &fileStat);
     if(exist == 0)
     {
@@ -180,11 +169,9 @@ void delete_handling(data &req)
 }
 void check_url_path(data &req, std::vector<Locations> &conf)
 {
-	// bool is = false;
 	std::istringstream to_split(req.path);
 	std::string tmp;
 	std::string finalString;
-	std::cout << "path form req   " << req.path << std::endl;
 	std::vector<Locations>::iterator itB = conf.begin();
 	for (; itB != conf.end(); itB++)
 	{
@@ -206,18 +193,15 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 					req.location = (*it);
 					break;
 				}
-				std::cout << "ex ===> " <<  req.extension << std::endl;
 				if (req.extension == (*it).__RouteCGI)
 				{
 					req.cgiLocation = (*it);
-					std::cout << "root cgi from conf    " <<(*it).__RootCGI  << std::endl;
 					req.root_cgi = std::string((*it).__RootCGI);
 				}
 			}
 			finalString.append(tmp + "/");
 		}
 	}
-	std::cout << "Current used location is: " << req.location.__Root   << " root cgi  check is " << req.root_cgi  << std::endl;
 	if(req.location.__AllowedMethods.size() != 0)
 	{
 		bool accpetd =  false;
@@ -230,32 +214,22 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 		if(accpetd == false)
 			throw "405";
 	}
-	//std::cout << "route=== " << req.location.__Route << "root" << req.location.__Root << std::endl;
 	if (req.location.__Redirection[0].length() != 0)
 		throw req.location.__Redirection[0].c_str();
 
 	if (req.location.__Root.length() == 0)
 	{
 		req.location.__Root = "./default/";
-		// if (req.location.__Route.length() > 1)
-		// {
-		std::cout << "route is ====> " << req.location.__Route << std::endl;
 		req.path.replace(0, 0, req.location.__Root);
-		std::cout << "after replace ====> " << req.location.__Route << std::endl;
-		std::cout <<  "path befor replace  ==> "  << req.path <<  std::endl; 
 	}
 	else
 		req.path.replace(0, req.path.find(req.location.__Route) + req.location.__Route.length(), req.location.__Root);
-		// req.path.replace(0, req.location.__Route.length(), req.location.__Root);
-	std::cout << "path == > " <<  req.path << std::endl;
 	 if(req.method == "DELETE")
      {
-         std::cout << "start delete" << std::endl;
         delete_handling(req);
     }
 	if (is_dir_and_exist(req.path.c_str()) != 0)
 	{
-		std::cout << " path for dir " << req.path << std::endl;
 		if(req.path[req.path.length() - 1] != '/')
 		{
 			std::stringstream a;
@@ -263,15 +237,11 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			std::string tmp_port;
 			a >> tmp_port;
 			req.location.__Redirection[0] = "301";
-			std::cout << "lol ==> " << req.path << std::endl;
 			req.location.__Redirection[1] = req.path.erase(0, req.location.__Root.length()) + "/";
-			std::cout << "redoraction " << req.location.__Redirection[1] << std::endl;
 			throw "301";
 		}
-		// std::cout << "test  path ===> " << req.path  << std::endl;
 		bool tr = true;
 		int ret = 0;
-		std::cout << "default file ============= " << req.location.__DefaultFile  << std::endl;
 		if (req.location.__DefaultFile.length() != 0)
 		{
 			req.path.append(req.location.__DefaultFile);
@@ -294,7 +264,6 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			req.extension = ".html";
 			auto_index(req);
 		}
-		std::cout << "bool check is " <<  std::boolalpha << req.location.__DirList << " len ==> " << req.location.__DefaultFile.length() << std::endl;
 		if (req.location.__DirList == false && req.location.__DefaultFile.length() == 0)
 			throw "403";
 
@@ -364,7 +333,6 @@ void response::generate_response_header(const std::string &status, data &req)
 	}
 	else
 	{
-		std::cout << "ana hna " << std::endl;
 		goto_create_response_header:
 		this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n";
 		this->header_resp.append("Server: webserv\r\n");
@@ -373,14 +341,11 @@ void response::generate_response_header(const std::string &status, data &req)
 		std::string tmp;
 		if (exist == 0 && !S_ISDIR(fileStat.st_mode) && fileStat.st_mode & S_IRUSR)
 		{
-			// if(fileStat.mode && S_IWUSR)
-			// {
 			std::stringstream b;
 			unsigned long long a = fileStat.st_size;
 			b << a;
 			b >> tmp;
 			this->lenth = a;
-			std::cout << "tmp ===> " << tmp << std::endl;
 			this->header_resp.append("Content-Length: ");
 			this->header_resp.append(tmp);
 			this->header_resp.append("\r\n");
@@ -408,11 +373,9 @@ void response::generate_response_header(const std::string &status, data &req)
 
 void response::send_response(data &req)
 {
-	std::cout << header_resp << std::endl;
 	bool is_goto = false;
 	size_t len_write = 0;
 	char *buff_write = NULL;
-	// std::string append_test;append_test;
 	bool close_fd = false;
 	bool should_ret = false;
 	if(req.location.__Redirection[0].length() != 0)
@@ -420,12 +383,7 @@ void response::send_response(data &req)
 		len_write = strlen(header_resp.c_str());
 		buff_write = const_cast<char *>(header_resp.c_str());
 		goto goto_write;
-		// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-		// return ;
 	}
-	std::cout << " ========================================================= " << std::endl;
-	std::cout << "pcgi ====> " << req.root_cgi  << " len " <<  this->lenth  << std::endl;
-	std::cout << " ========================================================= " << std::endl;
 	if (req.root_cgi.length() == 0)
 	{
 		
@@ -433,8 +391,6 @@ void response::send_response(data &req)
 		buff_write = const_cast<char *>(header_resp.c_str());
 		should_ret = true;
 		goto goto_write;
-		// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-		// append_test;
 	}
 	if (this->lenth > 0)
 	{
@@ -449,18 +405,10 @@ void response::send_response(data &req)
 			buff_write = const_cast<char *>(header_resp.c_str());
 			len_write = strlen(header_resp.c_str());
 			goto goto_write;
-			// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-			// return;
 		}
-		std::cout << " ========================================================= " << std::endl;
-		std::cout << "path ====> " << req.path.c_str() << std::endl;
-		std::cout << " ========================================================= " << std::endl;
 		this->fd = open(req.path.c_str(), O_RDONLY);
 		if(fd < 0)
-		{
-			std::cout << "error in fd " << std::endl;
 			return;
-		}
 		char *buff = new char[this->lenth];
 		int re = read(this->fd, buff, this->lenth);
 		if(re == 0)
@@ -471,9 +419,6 @@ void response::send_response(data &req)
 		len_write = this->lenth;
 		close_fd = true;
 		goto goto_write;
-		// write(req.client_socket, buff, this->lenth);
-		// close(this->fd);
-		// delete[] buff;
 	}
 	if (is_goto)
 	{

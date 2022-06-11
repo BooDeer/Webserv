@@ -17,7 +17,6 @@ std::string generate_name_of_file(const std::string &gen)
 
 void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
 {
-    std::cout << "cgi    work" << std::endl;
     int pid = fork(); //
     if(pid < 0)
     {
@@ -65,7 +64,6 @@ void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
     }
     else
     {
-        // alarm(10);
         waitpid(pid, &status, 0);
         if(status == 500)
         {
@@ -116,7 +114,6 @@ void response::cgi_generate_response(data &req)
     int output = open(name.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0600);
     try
     {
-        std::cout << " start cgi" << std::endl;
         cgi_work(output, arg, req, *this);
         parse_cgi_output(*this, name);
     }
@@ -148,13 +145,6 @@ void response::cgi_generate_response(data &req)
     struct stat file_state;
     stat(output_file_name.c_str(), &file_state);
     this->lenth = file_state.st_size;
-    // 1.test cgi
-    // 2.parse cgi
-    // 3. test upload file
-    // 4.test problem for responce
-    //5. delete 
-    // 6.bonus
-    // this->header_resp.append("Server: webserv\r\n");
 }
 
 

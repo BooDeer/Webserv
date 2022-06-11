@@ -21,7 +21,6 @@ void first_line(std::string line, data &save)
         tmp.erase(0, d+1);
         save.path.erase(d, save.path.size() - d);
     }
-    std::cout << "path from parssing " << save.path << std::endl; 
     save.paramter =  tmp;
     std::string tmp2(save.path);
     size_t pt;

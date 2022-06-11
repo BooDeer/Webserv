@@ -33,7 +33,6 @@ int main(int ac, char **av)
 		parse(av[1], config);
 	else
 		parse((char*)"./Tests/config.fl", config);
-    std::cout << config.__Servers[0].__DefaultErrorpg.size() << std::endl;
 	install_servers(config);
 }
 
