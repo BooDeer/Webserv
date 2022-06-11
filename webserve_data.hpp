@@ -18,7 +18,7 @@ struct data
    // std::ofstream fd_file; // file stream
 	int	_fileFd;
     bool is_header; // check is header
-    //bool remove; // remove from header
+    bool remove; // remove from header
     std::string _fileName;
     int client_socket; // client id socket 
     int server_socket; //  server is socket
@@ -30,7 +30,7 @@ struct data
     std::string Cookie;
     std::string type;
     std::string referer;
-    int status_code;
+    std::string status_code;
     Locations  location;
     std::string root_cgi; // path of the cgi
     std::string paramter;
@@ -46,11 +46,11 @@ struct data
         // this->id  = 0;
         this->client_socket = 0;
         this->server_socket = 0;
-        this->status_code = 0;
+        // this->status_code = 0;
         this->lenth = 0;
         this->is_header = false;
         this->size_read_complet = 0;
-       // this->remove = false;
+       this->remove = false;
     }
     data& operator=(data &o)
     {
@@ -74,7 +74,7 @@ struct data
     {
         this->client_socket = 0;
         this->server_socket = 0;
-        this->status_code = 0;
+        // this->status_code = 0;
         is_header = false;
     }
     

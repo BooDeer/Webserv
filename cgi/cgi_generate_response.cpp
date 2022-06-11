@@ -68,7 +68,7 @@ void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
     }
     else
     {
-        alarm(10);
+        // alarm(10);
         if(waitpid(pid, &status, 0))
         {
             // if(test == 1)

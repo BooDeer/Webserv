@@ -80,7 +80,12 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     memset(chunk ,0 , CHUNK_SIZE);
     size_read = recv(s , chunk , CHUNK_SIZE - 1, 0);
     if(size_read < 0 )
-        exit(EXIT_FAILURE);
+        req[s].status_code = "500";
+    else if(size_read == 0)
+    {
+        req[s].remove = true;
+        return ;
+    }
 
     std::stringstream check(chunk);
     int headerLength = 0;
@@ -93,8 +98,9 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         // if(req[s].config_block.__Locations)
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
+            std::cout << "limit " << req[s].config_block.__ClientLimit << "lenth ==> " <<req[s].lenth  << std::endl;
             if(req[s].lenth > req[s].config_block.__ClientLimit)
-                throw "413";
+                req[s].status_code = "413";
         }
         tmp = std::string(chunk);
         headerLength = tmp.find("\r\n\r\n") + 4;
@@ -105,7 +111,11 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     if (req[s].is_header == true && req[s].method == "POST"  && (size_read  - headerLength > 0)) // if we recv chunk not in body of header
      {
         req[s].size_read_complet  -= size_read - headerLength;
-	    write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
+	    int ret = write(req[s]._fileFd, chunk + headerLength, (size_read - headerLength));
+        if(ret == 0)
+            ;
+        else if(ret == -1)
+            req[s].status_code = "500";
      }
     
    
@@ -193,30 +203,33 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     if(request_info.find(j) != request_info.end() && request_info[j].size_read_complet == 0) // if we complet Content-Length send responce 
                     {
                         response resp;
-                        try
+                        if(request_info[j].remove == false)
                         {
-                            check_metod(request_info[j]); // check method 
-                            check_url_path(request_info[j], request_info[j].config_block.__Locations);
-                            // generate body response and send it
-                            resp.generate_response_header("200", request_info[j]);
-                            resp.send_response(request_info[j], "200");
-                            
-                        }
-                        catch(char const* error)  
-                        {
-                            request_info[j].root_cgi.clear(); // for error in .php
-                            std::cout << "err " << error << std::endl;
-                            if(request_info[j].config_block.__DefaultErrorpg.size() == 0)
-					            request_info[j].extension = ".html"; 
-                            resp.generate_response_header(error, request_info[j]);
-                            resp.send_response(request_info[j], error);
+                            try
+                            {
+                                if(request_info[j].status_code.length() != 0)
+                                    throw request_info[j].status_code.c_str();
+                                check_metod(request_info[j]); // check method 
+                                check_url_path(request_info[j], request_info[j].config_block.__Locations);
+                                // generate body response and send it
+                                resp.generate_response_header("200", request_info[j]);
+                                resp.send_response(request_info[j], "200");
+                                
+                            }
+                            catch(char const* error)  
+                            {
+                                request_info[j].root_cgi.clear(); // for error in .php
+                                std::cout << "err " << error << std::endl;
+                                if(request_info[j].config_block.__DefaultErrorpg.size() == 0)
+                                    request_info[j].extension = ".html"; 
+                                resp.generate_response_header(error, request_info[j]);
+                                resp.send_response(request_info[j], error);
+                            }
                         }
                         FD_CLR(j, &socket_list[i]);
                         close(j);
                         close(request_info[j]._fileFd);
                         remove(request_info[j]._fileName.c_str());
-                        //remove(resp.output_file_name.c_str());
-
                         request_info.erase(j);
                     }
                 }

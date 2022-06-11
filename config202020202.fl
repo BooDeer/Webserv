@@ -4,9 +4,10 @@ server {
 #	"errorPages": 404 ./default/errorPage/404.html
 	"location": {
 		"route": /
-		"root": /goinfre/ssamadi/50_statis_web/
+#		"root": /goinfre/ssamadi/50_statis_web/
 		"default": index_default.html
 	}
+	"limitSize": 1
 
 	"location": {
 	"route": home/lol

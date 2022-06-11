@@ -398,20 +398,6 @@ void response::generate_response_header(const std::string &status, data &req)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void response::send_response(data &req, const std::string &status)
 {
 	std::cout << header_resp << std::endl;
@@ -441,6 +427,7 @@ void response::send_response(data &req, const std::string &status)
 	if (this->lenth > 0)
 	{
 		up_label:
+		should_ret = false;
 		if(this->lenth > 1147483647)
 		{
 			header_resp.clear();
@@ -459,7 +446,11 @@ void response::send_response(data &req, const std::string &status)
 			return;
 		}
 		char *buff = new char[this->lenth];
-		read(this->fd, buff, this->lenth);
+		int re = read(this->fd, buff, this->lenth);
+		if(re == 0)
+			;
+		else if(re == -1)
+			return ;
 		buff_write = buff;
 		len_write = this->lenth;
 		close_fd = true;
@@ -472,7 +463,11 @@ void response::send_response(data &req, const std::string &status)
 	if (is_goto)
 	{
 		goto_write:
-		write(req.client_socket, buff_write, len_write);
+		int check_write_re = write(req.client_socket, buff_write, len_write);
+		if(check_write_re == 0)
+			;
+		else if(check_write_re == -1)
+			close(this->fd);
 		if (close_fd)
 		{
 			close(this->fd);
