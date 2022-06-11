@@ -242,6 +242,10 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         close(j);
                         close(request_info[j]._fileFd);
                         remove(request_info[j]._fileName.c_str());
+                        if(resp.cgi_remove.length() != 0)
+                            remove(resp.cgi_remove.c_str());
+                        if(resp.output_file_name.length() != 0)
+                            remove(resp.output_file_name.c_str());
                         request_info.erase(j);
                     }
                 }
