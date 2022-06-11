@@ -167,3 +167,5 @@ void response::cgi_generate_response(data &req)
     // 6.bonus
     // this->header_resp.append("Server: webserv\r\n");
 }
+
+

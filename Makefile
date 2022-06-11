@@ -1,6 +1,6 @@
 CC 		= c++
 NAME 	= webserv
-FLAGS 	=  -g -fsanitize=address\
+FLAGS 	= # -g -fsanitize=address\
 		#-Wall -Wextra -Werror
 DFLAGS 	= -std=c++98 -Wall -Wextra -Werror -g \
 			-fsanitize=address

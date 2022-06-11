@@ -296,7 +296,11 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 		int ret = check_file(req.path);
 
 		if (ret == 404)
+		{
+				if( req.config_block.__DefaultErrorpg.size() == 0)
+					req.extension = ".html"; 
 			throw "404";
+		}
 		if (ret == 403)
 			throw "403";
 	}
@@ -392,26 +396,60 @@ void response::generate_response_header(const std::string &status, data &req)
 	data_base[this->status_code].generate_error(*this, req.config_block.__DefaultErrorpg, req);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void response::send_response(data &req, const std::string &status)
 {
 	std::cout << header_resp << std::endl;
+	bool is_goto = false;
+	size_t len_write = 0;
+	char *buff_write = NULL;
+	// std::string append_test;append_test;
+	bool close_fd = false;
+	bool should_ret = false;
 	if(req.location.__Redirection[0].length() != 0)
 	{
-		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-		return ;
+		len_write = strlen(header_resp.c_str());
+		buff_write = const_cast<char *>(header_resp.c_str());
+		goto goto_write;
+		// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
+		// return ;
 	}
 	if (req.root_cgi.length() == 0)
 	{
-		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
+		len_write = strlen(header_resp.c_str());
+		buff_write = const_cast<char *>(header_resp.c_str());
+		should_ret = true;
+		goto goto_write;
+		// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
+		// append_test;
 	}
 	if (this->lenth > 0)
 	{
+		up_label:
 		if(this->lenth > 1147483647)
 		{
 			header_resp.clear();
 			header_resp = "HTTP/1.1 507 Insufficient Storage\r\nContent-Type: text/plain\r\n\r\nWow, that's a big file. Can you store it somewhere else? We're pretty cramped here.";
-			write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-			return;
+		buff_write = const_cast<char *>(header_resp.c_str());
+		len_write = strlen(header_resp.c_str());
+		goto goto_write;
+			// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
+			// return;
 		}
 		std::cout << "path ====> " << req.path.c_str() << std::endl;
 		this->fd = open(req.path.c_str(), O_RDONLY);
@@ -422,8 +460,25 @@ void response::send_response(data &req, const std::string &status)
 		}
 		char *buff = new char[this->lenth];
 		read(this->fd, buff, this->lenth);
-		write(req.client_socket, buff, this->lenth);
-		close(this->fd);
-		delete[] buff;
+		buff_write = buff;
+		len_write = this->lenth;
+		close_fd = true;
+		goto goto_write;
+		// write(req.client_socket, buff, this->lenth);
+		// close(this->fd);
+		// delete[] buff;
+	}
+
+	if (is_goto)
+	{
+		goto_write:
+		write(req.client_socket, buff_write, len_write);
+		if (close_fd)
+		{
+			close(this->fd);
+			delete[] buff_write;
+		}
+		else if (should_ret)
+			goto up_label;
 	}
 }
