@@ -1,0 +1,22 @@
+server {
+	"port": 2070
+	"host": 127.0.0.1
+	"serverNames": www.example1.com
+	"location": {
+	"route": /
+	"autoindex": on
+	}
+}
+
+server {
+	"port": 2070
+	"host": 127.0.0.1
+	"serverNames": www.example2.com
+}
+
+server {
+	"port": 2070
+	"host": 127.0.0.1
+	"serverNames": www.example3.com
+}
+

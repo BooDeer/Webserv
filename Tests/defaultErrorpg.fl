@@ -1,0 +1,7 @@
+server {
+	"port": 2070
+	"host": 127.0.0.1
+	"serverNames": www.example2.com
+	"errorPages": 403 /index.html
+}
+
