@@ -5,7 +5,7 @@ server {
 	"location": {
 		"route": /
 #		"root": /goinfre/ssamadi/50_statis_web/
-		"default": index_default.html
+		"default": empty_file.txt
 	}
 	"limitSize": 1
 
@@ -29,6 +29,7 @@ server {
 	"location": {
 		"route_cgi": .php 
 		"root_cgi": /goinfre/ssamadi/.brew/bin/php-cgi
+#		"upload_cgi": /tmp/download/
 	}
 }
 

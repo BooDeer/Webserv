@@ -51,6 +51,7 @@ void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
         setenv("REQUEST_METHOD", req.method.c_str(),1);
         setenv("CONTENT_LENGTH", tmp.c_str(),1);
         setenv("QUERY_STRING", req.paramter.c_str(),1);
+        
         if(req.type.length() != 0)
         {
             setenv("CONTENT_TYPE", const_cast<char *>(req.type.c_str()), 1);
@@ -61,6 +62,11 @@ void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
             setenv("CONTENT_TYPE", "application/octet-stream", 1);
         if(req.Cookie.length() != 0)
             setenv("HTTP_COOKIE", const_cast<char *>(req.Cookie.c_str()) ,1);
+        if(req.cgiLocation.__UploadCGI.length() != 0) // upload location not found go to default
+             setenv("UPLOAD_LCOATION", req.cgiLocation.__UploadCGI.c_str(),1);
+        else
+             setenv("UPLOAD_LCOATION", "/tmp/",1);
+
         dup2(input, 0);
         dup2(fd_output_file, 1);
         if(execve(req.root_cgi.c_str(), (char**)args, environ) < 0)

@@ -18,7 +18,7 @@
 
 #define LOG(X)	std::cout << X << std::endl
 
-void	ft_split(std::string const& src, const char delimiter, std::vector<std::string> &dst)
+void	ft_split(const std::string& src, std::vector<std::string> &dst)
 {
 	std::istringstream iss(src);
 	
@@ -56,7 +56,7 @@ void	checkPort(std::vector<std::string> &line, ServerBlock &config, int ln, bool
 	if (line.size() != 2)
 		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
 
-	for (int i = 0; i < line[1].size(); i++)
+	for (size_t i = 0; i < line[1].size(); i++)
 		if (!(std::isdigit(line[1][i])))
 			exitMessage(1, "Error! positive numeric argument only, line: ", ln);
 	std::istringstream(line[1]) >> nb;
@@ -210,7 +210,7 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 	std::vector<std::string>	tmp;
 	Locations					location;
 
-	ft_split(line, ' ', tmp);
+	ft_split(line, tmp);
 	if (tmp.size() != 2 && tmp[1] != "{")
 		exitMessage(1, "missing '{' in line: ", ln);
 	else if (tmp.size() > 2)
@@ -223,10 +223,10 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 			exitMessage(1, "missing '}' after line: ", start);
 		else if (line[0] == '#')
 		{
-			ft_split(line, ' ', tmp);
+			ft_split(line, tmp);
 			continue ;
 		}
-		ft_split(line, ' ', tmp);
+		ft_split(line, tmp);
 		if (tmp.size() > 0 && tmp[0] == "\"route\":")
 			route(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"root_cgi\":")
@@ -271,7 +271,7 @@ void	serverBlock(std::ifstream &ifs, int &ln, ConfigFile &config)
 			exitMessage(1, "missing '}' after line: ", start);
 		else if (line[0] == '#')
 			continue ;
-		ft_split(line, ' ', tmp);
+		ft_split(line, tmp);
 		if (tmp.size() > 0 && tmp[0] == "\"port\":")
 			checkPort(tmp, server, ln, true);
 		else if (tmp.size() > 0 && tmp[0] == "\"limitSize\":")
@@ -296,9 +296,9 @@ void	serverBlock(std::ifstream &ifs, int &ln, ConfigFile &config)
 
 void  filter_servers(ConfigFile& config)
 {
-	for(int i = 0; i < config.__Servers.size(); i++)
+	for(size_t i = 0; i < config.__Servers.size(); i++)
 	{
-		for (int j = 0; j < config.__Servers.size(); j++)
+		for (size_t j = 0; j < config.__Servers.size(); j++)
 		{
 			if (j != i)
 			{

@@ -69,7 +69,7 @@ void findServerBlock(data& req, ConfigFile& conf) // serverBlock, data struct, h
 
 
 
-void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int , data> &req, ConfigFile& conf)// s ==> client socket
+void receive_basic(int s, int fd_socket,  std::map<int , data> &req, ConfigFile& conf)// s ==> client socket
 {
     char chunk[CHUNK_SIZE];
 	int size_read;
@@ -80,7 +80,11 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
     memset(chunk ,0 , CHUNK_SIZE);
     size_read = recv(s , chunk , CHUNK_SIZE - 1, 0);
     if(size_read < 0 )
+    {
         req[s].status_code = "500";
+         req[s].remove = true;
+        return;
+    }
     else if(size_read == 0)
     {
         req[s].remove = true;
@@ -96,11 +100,13 @@ void receive_basic(int s, fd_set &current_sockets, int fd_socket,  std::map<int 
         parsing_header(check, req[s]);
         findServerBlock(req[s], conf);
         // if(req[s].config_block.__Locations)
+        std::cout << "limite 9bel" << req[s].config_block.__ClientLimit << std::endl;
         if(req[s].config_block.__ClientLimit != 0) // if __ClientLimit equel 0 do nothing
         {
             std::cout << "limit " << req[s].config_block.__ClientLimit << "lenth ==> " <<req[s].lenth  << std::endl;
             if(req[s].lenth > req[s].config_block.__ClientLimit)
                 req[s].status_code = "413";
+            return;
         }
         tmp = std::string(chunk);
         headerLength = tmp.find("\r\n\r\n") + 4;
@@ -177,7 +183,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
             write_check =  read_check;
             if(select(FD_SETSIZE, &read_check, &write_check, NULL, &tm) < 0)
 				exitMessage(1, "select problem");
-            for(size_t j = 0; j < FD_SETSIZE; j++)
+            for(int j = 0; j < FD_SETSIZE; j++)
             {
                 if(FD_ISSET(j, &read_check))
                 {
@@ -195,7 +201,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     }
                     else if(request_info.find(j) != request_info.end())
                     {
-                        receive_basic(j, socket_list[i], fd_savior[i], request_info, conf);
+                        receive_basic(j, fd_savior[i], request_info, conf);
                     }
                 }
                 if(FD_ISSET(j, &write_check))
@@ -213,7 +219,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                                 check_url_path(request_info[j], request_info[j].config_block.__Locations);
                                 // generate body response and send it
                                 resp.generate_response_header("200", request_info[j]);
-                                resp.send_response(request_info[j], "200");
+                                resp.send_response(request_info[j]);
                                 
                             }
                             catch(char const* error)  
@@ -223,7 +229,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                                 if(request_info[j].config_block.__DefaultErrorpg.size() == 0)
                                     request_info[j].extension = ".html"; 
                                 resp.generate_response_header(error, request_info[j]);
-                                resp.send_response(request_info[j], error);
+                                resp.send_response(request_info[j]);
                             }
                         }
                         FD_CLR(j, &socket_list[i]);
@@ -243,7 +249,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
 void filterByServer(ConfigFile &conf, std::map<std::pair<std::string, unsigned short>, std::string>&unq)
 {
 
-    for(int i = 0; i < conf.__Servers.size(); i++)
+    for(size_t i = 0; i < conf.__Servers.size(); i++)
     {
         std::pair<std::string, unsigned short> tmp_pair(conf.__Servers[i].__Host, conf.__Servers[i].__Port);
         if (conf.__Servers[i].__ServerNames.size())

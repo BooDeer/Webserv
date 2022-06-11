@@ -79,8 +79,8 @@ void auto_index(data &req)
 	DIR *dir;
 
 	dir = opendir(req.path.c_str());
-	if (dir == NULL)
-		throw "403";
+	// if (dir == NULL)
+	// 	throw "403";
 
 	struct dirent *entry;
 
@@ -133,6 +133,9 @@ void auto_index(data &req)
 }
 int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
+	(void)sb;
+	(void)typeflag;
+	(void)ftwbuf;
 	struct stat fileStat;
 	stat(fpath, &fileStat);
 
@@ -205,6 +208,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 				}
 				else if (req.extension == (*it).__RouteCGI)
 				{
+					req.cgiLocation = (*it);
 					req.root_cgi = (*it).__RootCGI;
 				}
 			}
@@ -398,7 +402,7 @@ void response::generate_response_header(const std::string &status, data &req)
 
 
 
-void response::send_response(data &req, const std::string &status)
+void response::send_response(data &req)
 {
 	std::cout << header_resp << std::endl;
 	bool is_goto = false;

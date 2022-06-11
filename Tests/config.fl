@@ -1,19 +1,21 @@
 server {
 	"port": 2071
 	"host": 127.0.0.1
-	
+	"serverNames": www.example.com
+	"limitSize": 1
 	"location": {
 		"route": /
 #		"root": /tmp/www/
 		"default": empty_file.txt
 #		"autoindex": on
+		"redirection": 302 https://github.com/
 	}
 }
 
 server {
 	"port": 2072
 	"host": 127.0.0.1
-	
+	"serverNames": test2.com
 	"location": {
 		"route": /
 		"default": empty_file.txt

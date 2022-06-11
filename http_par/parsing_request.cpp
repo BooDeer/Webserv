@@ -23,7 +23,7 @@ void first_line(std::string line, data &save)
     }
     save.paramter =  tmp;
     std::string tmp2(save.path);
-    size_t pt, qstmark;
+    size_t pt;
     if ((pt = tmp2.find(".")) != std::string::npos)
     {
         tmp2 = tmp2.substr(pt, tmp2.size() - pt);
@@ -40,7 +40,7 @@ void parsing_header(std::stringstream &fs, data &d)
         if (lines.find("Host:") != std::string::npos)
         {
             d.host = lines.erase(0, strlen("Host: "));
-            int test;
+            size_t test;
             if ((test = d.host.find(":")) != std::string::npos)
             {
                  std::stringstream ss; 

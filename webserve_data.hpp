@@ -32,6 +32,7 @@ struct data
     std::string referer;
     std::string status_code;
     Locations  location;
+    Locations  cgiLocation;
     std::string root_cgi; // path of the cgi
     std::string paramter;
     std::string extension;
@@ -140,7 +141,7 @@ class response
 
     public:
         void generate_response_header(const std::string &status, data &req);
-        void send_response(data &req, const std::string &status);
+        void send_response(data &req);
         void cgi_generate_response(data &req);
         void redirection_header_generate(data &req);
 
