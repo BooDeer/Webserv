@@ -117,7 +117,7 @@ class errors
         this->you_can_genrate = err.you_can_genrate;
         return *this;
     }
-    void generate_error(response &resp, std::map<std::string, std::string> &error);// generate reponce
+    void generate_error(response &resp, std::map<std::string, std::string> &error, data &req);// generate reponce
     ~errors()
     {
 
@@ -164,6 +164,7 @@ class response
         // 5xx
         data_base.insert(std::pair<std::string, errors>("500", errors("Internal Server Error", "500")));
         data_base.insert(std::pair<std::string, errors>("507", errors("Insufficient Storage", "507")));
+        data_base.insert(std::pair<std::string, errors>("504", errors("Gateway Timeout", "504")));
 
 
 
@@ -179,8 +180,9 @@ class response
         Common_types.insert(std::pair<std::string, std::string>(".bz", "application/x-bzip"));
         Common_types.insert(std::pair<std::string, std::string>(".bz2", "application/x-bzip2"));
         Common_types.insert(std::pair<std::string, std::string>(".cda", "application/x-cdf"));
-        Common_types.insert(std::pair<std::string, std::string>(".csh", "text/css"));
+        Common_types.insert(std::pair<std::string, std::string>(".csh", "application/x-csh"));
         Common_types.insert(std::pair<std::string, std::string>(".csv", "text/csv"));
+        Common_types.insert(std::pair<std::string, std::string>(".css", "text/css"));
         Common_types.insert(std::pair<std::string, std::string>(".doc", "application/msword"));
         Common_types.insert(std::pair<std::string, std::string>(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
         Common_types.insert(std::pair<std::string, std::string>(".eot", "application/vnd.ms-fontobject"));

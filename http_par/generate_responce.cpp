@@ -30,15 +30,26 @@ int check_file(std::string &file_name)
 	return 0;
 }
 
-void errors::generate_error(response &resp, std::map<std::string, std::string> &error)
+void errors::generate_error(response &resp, std::map<std::string, std::string> &error, data &req)
 {
 	bool is_exist = false;
 	struct stat path_stat;
-	int exist = stat(error[resp.status_code].c_str(), &path_stat);
+	std::cout << "=========================================================" << std::endl;
+	std::cout << "Size of error map: " << error.size() << std::endl;
+	// std::cout << " error " <<  resp.status_code << std::endl;
+	// std::cout << "file error " << error[resp.status_code] << std::endl;
+  	int exist = stat(error[resp.status_code].c_str(), &path_stat);
+	std::cout << "exit ==> " << exist <<  "file name " << error[resp.status_code] << std::endl;
 	if (exist == 0)
 	{
-		if (path_stat.st_mode & S_IFREG)
+		if (path_stat.st_mode & S_IRUSR)
+		{
+			req.path = error[resp.status_code];
+			resp.lenth=  path_stat.st_size;
 			is_exist = true;
+			this->you_can_genrate = false;
+		}
+		
 	}
 	if (this->you_can_genrate == true)
 	{
@@ -82,10 +93,7 @@ void auto_index(data &req)
 			std::string tmp(entry->d_name);
 			std::string name_search = req.path + "/" + tmp;
 			if (stat(name_search.c_str(), &st) < 0)
-			{
-				perror("stat: "); //TODO: Forbidden errno usage.
-				exit(1);
-			}
+				throw "500";
 			if (S_ISDIR(st.st_mode))
 			{
 				tmp.append("/");
@@ -266,7 +274,11 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			if (ret == 0)
 				tr = false;
 			if (ret == 404 && req.location.__DirList == false)
+			{
+				if( req.config_block.__DefaultErrorpg.size() == 0)
+					req.extension = ".html"; 
 				throw "404";
+			}
 			else if (ret == 403)
 				throw "403";
 		}
@@ -340,19 +352,23 @@ void response::generate_response_header(const std::string &status, data &req)
 	}
 	else
 	{
+		std::cout << "ana hna " << std::endl;
 		goto_create_response_header:
 		this->header_resp = "HTTP/1.1 " + status_code + " " + reason_phrase + "\r\n";
 		this->header_resp.append("Server: webserv\r\n");
 		struct stat fileStat;
 		int exist = stat(req.path.c_str(), &fileStat);
 		std::string tmp;
-		if (exist == 0 && !S_ISDIR(fileStat.st_mode))
+		if (exist == 0 && !S_ISDIR(fileStat.st_mode) && fileStat.st_mode & S_IRUSR)
 		{
+			// if(fileStat.mode && S_IWUSR)
+			// {
 			std::stringstream b;
 			unsigned long long a = fileStat.st_size;
 			b << a;
 			b >> tmp;
 			this->lenth = a;
+			std::cout << "tmp ===> " << tmp << std::endl;
 			this->header_resp.append("Content-Length: ");
 			this->header_resp.append(tmp);
 			this->header_resp.append("\r\n");
@@ -373,7 +389,7 @@ void response::generate_response_header(const std::string &status, data &req)
 		this->header_resp.append("Connection: Keep-Alive\r\n");
 		this->header_resp.append("\r\n");
 	}
-	data_base[this->status_code].generate_error(*this, req.config_block.__DefaultErrorpg);
+	data_base[this->status_code].generate_error(*this, req.config_block.__DefaultErrorpg, req);
 }
 
 void response::send_response(data &req, const std::string &status)
@@ -382,7 +398,6 @@ void response::send_response(data &req, const std::string &status)
 	if(req.location.__Redirection[0].length() != 0)
 	{
 		write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
-
 		return ;
 	}
 	if (req.root_cgi.length() == 0)
@@ -391,13 +406,14 @@ void response::send_response(data &req, const std::string &status)
 	}
 	if (this->lenth > 0)
 	{
-		if(this->lenth > 2147483647)
+		if(this->lenth > 1147483647)
 		{
 			header_resp.clear();
 			header_resp = "HTTP/1.1 507 Insufficient Storage\r\nContent-Type: text/plain\r\n\r\nWow, that's a big file. Can you store it somewhere else? We're pretty cramped here.";
 			write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 			return;
 		}
+		std::cout << "path ====> " << req.path.c_str() << std::endl;
 		this->fd = open(req.path.c_str(), O_RDONLY);
 		if(fd < 0)
 		{

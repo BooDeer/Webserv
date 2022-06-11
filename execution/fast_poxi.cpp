@@ -118,7 +118,11 @@ void check_metod(data &d)
     for(size_t i = 0; save[i] != '\0'; i++)
     {
         if(islower(save[i]))
+        {
+            if( d.config_block.__DefaultErrorpg.size() == 0)
+					d.extension = ".html"; 
             throw "400";
+        }
     }
     // GET POST DELETE
     if(d.method.length() != 0)
@@ -126,7 +130,11 @@ void check_metod(data &d)
         if(d.method != "GET" && d.method != "POST" && d.method != "DELETE")
         {
             std::cout << "fucl ==> " << d.method << std::endl;
-            throw "405";
+            {
+                if(d.config_block.__DefaultErrorpg.size() == 0)
+					d.extension = ".html"; 
+                throw "405";
+            }
         }
     }
 }
@@ -167,7 +175,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     if (j == fd_savior[i] && request_info.size() < FD_SETSIZE)
                     {
                         client_socket = accept(fd_savior[i], NULL, NULL);
-                       // fcntl(client_socket, F_SETFL, O_NONBLOCK);
+                       fcntl(client_socket, F_SETFL, O_NONBLOCK);
                         if (client_socket < 0 )
 							exitMessage(1, "accept error");
                         tmp.create_file(fd_savior[i], client_socket);
@@ -198,6 +206,8 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                         {
                             request_info[j].root_cgi.clear(); // for error in .php
                             std::cout << "err " << error << std::endl;
+                            if(request_info[j].config_block.__DefaultErrorpg.size() == 0)
+					            request_info[j].extension = ".html"; 
                             resp.generate_response_header(error, request_info[j]);
                             resp.send_response(request_info[j], error);
                         }

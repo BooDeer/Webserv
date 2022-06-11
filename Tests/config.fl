@@ -3,9 +3,10 @@ server {
 	"host": 127.0.0.1
 	
 	"location": {
-		"route": home
+		"route": /
 #		"root": /tmp/www/
-	"default": empty_file.txt
+		"default": empty_file.txt
+#		"autoindex": on
 	}
 }
 
