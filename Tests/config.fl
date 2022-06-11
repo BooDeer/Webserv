@@ -21,6 +21,7 @@ server {
 	"location": {
 		"route_cgi": .php
 		"root_cgi": /goinfre/ssamadi/.brew/bin/php-cgi
+		"upload_cgi": asdassd
 	}
 }
 

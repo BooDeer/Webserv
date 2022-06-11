@@ -6,7 +6,7 @@
 /*   By: hboudhir <hboudhir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 22:27:26 by hboudhir          #+#    #+#             */
-/*   Updated: 2022/06/09 01:51:00 by hboudhir         ###   ########.fr       */
+/*   Updated: 2022/06/11 04:52:15 by hboudhir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,6 +188,12 @@ void	route_cgi(std::vector<std::string>& line, Locations& location, int ln)
 		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
 	location.__RouteCGI = line[1];
 }
+void	cgiUploadPath(std::vector<std::string>& line, Locations& location, int ln)
+{
+	if (line.size() != 2)
+		exitMessage(1, "Error! Wrong number of arguments in line: ", ln);
+	location.__UploadCGI = line[1];
+}
 
 void	checkLocation(Locations &location)
 {
@@ -237,6 +243,8 @@ void	locationBlock(std::ifstream &ifs, std::string line, int &ln, ServerBlock& c
 			directoryListing(tmp, location, ln);
 		else if (tmp.size() > 0 && tmp[0] == "\"default\":")
 			defaultFile(tmp, location, ln);
+		else if (tmp.size() > 0 && tmp[0] == "\"upload_cgi\":")
+			cgiUploadPath(tmp, location, ln);
 		else if ( tmp.size() > 0  && tmp[0] != "}")
 			exitMessage(1, "Unknown directive line: ", ln);
 		else if (tmp.size() == 1 && tmp[0] == "}")

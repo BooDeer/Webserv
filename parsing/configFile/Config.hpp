@@ -13,6 +13,7 @@ class Locations
 		std::string					__Redirection[2];
 		std::string					__Root;
 		std::string					__RootCGI;
+		std::string					__UploadCGI;
 		bool						__DirList;
 		std::string					__DefaultFile;
 		//? ◦ Execute CGI based on certain file extension (for example .php).
