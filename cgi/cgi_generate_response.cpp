@@ -17,6 +17,7 @@ std::string generate_name_of_file(const std::string &gen)
 
 void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
 {
+    std::cout << "cgi    work" << std::endl;
     int pid = fork(); //
     if(pid < 0)
     {
@@ -34,7 +35,6 @@ void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
 	    b << req.lenth;
 	    std::string tmp;
 	    b >> tmp;
-        //signal(SIGALRM, timer_handler);
         setenv("GATEWAY_INTERFACE", "CGI/1.1",1);
         setenv("SERVER_PROTOCOL", "HTTP/1.1",1);
         setenv("REDIRECT_STATUS", "200",1);
@@ -92,7 +92,6 @@ void parse_cgi_output(response &resp, std::string &name_of_file)
         }
         sum += line.length() + 1;
     }
-
     struct stat file_state;
     stat(name_of_file.c_str(), &file_state);
     resp.lenth = file_state.st_size - sum;

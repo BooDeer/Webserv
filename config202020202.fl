@@ -2,7 +2,7 @@ server {
     "port": 2070
     "host": 127.0.0.1
     "serverNames": www.example2.com
-    "limitSize": 1
+    "limitSize": 10
 }
 
 server {
@@ -42,6 +42,11 @@ server {
 		"route_cgi": .php 
 		"root_cgi": /goinfre/ssamadi/.brew/bin/php-cgi
 #		"upload_cgi": /tmp/download/
+	}
+		"location": {
+		"route_cgi": .pl 
+		"root_cgi": /usr/bin/perl
+
 	}
 }
 

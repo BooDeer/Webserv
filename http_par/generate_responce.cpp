@@ -204,7 +204,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 				if ((finalString + tmp) == (*it).__Route)
 				{
 					req.location = (*it);
-					// break;
+					break;
 				}
 				std::cout << "ex ===> " <<  req.extension << std::endl;
 				if (req.extension == (*it).__RouteCGI)
@@ -423,8 +423,12 @@ void response::send_response(data &req)
 		// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 		// return ;
 	}
+	std::cout << " ========================================================= " << std::endl;
+	std::cout << "pcgi ====> " << req.root_cgi  << " len " <<  this->lenth  << std::endl;
+	std::cout << " ========================================================= " << std::endl;
 	if (req.root_cgi.length() == 0)
 	{
+		
 		len_write = strlen(header_resp.c_str());
 		buff_write = const_cast<char *>(header_resp.c_str());
 		should_ret = true;
@@ -436,7 +440,8 @@ void response::send_response(data &req)
 	{
 		up_label:
 		should_ret = false;
-		bzero(buff_write, strlen(buff_write));
+		if(buff_write != NULL)
+			bzero(buff_write, strlen(buff_write));
 		if(this->lenth > 1147483647)
 		{
 			header_resp.clear();
@@ -447,7 +452,9 @@ void response::send_response(data &req)
 			// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 			// return;
 		}
+		std::cout << " ========================================================= " << std::endl;
 		std::cout << "path ====> " << req.path.c_str() << std::endl;
+		std::cout << " ========================================================= " << std::endl;
 		this->fd = open(req.path.c_str(), O_RDONLY);
 		if(fd < 0)
 		{
