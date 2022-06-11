@@ -184,7 +184,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 	std::istringstream to_split(req.path);
 	std::string tmp;
 	std::string finalString;
-
+	std::cout << "path form req   " << req.path << std::endl;
 	std::vector<Locations>::iterator itB = conf.begin();
 	for (; itB != conf.end(); itB++)
 	{
@@ -204,18 +204,20 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 				if ((finalString + tmp) == (*it).__Route)
 				{
 					req.location = (*it);
-					break;
+					// break;
 				}
-				else if (req.extension == (*it).__RouteCGI)
+				std::cout << "ex ===> " <<  req.extension << std::endl;
+				if (req.extension == (*it).__RouteCGI)
 				{
 					req.cgiLocation = (*it);
-					req.root_cgi = (*it).__RootCGI;
+					std::cout << "root cgi from conf    " <<(*it).__RootCGI  << std::endl;
+					req.root_cgi = std::string((*it).__RootCGI);
 				}
 			}
 			finalString.append(tmp + "/");
 		}
 	}
-	std::cout << "Current used location is: " << req.location.__Root << std::endl;
+	std::cout << "Current used location is: " << req.location.__Root   << " root cgi  check is " << req.root_cgi  << std::endl;
 	if(req.location.__AllowedMethods.size() != 0)
 	{
 		bool accpetd =  false;
@@ -253,6 +255,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
     }
 	if (is_dir_and_exist(req.path.c_str()) != 0)
 	{
+		std::cout << " path for dir " << req.path << std::endl;
 		if(req.path[req.path.length() - 1] != '/')
 		{
 			std::stringstream a;
@@ -265,10 +268,10 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			std::cout << "redoraction " << req.location.__Redirection[1] << std::endl;
 			throw "301";
 		}
-		std::cout << "test  path ===> " << req.path  << std::endl;
+		// std::cout << "test  path ===> " << req.path  << std::endl;
 		bool tr = true;
 		int ret = 0;
-		std::cout << "default ============= " << req.location.__DefaultFile  << std::endl;
+		std::cout << "default file ============= " << req.location.__DefaultFile  << std::endl;
 		if (req.location.__DefaultFile.length() != 0)
 		{
 			req.path.append(req.location.__DefaultFile);
@@ -291,6 +294,7 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 			req.extension = ".html";
 			auto_index(req);
 		}
+		std::cout << "bool check is " <<  std::boolalpha << req.location.__DirList << " len ==> " << req.location.__DefaultFile.length() << std::endl;
 		if (req.location.__DirList == false && req.location.__DefaultFile.length() == 0)
 			throw "403";
 
@@ -301,8 +305,8 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 
 		if (ret == 404)
 		{
-				if( req.config_block.__DefaultErrorpg.size() == 0)
-					req.extension = ".html"; 
+			if( req.config_block.__DefaultErrorpg.size() == 0)
+				req.extension = ".html"; 
 			throw "404";
 		}
 		if (ret == 403)
@@ -328,7 +332,7 @@ void response::redirection_header_generate(data &req)
 	}
 	else
 	{
-		 this->reason_phrase.clear();
+		this->reason_phrase.clear();
 		this->header_resp = "HTTP/1.1 " + status_code + " " + this->reason_phrase +"\r\n";
 		this->header_resp.append("Server: webserv\r\n");
 		this->header_resp.append("Content-Type: application/octet-stream");
@@ -455,6 +459,7 @@ void response::send_response(data &req)
 			;
 		else if(re == -1)
 			return ;
+		
 		buff_write = buff;
 		len_write = this->lenth;
 		close_fd = true;

@@ -134,6 +134,7 @@ void response::cgi_generate_response(data &req)
     int output = open(name.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0600);
     try
     {
+        std::cout << " start cgi" << std::endl;
         cgi_work(output, arg, req, *this);
         parse_cgi_output(*this, name);
     }

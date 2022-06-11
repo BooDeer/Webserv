@@ -76,7 +76,8 @@ struct data
         this->client_socket = 0;
         this->server_socket = 0;
         // this->status_code = 0;
-        is_header = false;
+        this->is_header = false;
+        this->remove = false;
     }
     
 };

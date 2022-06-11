@@ -82,7 +82,7 @@ void receive_basic(int s, int fd_socket,  std::map<int , data> &req, ConfigFile&
     if(size_read < 0 )
     {
         req[s].status_code = "500";
-         req[s].remove = true;
+        req[s].remove = true;
         return;
     }
     else if(size_read == 0)
@@ -93,10 +93,12 @@ void receive_basic(int s, int fd_socket,  std::map<int , data> &req, ConfigFile&
 
     std::stringstream check(chunk);
     int headerLength = 0;
+   // std::cout << "is header " << std::boolalpha << req[s].is_header << chunk <<  std::endl;
     if(req[s].is_header ==  false) // parsing the header.
     {
         std::getline(check, tmp);
-        first_line(tmp, req[s]);
+       // std::cout << "firs line ===>  " << tmp << std::endl;
+         first_line(tmp, req[s]);
         parsing_header(check, req[s]);
         findServerBlock(req[s], conf);
         // if(req[s].config_block.__Locations)
@@ -170,6 +172,8 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
     struct timeval tm;
     fd_set read_check;
     fd_set  write_check;
+    FD_ZERO(&write_check);
+    FD_ZERO(&read_check);
     int client_socket;
     std::map<int , data> request_info; // std::map<client_socket, data struct(contains headers ect)>
    
@@ -180,7 +184,7 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
         for(size_t i = 0; i <  servers; i++)
         {
             read_check = socket_list[i];
-            write_check =  read_check;
+            FD_ZERO(&write_check);
             if(select(FD_SETSIZE, &read_check, &write_check, NULL, &tm) < 0)
 				exitMessage(1, "select problem");
             for(int j = 0; j < FD_SETSIZE; j++)
@@ -201,7 +205,9 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     }
                     else if(request_info.find(j) != request_info.end())
                     {
+                      //  std::cout << "start pars      " <<  std::endl;
                         receive_basic(j, fd_savior[i], request_info, conf);
+                        write_check =  read_check; // 
                     }
                 }
                 if(FD_ISSET(j, &write_check))
@@ -240,8 +246,6 @@ void start_server(int *fd_savior, fd_set *socket_list, size_t servers, ConfigFil
                     }
                 }
             }
-          
-
         }
     }
 }
