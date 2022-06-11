@@ -436,13 +436,14 @@ void response::send_response(data &req)
 	{
 		up_label:
 		should_ret = false;
+		bzero(buff_write, strlen(buff_write));
 		if(this->lenth > 1147483647)
 		{
 			header_resp.clear();
 			header_resp = "HTTP/1.1 507 Insufficient Storage\r\nContent-Type: text/plain\r\n\r\nWow, that's a big file. Can you store it somewhere else? We're pretty cramped here.";
-		buff_write = const_cast<char *>(header_resp.c_str());
-		len_write = strlen(header_resp.c_str());
-		goto goto_write;
+			buff_write = const_cast<char *>(header_resp.c_str());
+			len_write = strlen(header_resp.c_str());
+			goto goto_write;
 			// write(req.client_socket, header_resp.c_str(), strlen(header_resp.c_str()));
 			// return;
 		}
@@ -459,7 +460,6 @@ void response::send_response(data &req)
 			;
 		else if(re == -1)
 			return ;
-		
 		buff_write = buff;
 		len_write = this->lenth;
 		close_fd = true;
@@ -468,7 +468,6 @@ void response::send_response(data &req)
 		// close(this->fd);
 		// delete[] buff;
 	}
-
 	if (is_goto)
 	{
 		goto_write:

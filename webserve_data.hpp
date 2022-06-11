@@ -134,6 +134,8 @@ class response
         std::string reason_phrase;
         std::map<std::string, errors> data_base;
         std::map<std::string, std::string> Common_types;
+        std::string cgi_remove;
+        // std::string file_send_remove;
         int fd; //  for file want to send
         unsigned long long lenth;
         std::string output_file_name;

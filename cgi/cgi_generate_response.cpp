@@ -14,15 +14,7 @@ std::string generate_name_of_file(const std::string &gen)
     std::string name  = "/tmp/" + gen + tmp + ".txt";
     return name;
 }
-int killpro  = 0;
-int test = 0;
-// void  timer_handler(int time)
-// { 
-//     std::cout << "timout " << std::endl;
-//     kill(killpro, SIGKILL);
-//     // throw "504";
-//     test = 1;
-// }
+
 void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
 {
     int pid = fork(); //
@@ -34,7 +26,6 @@ void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
     }
     int status;
     int input;
-    killpro = pid;
     
     input = open(req._fileName.c_str(), O_RDONLY, 0777);
     if (pid == 0)
@@ -75,16 +66,7 @@ void cgi_work(int fd_output_file, const char **args, data &req, response &resp)
     else
     {
         // alarm(10);
-        if(waitpid(pid, &status, 0))
-        {
-            // if(test == 1)
-            //     std::cout << "lol" << std::endl;
-            // std::cout << "status ==> " << status << std::endl;
-            //  printf(" WIFEXITED: %d\n",  WIFEXITED(status));
-            // printf(" WEXITSTATUS: %d\n",  WEXITSTATUS(status));
-            // printf("(%ld) Done from parent\n", time(0));
-        }
-
+        waitpid(pid, &status, 0);
         if(status == 500)
         {
             	if( req.config_block.__DefaultErrorpg.size() == 0)
@@ -130,6 +112,7 @@ void response::cgi_generate_response(data &req)
         return ;
     }
     std::string name = generate_name_of_file("cgi_output");
+    this->cgi_remove =  name;
     const char *arg[3] = {const_cast<char *>(req.root_cgi.c_str()), const_cast<char *>(req.path.c_str()), NULL};
     int output = open(name.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0600);
     try
@@ -151,7 +134,7 @@ void response::cgi_generate_response(data &req)
 
         fs << header_resp;
         header_resp.clear();
-         std::stringstream b;
+        std::stringstream b;
         b << this->lenth;
         std::string tmp;
         b >> tmp;
