@@ -1,4 +1,11 @@
 server {
+    "port": 2070
+    "host": 127.0.0.1
+    "serverNames": www.example2.com
+    "limitSize": 1
+}
+
+server {
 	"port": 2071
 	"host": 127.0.0.1
 #	"errorPages": 404 ./default/errorPage/404.html
@@ -27,6 +34,11 @@ server {
 #		"root": /tmp/www/html
 	}
 	"location": {
+		"route_cgi": .php 
+		"root_cgi": /goinfre/ssamadi/.brew/bin/php-cgi
+#		"upload_cgi": /tmp/download/
+	}
+		"location": {
 		"route_cgi": .php 
 		"root_cgi": /goinfre/ssamadi/.brew/bin/php-cgi
 #		"upload_cgi": /tmp/download/
