@@ -11,16 +11,16 @@ server {
 #	"errorPages": 404 ./default/errorPage/404.html
 	"location": {
 		"route": /
-#		"root": /goinfre/ssamadi/50_statis_web/
+		"root": /goinfre/ssamadi/50_statis_web/
 		"default": empty_file.txt
 	}
 	"limitSize": 1
 
 	"location": {
 	"route": home/lol
-#	"autoindex": on
+	"autoindex": on
 	"root": /Users/ssamadi/Desktop/Webserv/default/files/
-	"default": f1.txt
+#	"default": f1.txt
 }
 
 }

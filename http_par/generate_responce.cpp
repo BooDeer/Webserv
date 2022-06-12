@@ -216,15 +216,14 @@ void check_url_path(data &req, std::vector<Locations> &conf)
 	}
 	if (req.location.__Redirection[0].length() != 0)
 		throw req.location.__Redirection[0].c_str();
-
 	if (req.location.__Root.length() == 0)
 	{
 		req.location.__Root = "./default/";
-		req.path.replace(0, 0, req.location.__Root);
+		req.path.replace(0, req.path.find(req.location.__Route) + req.location.__Route.length(), req.location.__Root);
 	}
 	else
 		req.path.replace(0, req.path.find(req.location.__Route) + req.location.__Route.length(), req.location.__Root);
-	 if(req.method == "DELETE")
+	if(req.method == "DELETE")
      {
         delete_handling(req);
     }
@@ -414,7 +413,10 @@ void response::send_response(data &req)
 		if(re == 0)
 			;
 		else if(re == -1)
+		{
+			delete[] buff;
 			return ;
+		}
 		buff_write = buff;
 		len_write = this->lenth;
 		close_fd = true;

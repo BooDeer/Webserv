@@ -1,6 +1,6 @@
 CC 		= c++
 NAME 	= webserv
-FLAGS 	= -Wall -Wextra -Werror -g 
+FLAGS 	= -Wall -Wextra -Werror 
 DFLAGS 	= -std=c++98 -Wall -Wextra -Werror -g \
 			-fsanitize=address
 HEADER	= parsing/parsing.hpp parsing/configFile/Config.hpp
